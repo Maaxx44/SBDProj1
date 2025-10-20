@@ -131,7 +131,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core.cpp" />
+    <ClCompile Include="data_manager.cpp" />
+    <ClCompile Include="file.cpp" />
+    <ClCompile Include="merger.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
+    <ClCompile Include="ui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core.h" />
+    <ClInclude Include="data_manager.h" />
+    <ClInclude Include="file.h" />
+    <ClInclude Include="merger.h" />
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
