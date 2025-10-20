@@ -133,7 +133,7 @@
   <ItemGroup>
     <ClCompile Include="core.cpp" />
     <ClCompile Include="data_manager.cpp" />
-    <ClCompile Include="file.cpp" />
+    <ClCompile Include="fileTape.cpp" />
     <ClCompile Include="merger.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
     <ClCompile Include="ui.cpp" />
@@ -141,7 +141,7 @@
   <ItemGroup>
     <ClInclude Include="core.h" />
     <ClInclude Include="data_manager.h" />
-    <ClInclude Include="file.h" />
+    <ClInclude Include="fileTape.h" />
     <ClInclude Include="merger.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>

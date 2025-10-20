@@ -1,7 +1,11 @@
 #pragma once
-#include "file.h"
+#include "fileTape.h"
 
-class merger
-{
+class merger {
+private:
+
+public:
+	merger();
+	~merger();
 };
 

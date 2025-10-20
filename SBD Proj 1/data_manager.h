@@ -1,8 +1,16 @@
 #pragma once
 #include "merger.h"
-#include "file.h"
+#include "fileTape.h"
 
-class data_manager
-{
+#include <vector>
+
+class data_manager {
+private:
+	std::vector<fileTape> storedFiles;
+	merger fileMerger;
+
+public:
+	data_manager();
+	~data_manager();
 };
 

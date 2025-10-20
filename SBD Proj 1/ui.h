@@ -1,5 +1,9 @@
 #pragma once
-class ui
-{
+class ui {
+private:
+
+public:
+	ui();
+	~ui();
 };
 
