@@ -1,5 +1,4 @@
 #include "dataBlock.h"
-#include <string>
 
 dataBlock::dataBlock() {
 	for (int i = 0; i < BLOCK_SIZE; i++) {

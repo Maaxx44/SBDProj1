@@ -145,7 +145,7 @@
     <ClInclude Include="dataBlock.h" />
     <ClInclude Include="data_manager.h" />
     <ClInclude Include="fileTape.h" />
-    <ClInclude Include="globalData.hpp" />
+    <ClInclude Include="globalData.cpp" />
     <ClInclude Include="merger.h" />
     <ClInclude Include="record.h" />
     <ClInclude Include="ui.h" />

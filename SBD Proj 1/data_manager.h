@@ -1,8 +1,8 @@
 #pragma once
+#include <vector>
+
 #include "merger.h"
 #include "fileTape.h"
-
-#include <vector>
 
 class data_manager {
 private:

@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "dataBlock.h"
-
 #include <vector>
 #include <fstream>
+
+#include "dataBlock.h"
 
 class fileTape {
 private:

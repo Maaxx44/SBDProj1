@@ -1,6 +1,7 @@
 #pragma once
+#include <string>
+
 #include "record.h"
-#include "globalData.hpp"
 
 struct dataBlock {
 private:

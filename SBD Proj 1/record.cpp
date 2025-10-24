@@ -1,11 +1,6 @@
-#ifndef _USE_MATH_DEFINES
-	#define _USE_MATH_DEFINES
-#endif
 
 #include "record.h"
-#include "globalData.hpp"
-#include <random>
-#include <cmath>
+
 
 // private members
 void record::recalculateArea() {
