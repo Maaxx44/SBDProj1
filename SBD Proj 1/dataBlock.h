@@ -10,6 +10,8 @@ public:
 	dataBlock();
 	dataBlock(record blockRecords[BLOCK_SIZE]);
 
+	record& getRecord(unsigned int position);
+
 	dataBlock static getRandomDataBlock();
 };
 
