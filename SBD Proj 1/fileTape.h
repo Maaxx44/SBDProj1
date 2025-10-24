@@ -2,6 +2,7 @@
 #include "dataBlock.h"
 
 #include <vector>
+#include <fstream>
 
 class fileTape {
 private:
@@ -9,12 +10,10 @@ private:
 
 public:
 	fileTape();
-	~fileTape();
+	fileTape(std::vector<dataBlock> dataFile);
 
-
-	fileTape static getFileTapeFromDisk(std::string filePath);
-	fileTape static getRandomFileTape(unsigned int numberOfRecords);
-	fileTape static getRandomFileTape();
+	fileTape static getFileTapeFromDisk(FILE filePath);
+	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0);
 
 };
 

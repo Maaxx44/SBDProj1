@@ -12,6 +12,6 @@ public:
 
 	record& getRecord(unsigned int position);
 
-	dataBlock static getRandomDataBlock();
+	dataBlock static getRandomDataBlock(unsigned int numberOfRandomRecords = BLOCK_SIZE);
 };
 
