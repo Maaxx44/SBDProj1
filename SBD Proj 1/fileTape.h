@@ -1,7 +1,4 @@
 ﻿#pragma once
-#include <vector>
-#include <fstream>
-
 #include "common.h"
 #include "dataBlock.h"
 
@@ -17,7 +14,20 @@ public:
 	record getRecord(unsigned int recordIndex);
 	void setRecord(unsigned int recordIndex, record newRecord);
 
-	fileTape static getFileTapeFromDisk(FILE filePath) {
+	fileTape static getFileTapeFromDisk(std::ifstream* filePath) {
+		if (filePath == nullptr || !filePath->is_open()) throw std::runtime_error("getFileTapeFromDisk error: filePath was NULL");
+		
+		
+		filePath->seekg(0);
+		std::vector<dataBlock> dataFile;
+		unsigned int dataLength = 0;
+
+		for (std::string fileLine; std::getline(*filePath, fileLine);) {
+			// TODO: Parse lines, extract values, create blocks and recodrs and insert them into dataFile
+		}
+
+
+
 		// TODO
 	}
 	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0) {

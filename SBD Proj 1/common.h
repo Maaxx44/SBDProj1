@@ -4,6 +4,9 @@
 #endif
 #include <random>
 #include <cmath>
+#include <vector>
+#include <fstream>
+#include <string>
 
 #define BLOCK_SIZE 16
 
