@@ -1,11 +1,5 @@
 #pragma once
-#ifndef _USE_MATH_DEFINES
-	#define _USE_MATH_DEFINES
-#endif
-#include <random>
-#include <cmath>
-
-#include "globalData.cpp"
+#include "common.h"
 
 struct record {
 private:
@@ -26,6 +20,11 @@ public:
 	double getRadius() const;
 	double getArea() const;
 
-	record static getRandomRecord();
+	record static getRandomRecord() {
+		double randomAngle = randomAngleMin + ((rand() % 100) / (randomAngleMax - randomAngleMin));
+		double randomRadius = randomRadiusMin + ((rand() % 100) / (randomRadiusMax - randomRadiusMin));
+
+		return record(randomAngle, randomRadius);
+	}
 };
 

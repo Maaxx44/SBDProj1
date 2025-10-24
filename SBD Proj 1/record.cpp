@@ -1,6 +1,4 @@
-
 #include "record.h"
-
 
 // private members
 void record::recalculateArea() {
@@ -27,7 +25,3 @@ void record::setRadius(double newRadius) {
 double record::getAngle() const { return this->angle; }
 double record::getRadius() const { return this->radius; }
 double record::getArea() const { return this->area; }
-
-record static getRandomRecord() {
-	return record(angleRandDistr(randomEngine), radiusRandDistr(randomEngine)); // i hope this works
-}

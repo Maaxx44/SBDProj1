@@ -1,17 +1,14 @@
 #include <iostream>
-#include "globalData.cpp"
-#include "core.h"
+#include "common.h"
 
-void createExternGlobalVariables() {
-	std::uniform_real_distribution<double> radiusRandDistr(randomRadiusMin, randomRadiusMax);
-	std::uniform_real_distribution<double> angleRandDistr(randomAngleMin, randomAngleMax);
-	std::uniform_int_distribution<unsigned int> recordsRandDistr(randomRecordsMin, randomRecordsMax);
-	std::default_random_engine randomEngine;
-}
+#include "core.h"
+#include "fileTape.h"
 
 int main() {
-	createExternGlobalVariables();
-	core core();
+	srand(time(0));
 
+	// DEBUG - REMOVE LATER
+	fileTape testTape = fileTape::getRandomFileTape();
+ 
 	return 0;
 }

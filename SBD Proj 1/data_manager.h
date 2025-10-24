@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include "common.h"
 #include "merger.h"
 #include "fileTape.h"
 

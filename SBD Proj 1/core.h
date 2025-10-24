@@ -1,4 +1,5 @@
 #pragma once
+#include "common.h"
 #include "data_manager.h"
 #include "ui.h"
 

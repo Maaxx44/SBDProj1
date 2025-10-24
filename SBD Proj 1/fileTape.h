@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 
+#include "common.h"
 #include "dataBlock.h"
 
 class fileTape {
@@ -12,8 +13,28 @@ public:
 	fileTape();
 	fileTape(std::vector<dataBlock> dataFile);
 
-	fileTape static getFileTapeFromDisk(FILE filePath);
-	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0);
 
+
+	fileTape static getFileTapeFromDisk(FILE filePath) {
+		// TODO
+	}
+	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0) {
+		if (numberOfRecords == 0) numberOfRecords = randomRecordsMin + (rand() / (randomRecordsMax - randomRecordsMin)); // if default parameter or parameter set to 0 - get random number in range
+
+		unsigned int numberOfBlocks = ceil((double)numberOfRecords / (double)BLOCK_SIZE);
+		unsigned int numberOfLastBlockRecords = numberOfRecords - (numberOfBlocks - 1) * BLOCK_SIZE;
+
+		// Creating and populating random data blocks
+		std::vector<dataBlock> dataFile;
+		dataFile.resize(numberOfBlocks);
+
+		for (int i = 0; i < numberOfBlocks - 1; i++) {
+			dataFile[i] = dataBlock::getRandomDataBlock();
+		}
+		dataFile[numberOfBlocks - 1] = dataBlock::getRandomDataBlock(numberOfLastBlockRecords);
+
+		//returning new fileTape created with random blocks
+		return fileTape(dataFile);
+	}
 };
 

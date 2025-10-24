@@ -141,11 +141,11 @@
     <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="common.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dataBlock.h" />
     <ClInclude Include="data_manager.h" />
     <ClInclude Include="fileTape.h" />
-    <ClInclude Include="globalData.cpp" />
     <ClInclude Include="merger.h" />
     <ClInclude Include="record.h" />
     <ClInclude Include="ui.h" />
