@@ -12,7 +12,8 @@ public:
 	dataBlock();
 	dataBlock(record blockRecords[BLOCK_SIZE]);
 
-	record& getRecord(unsigned int position);
+	record getRecord(unsigned int position);
+	void setRecord(unsigned int position, record newRecord);
 
 	dataBlock static getRandomDataBlock(unsigned int numberOfRandomRecords = BLOCK_SIZE) {
 		if (numberOfRandomRecords > BLOCK_SIZE) throw std::runtime_error("getRandomDataBlock error: numberOfRandomRecords(" + std::to_string(numberOfRandomRecords) + ") out of range(" + std::to_string(BLOCK_SIZE) + ")");

@@ -8,12 +8,14 @@
 class fileTape {
 private:
 	std::vector<dataBlock> dataFile;
+	unsigned int dataLength;
 
 public:
 	fileTape();
-	fileTape(std::vector<dataBlock> dataFile);
+	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
-
+	record getRecord(unsigned int recordIndex);
+	void setRecord(unsigned int recordIndex, record newRecord);
 
 	fileTape static getFileTapeFromDisk(FILE filePath) {
 		// TODO
