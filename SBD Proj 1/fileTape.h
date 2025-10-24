@@ -36,7 +36,7 @@ public:
 		dataFile[numberOfBlocks - 1] = dataBlock::getRandomDataBlock(numberOfLastBlockRecords);
 
 		//returning new fileTape created with random blocks
-		return fileTape(dataFile);
+		return fileTape(dataFile, numberOfRecords);
 	}
 };
 
