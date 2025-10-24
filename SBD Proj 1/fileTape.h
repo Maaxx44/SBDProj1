@@ -1,12 +1,20 @@
 ﻿#pragma once
+#include "dataBlock.h"
+
+#include <vector>
+
 class fileTape {
 private:
+	std::vector<dataBlock> dataFile;
 
 public:
 	fileTape();
 	~fileTape();
 
-	//fileTape& operator=(unsigned int dummyData); // TODO - CHANGE DATA TYPE
-	//fileTape& operator[](size_t index); // nie da się tak łatow i 'legalnie' tego zrobić :-(
+
+	fileTape static getFileTapeFromDisk(std::string filePath);
+	fileTape static getRandomFileTape(unsigned int numberOfRecords);
+	fileTape static getRandomFileTape();
+
 };
 

@@ -132,17 +132,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="dataBlock.cpp" />
     <ClCompile Include="data_manager.cpp" />
     <ClCompile Include="fileTape.cpp" />
     <ClCompile Include="merger.cpp" />
+    <ClCompile Include="record.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
     <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h" />
+    <ClInclude Include="dataBlock.h" />
     <ClInclude Include="data_manager.h" />
     <ClInclude Include="fileTape.h" />
+    <ClInclude Include="globalData.hpp" />
     <ClInclude Include="merger.h" />
+    <ClInclude Include="record.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
