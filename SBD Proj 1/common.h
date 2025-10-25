@@ -7,6 +7,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #define BLOCK_SIZE 16
 

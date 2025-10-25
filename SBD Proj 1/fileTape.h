@@ -20,15 +20,49 @@ public:
 		
 		filePath->seekg(0);
 		std::vector<dataBlock> dataFile;
-		unsigned int dataLength = 0;
+		record			tempBlock[BLOCK_SIZE];
+		unsigned int	totalDataLength = 0,
+						recordIndex = 0;
+		double			tempAngle = 0.0,
+						tempRadius = 0.0;
+		char			c = ' ';
 
 		for (std::string fileLine; std::getline(*filePath, fileLine);) {
-			// TODO: Parse lines, extract values, create blocks and recodrs and insert them into dataFile
+			std::stringstream ss(fileLine);
+
+			while (!ss.eof()) {
+				while (c != '[' && !ss.eof()) { ss >> c; }	// seeking [ bracket
+				if (ss.eof()) continue;							// Skip this line
+				ss >> tempRadius;							// parse first number
+				if (ss.eof()) continue;							// Skip this line
+				while (c != ';' && !ss.eof()) { ss >> c; }	// seeking ;
+				if (ss.eof()) continue;							// Skip this line
+				ss >> tempAngle;							// parse second number
+				if (ss.eof()) continue;							// Skip this line
+				while (c != ']' && !ss.eof()) { ss >> c; }	// seeking ] bracket
+				if (ss.eof()) continue;							// Skip this line
+
+				// numbers parsed successfully
+				tempBlock[recordIndex] = record(tempAngle, tempRadius);
+				totalDataLength++;
+				recordIndex++;
+
+				// if we reached the end of a block - add it to file and clear tempBlock
+				if (recordIndex >= BLOCK_SIZE) {
+					dataFile.push_back(dataBlock(tempBlock));
+					for (int i = 0; i < 16; i++) tempBlock[i] = record(); //clean temp block
+
+					recordIndex = 0;
+				}
+			}
 		}
 
+		// Add incomplete blocks at the end
+		if (recordIndex != 0) {
+			dataFile.push_back(dataBlock(tempBlock));
+		}
 
-
-		// TODO
+		return fileTape(dataFile, totalDataLength);
 	}
 	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0) {
 		if (numberOfRecords == 0) numberOfRecords = randomRecordsMin + (rand() / (randomRecordsMax - randomRecordsMin)); // if default parameter or parameter set to 0 - get random number in range
