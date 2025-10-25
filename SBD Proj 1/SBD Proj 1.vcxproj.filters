@@ -30,9 +30,6 @@
     <ClCompile Include="fileTape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="merger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="record.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileTape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="merger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="record.h">
