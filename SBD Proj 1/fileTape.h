@@ -7,12 +7,16 @@ private:
 	std::vector<dataBlock> dataFile;
 	unsigned int dataLength;
 
+	unsigned int getBlockOffset(unsigned int recordIndex) const;
+	unsigned int getOffsetIndex(unsigned int recordIndex) const;
+
 public:
 	fileTape();
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
 	record getRecord(unsigned int recordIndex);
 	void setRecord(unsigned int recordIndex, record newRecord);
+	void addRecord(record newRecord);
 
 	fileTape static getFileTapeFromDisk(std::ifstream* filePath) {
 		if (filePath == nullptr || !filePath->is_open()) throw std::runtime_error("getFileTapeFromDisk error: filePath was NULL");
