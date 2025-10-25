@@ -50,7 +50,7 @@ public:
 				// if we reached the end of a block - add it to file and clear tempBlock
 				if (recordIndex >= BLOCK_SIZE) {
 					dataFile.push_back(dataBlock(tempBlock));
-					for (int i = 0; i < 16; i++) tempBlock[i] = record(); //clean temp block
+					for (unsigned int i = 0; i < BLOCK_SIZE; i++) tempBlock[i] = record(); //clean temp block
 
 					recordIndex = 0;
 				}
@@ -67,14 +67,14 @@ public:
 	fileTape static getRandomFileTape(unsigned int numberOfRecords = 0) {
 		if (numberOfRecords == 0) numberOfRecords = randomRecordsMin + (rand() / (randomRecordsMax - randomRecordsMin)); // if default parameter or parameter set to 0 - get random number in range
 
-		unsigned int numberOfBlocks = ceil((double)numberOfRecords / (double)BLOCK_SIZE);
+		unsigned int numberOfBlocks = (unsigned int)ceil((double)numberOfRecords / (double)BLOCK_SIZE);
 		unsigned int numberOfLastBlockRecords = numberOfRecords - (numberOfBlocks - 1) * BLOCK_SIZE;
 
 		// Creating and populating random data blocks
 		std::vector<dataBlock> dataFile;
 		dataFile.resize(numberOfBlocks);
 
-		for (int i = 0; i < numberOfBlocks - 1; i++) {
+		for (unsigned int i = 0; i < numberOfBlocks - 1; i++) {
 			dataFile[i] = dataBlock::getRandomDataBlock();
 		}
 		dataFile[numberOfBlocks - 1] = dataBlock::getRandomDataBlock(numberOfLastBlockRecords);

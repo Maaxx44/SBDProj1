@@ -5,7 +5,7 @@
 #include "fileTape.h"
 
 int main() {
-	srand(time(0));
+	srand((unsigned int)time(0));
 
 	// DEBUG - REMOVE LATER
 	fileTape testTape = fileTape::getRandomFileTape();
