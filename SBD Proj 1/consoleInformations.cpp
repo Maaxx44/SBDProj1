@@ -1,7 +1,5 @@
  #include "consoleInformations.h"
 
-//HWND cHandle;
-//CONSOLE_CURSOR_INFO* cCursorInfo;
 //CONSOLE_FONT_INFO* cFontInfo;
 //CONSOLE_SCREEN_BUFFER_INFO* cScreenBufferInfo;
 //CONSOLE_SCREEN_BUFFER_INFOEX* cScreenBufferInfoEx;
@@ -28,24 +26,15 @@ void consoleInformations::getConsoleHWND() {
 	// Restoring old name
 	if (!SetConsoleTitleW(windowTitle)) throw std::runtime_error("getConsoleHWND error: SetConsoleTitleW function for old name failed with code: " + std::to_string(GetLastError()));
 }
-void consoleInformations::initData() {
+void consoleInformations::getData() {
 	getConsoleHWND();
-
+	 
 	// TODO
-
-
-
 }
 
 
 consoleInformations::consoleInformations() {
-	initData();
-}
-consoleInformations::~consoleInformations() {
-	if (this->cCursorInfo != nullptr) delete this->cCursorInfo;
-	if (this->cFontInfo != nullptr) delete this->cFontInfo;
-	if (this->cScreenBufferInfo != nullptr) delete this->cScreenBufferInfo;
-	if (this->cScreenBufferInfoEx != nullptr) delete this->cScreenBufferInfoEx;
+	getData();
 }
 
 void consoleInformations::refreshAllConsoleInformations() {
@@ -53,7 +42,7 @@ void consoleInformations::refreshAllConsoleInformations() {
 }
 void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	// converting string to char array (yay windows...)
-	unsigned int titleLength = newConsoleTitle.length();
+	unsigned int titleLength = (unsigned int)newConsoleTitle.length();
 	char* cTitle = new char[titleLength + 1];
 
 	for (unsigned int i = 0; i < titleLength; i++) {
