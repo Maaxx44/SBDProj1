@@ -1,11 +1,11 @@
 #pragma once
 #include "common.h"
-#include "data_manager.h"
+#include "dataManager.h"
 #include "ui.h"
 
 class core {
 private:
-	data_manager currentDataManager;
+	dataManager currentDataManager;
 	ui userInterface;
 
 public:

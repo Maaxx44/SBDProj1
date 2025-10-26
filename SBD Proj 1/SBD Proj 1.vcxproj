@@ -131,21 +131,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="consoleInformations.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="dataBlock.cpp" />
-    <ClCompile Include="data_manager.cpp" />
+    <ClCompile Include="dataManager.cpp" />
     <ClCompile Include="fileTape.cpp" />
     <ClCompile Include="record.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
+    <ClCompile Include="tapeSorter.cpp" />
     <ClCompile Include="ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
+    <ClInclude Include="consoleInformations.h" />
     <ClInclude Include="core.h" />
     <ClInclude Include="dataBlock.h" />
-    <ClInclude Include="data_manager.h" />
+    <ClInclude Include="dataManager.h" />
     <ClInclude Include="fileTape.h" />
     <ClInclude Include="record.h" />
+    <ClInclude Include="tapeSorter.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

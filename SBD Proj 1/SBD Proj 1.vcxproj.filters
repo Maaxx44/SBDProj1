@@ -24,7 +24,7 @@
     <ClCompile Include="dataBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="data_manager.cpp">
+    <ClCompile Include="dataManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fileTape.cpp">
@@ -36,6 +36,12 @@
     <ClCompile Include="ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tapeSorter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="consoleInformations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -44,7 +50,7 @@
     <ClInclude Include="dataBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="data_manager.h">
+    <ClInclude Include="dataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fileTape.h">
@@ -57,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tapeSorter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="consoleInformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

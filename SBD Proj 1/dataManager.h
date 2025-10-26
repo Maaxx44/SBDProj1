@@ -1,13 +1,14 @@
 #pragma once
 #include "common.h"
+#include "tapeSorter.h"
 #include "fileTape.h"
 
-class data_manager {
+class dataManager {
 private:
 	std::vector<fileTape> storedFiles;
 
 public:
-	data_manager();
-	~data_manager();
+	dataManager();
+	~dataManager();
 };
 
