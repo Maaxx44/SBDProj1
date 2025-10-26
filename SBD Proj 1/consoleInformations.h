@@ -13,6 +13,5 @@ public:
 
 	void refreshAllConsoleInformations();
 	void setConsoleTitle(std::string newConsoleTitle);
-
 };
 typedef consoleInformations cInfo;

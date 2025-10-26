@@ -1,9 +1,11 @@
  #include "consoleInformations.h"
 
 consoleInformations::consoleInformations() {
+	// getting handle
 	this->cHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (this->cHandle == NULL) ErrorHandler("Failed to get output hande!");
 
+	// getting console informations
 	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
 	this->cScreenBufferInfoEx.cbSize = sizeof(cScreenBufferInfoEx);
 	if (!GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
