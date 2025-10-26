@@ -1,14 +1,11 @@
-#include <iostream>
 #include "common.h"
-
 #include "core.h"
-#include "fileTape.h"
 
 int main() {
 	srand((unsigned int)time(0));
+	core core;
 
-	// DEBUG - REMOVE LATER
-	fileTape testTape = fileTape::getRandomFileTape();
+
  
 	return 0;
 }
