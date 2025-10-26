@@ -5,17 +5,9 @@
 #include <Windows.h>
 
 struct consoleInformations {
-private:
-	void getData();
-
 public:
-	HWND cHandle;
-
-	CONSOLE_SCREEN_BUFFER_INFO cScreenBufferInfo;
+	HANDLE cHandle;
 	CONSOLE_SCREEN_BUFFER_INFOEX cScreenBufferInfoEx;
-
-
-
 
 	consoleInformations();
 

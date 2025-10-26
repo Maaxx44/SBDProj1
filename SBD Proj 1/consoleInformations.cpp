@@ -1,24 +1,20 @@
  #include "consoleInformations.h"
 
-//CONSOLE_SCREEN_BUFFER_INFO* cScreenBufferInfo;
-//CONSOLE_SCREEN_BUFFER_INFOEX* cScreenBufferInfoEx;
-
-void consoleInformations::getData() {
-	this->cHandle = GetConsoleWindow();
-	if (this->cHandle == NULL) ErrorHandler("Failed to get console window handle!");
-
-
-	 
-	// TODO
-}
-
-
 consoleInformations::consoleInformations() {
-	getData();
+	this->cHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (this->cHandle == NULL) ErrorHandler("Failed to get output hande!");
+
+	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
+	this->cScreenBufferInfoEx.cbSize = sizeof(cScreenBufferInfoEx);
+	if (!GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
+		ErrorHandler("Failed to get extended screen buffer info!");
 }
 
 void consoleInformations::refreshAllConsoleInformations() {
-	// TODO
+	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
+	this->cScreenBufferInfoEx.cbSize = sizeof(cScreenBufferInfoEx);
+	if (!GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
+		ErrorHandler("Failed to get extended screen buffer info!");
 }
 void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	// converting string to char array (yay windows...)
@@ -30,5 +26,6 @@ void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	}
 	cTitle[titleLength] = '\0';
 
-	if (!SetConsoleTitleA(cTitle)) ErrorHandler("Failed to set console window title!");
+	if (!SetConsoleTitleA(cTitle))
+		ErrorHandler("Failed to set console window title!");
 }
