@@ -6,14 +6,11 @@
 
 struct consoleInformations {
 private:
-	void getConsoleHWND();
-
 	void getData();
 
 public:
 	HWND cHandle;
 
-	CONSOLE_FONT_INFO cFontInfo;
 	CONSOLE_SCREEN_BUFFER_INFO cScreenBufferInfo;
 	CONSOLE_SCREEN_BUFFER_INFOEX cScreenBufferInfoEx;
 
