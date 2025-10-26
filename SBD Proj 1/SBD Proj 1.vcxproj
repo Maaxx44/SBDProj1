@@ -140,6 +140,7 @@
     <ClCompile Include="SBD Proj 1.cpp" />
     <ClCompile Include="tapeSorter.cpp" />
     <ClCompile Include="ui.cpp" />
+    <ClCompile Include="winErrorHandlers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="record.h" />
     <ClInclude Include="tapeSorter.h" />
     <ClInclude Include="ui.h" />
+    <ClInclude Include="winErrorHandlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
