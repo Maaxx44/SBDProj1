@@ -14,7 +14,7 @@ void consoleInformations::getConsoleHWND() {
 
 	// Creating and setting a new, unique window title, based on proc ID and time
 	wchar_t newWindowTitle[TITLE_BUFFER_SIZE];
-	wsprintf(newWindowTitle, L"%d/%d", GetTickCount(), GetCurrentProcessId());
+	wsprintf(newWindowTitle, L"%d/%d", GetTickCount64 (), GetCurrentProcessId());
 	if(!SetConsoleTitleW(newWindowTitle)) throw std::runtime_error("getConsoleHWND error: SetConsoleTitleW function for new name failed with code: " + std::to_string(GetLastError()));
 
 	Sleep(50); // I hate every single line of code that I wrote here, but as it turns out it is the recommended way by Microsoft (why goddamit?) https://learn.microsoft.com/en-us/troubleshoot/windows-server/performance/obtain-console-window-handle
