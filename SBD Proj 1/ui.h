@@ -10,6 +10,12 @@ private:
 	void changeColor(WORD colorParameters);
 	void resetColor();
 
+	void createTable(std::vector<std::string> titleLines, std::vector<std::string> contentLines) {
+
+	}
+
+
+
 	void writeBorders();
 	void writeData();
 
