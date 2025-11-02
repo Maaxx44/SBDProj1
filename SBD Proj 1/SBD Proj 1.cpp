@@ -1,10 +1,13 @@
 #include "common.h"
 #include "core.h"
 
-int main() {
+void initProgram() {
 	srand((unsigned int)time(0));
-	core core;
+}
 
+int main() {
+	initProgram(); 
+	core core;
 
  
 	return 0;

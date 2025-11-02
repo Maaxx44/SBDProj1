@@ -2,7 +2,7 @@
 
 
 // constructors
-record::record(double angle = 0.0, double radius = 0.0) : angle(angle), radius(radius) {}
+record::record(double angle, double radius) : angle(angle), radius(radius) {}
 
 //public members
 void record::setAngle(double newAngle) { this->angle = newAngle; }
