@@ -10,6 +10,7 @@ public:
 	CONSOLE_SCREEN_BUFFER_INFOEX cScreenBufferInfoEx;
 
 	consoleInformations();
+	~consoleInformations();
 
 	void refreshAllConsoleInformations();
 	void setConsoleTitle(std::string newConsoleTitle);

@@ -10,6 +10,9 @@ private:
 	void changeColor();
 	void resetColor();
 
+	void writeBorders();
+	void writeData();
+
 public:
 	ui();
 	~ui();

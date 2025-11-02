@@ -36,3 +36,6 @@ void fileTape::addRecord(record newRecord) {
 		this->dataLength++;
 	}
 }
+unsigned int fileTape::getSize() const {
+	return this->dataLength;
+}

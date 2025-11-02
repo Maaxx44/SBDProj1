@@ -11,8 +11,14 @@ consoleInformations::consoleInformations() {
 	if (this->cHandle != NULL && !GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
 		ErrorHandler("Failed to get extended screen buffer info!");
 }
+consoleInformations::~consoleInformations() {
+	// Setting font to oryginal
+	if(this->cHandle != NULL && !SetConsoleTextAttribute(this->cHandle, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY))
+		ErrorHandler("Failed to set console font attributes!");
+}
 
 void consoleInformations::refreshAllConsoleInformations() {
+	if (this->cHandle == NULL) throw std::runtime_error("setConsoleBuffer error: cHandle was NULL!");
 	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
 	this->cScreenBufferInfoEx.cbSize = sizeof(cScreenBufferInfoEx);
 	if (!GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
