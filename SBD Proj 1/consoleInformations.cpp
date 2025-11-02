@@ -8,7 +8,7 @@ consoleInformations::consoleInformations() {
 	// getting console informations
 	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
 	this->cScreenBufferInfoEx.cbSize = sizeof(cScreenBufferInfoEx);
-	if (!GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
+	if (this->cHandle != NULL && !GetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
 		ErrorHandler("Failed to get extended screen buffer info!");
 }
 

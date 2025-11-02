@@ -5,20 +5,17 @@ struct record {
 private:
 	double angle;
 	double radius;
-	double area; // precalculating area to optimize further calculations
-
-	void recalculateArea();
 
 public:
-	record();
-	record(double angle, double radius);
+	record(double angle = 0.0, double radius = 0.0);
 
 	void setAngle(double newAngle);
 	void setRadius(double newRadius);
 
 	double getAngle() const;
 	double getRadius() const;
-	double getArea() const;
+
+	double calculateArea() const;
 
 	record static getRandomRecord() {
 		double randomAngle = randomAngleMin + ((rand() % 100) / (randomAngleMax - randomAngleMin));
