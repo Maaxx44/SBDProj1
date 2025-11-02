@@ -7,7 +7,7 @@ private:
 	cInfo cInfo;
 	
 	void initConsole();
-	void changeColor();
+	void changeColor(WORD colorParameters);
 	void resetColor();
 
 	void writeBorders();

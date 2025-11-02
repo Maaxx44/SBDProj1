@@ -37,3 +37,18 @@ void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	if (!SetConsoleTitleA(cTitle))
 		ErrorHandler("Failed to set console window title!");
 }
+void consoleInformations::setConsoleSize(unsigned int X, unsigned int Y) {
+	if (this->cHandle == NULL) throw std::runtime_error("setConsoleSize error: cHandle was NULL!");
+
+	this->refreshAllConsoleInformations();
+	this->cScreenBufferInfoEx.dwSize.X = X + 1;
+	this->cScreenBufferInfoEx.dwSize.Y = Y + 1;
+	this->cScreenBufferInfoEx.srWindow.Right = X;
+	this->cScreenBufferInfoEx.srWindow.Bottom = Y;
+	
+	if (!SetConsoleScreenBufferInfoEx(this->cHandle, &this->cScreenBufferInfoEx))
+		ErrorHandler("Failed to set extended screen buffer info!");
+
+	if(!SetConsoleWindowInfo(this->cHandle, TRUE, &this->cScreenBufferInfoEx.srWindow))
+		ErrorHandler("Failed to set console window info!");
+}
