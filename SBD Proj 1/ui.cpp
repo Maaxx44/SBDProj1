@@ -32,11 +32,25 @@ ui::ui() {
 	*/
 
 
-	this->cInfo.setConsoleSize(150, 40);
-	for (int j = 0; j <= 36; j++) {
-		for (int i = 0; i <= 150; i++) {
-			printf("*");
-		}
-	}
+	//this->cInfo.setConsoleSize(150, 40);
+	//for (int j = 0; j <= 36; j++) {
+	//	for (int i = 0; i <= 150; i++) {
+	//		printf("*");
+	//	}
+	//}
+
+	uiTable testTable = uiTable({ .X = 1, .Y = 1, .W = 6, .H = 5 }, "TitleTitleTitle", { "File 11", "File 21", "File 31" });
+	std::vector<std::string> testFiles = testTable.getContent();
+
+	std::cout << testTable.getTitle() << std::endl;
+	for (unsigned int i = 0; i < testFiles.size(); i++)
+		std::cout << testFiles[i] << std::endl;
+
+	testTable.setPositionToText();
+	testFiles = testTable.getContent();
+
+	std::cout << testTable.getTitle() << std::endl;
+	for (unsigned int i = 0; i < testFiles.size(); i++)
+		std::cout << testFiles[i] << std::endl;
 }
 ui::~ui() {}
