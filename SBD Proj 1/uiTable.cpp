@@ -2,7 +2,7 @@
 
 std::string uiTable::cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const {
 	if (str.size() < length) {
-		str.append(std::string(length - str.size(), ' ')); // TODO - check if length is correct
+		str.append(std::string(length - str.size(), ' '));
 		return str;
 	}
 	if(str.size() == length)
@@ -64,20 +64,36 @@ std::vector<std::string> uiTable::getFullContent() const {
 }
 std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
 	std::vector<std::string> fullContent = this->getFullContent();
-	unsigned int contentHeight = this->getContentHeight();
 
-	// Adding empty lines to centent
-	if (fullContent.size() < contentHeight) {
-		for (unsigned int i = 0; i < contentHeight - fullContent.size(); i++)
-			fullContent.push_back(std::string(this->position.W, ' '));
+	// 1. Scrolling lines
+	unsigned int realScroll = scroll % fullContent.size();
+
+	if(realScroll != 0) {
+		// Copying block out of beg.
+		std::vector<std::string>::const_iterator blockFirst = fullContent.begin();
+		std::vector<std::string>::const_iterator blockLast = fullContent.begin() + realScroll;
+		std::vector<std::string> block(blockFirst, blockLast);
+
+		// Removing block from oryginal vector
+		fullContent.erase(fullContent.begin(), fullContent.begin() + realScroll);
+
+		// Appending block at the end
+		fullContent.reserve(fullContent.size() + block.size());
+		fullContent.insert(std::end(fullContent), std::begin(block), std::end(block)); // if performance suffers I could use std::move() for strings
 	}
 
+	// 2. Add empty lines ro remove extra lines (to fit into context's height)
+	if (fullContent.size() < this->getContentHeight()) {
+		// Adding empty lines
+		for (unsigned int i = 0; i < this->getContentHeight() - fullContent.size(); i++)
+			fullContent.push_back(std::string(this->position.W, ' '));
+	}
+	else if (fullContent.size() > this->getContentHeight()) {
+		// Removing extra lines
+		fullContent.erase(fullContent.begin() + this->getContentHeight(), fullContent.end());
+	}
 
-	// TODO - SCROLL
-	unsigned int realScroll = scroll % contentHeight;
-
-
-
+	return fullContent; // TODO - CHECK IF CORRECT
 }
 
 std::string uiTable::getContentLine(unsigned int n) const {

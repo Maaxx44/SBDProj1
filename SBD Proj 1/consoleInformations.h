@@ -15,5 +15,6 @@ public:
 	void refreshAllConsoleInformations();
 	void setConsoleTitle(std::string newConsoleTitle);
 	void setConsoleSize(unsigned int X, unsigned int Y);
+	void setCursorPosition(unsigned int X, unsigned int Y) const;
 };
 typedef consoleInformations cInfo;

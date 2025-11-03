@@ -8,12 +8,11 @@ private:
 	cInfo cInfo;
 	std::vector<uiTable> tables;
 	
-	void initConsole();
-	void changeColor(WORD colorParameters);
-	void resetColor();
+	void initConsole() const;
+	void changeColor(WORD colorParameters) const;
+	void resetColor() const;
 
-	void drawFullTables();
-	void drawTablesContent();
+	void drawTable(uiTable& table) const;
 
 public:
 	ui();

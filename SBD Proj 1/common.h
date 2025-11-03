@@ -22,6 +22,9 @@
 
 // For UI
 #define stringCutOffMin 5 // if box has more than 5 width - the last 3 chars of string will be replaced with '...'
+#define defaultTextColor FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
+#define defaultHighLightColor FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO
+#define defaultSelectColor FOREGROUND_GREEN | FOREGROUND_INTENSITY
 
 typedef struct RECTANGLE {
 	int X, Y, W, H;

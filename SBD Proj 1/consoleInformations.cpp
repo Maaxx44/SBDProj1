@@ -52,3 +52,8 @@ void consoleInformations::setConsoleSize(unsigned int X, unsigned int Y) {
 	if(!SetConsoleWindowInfo(this->cHandle, TRUE, &this->cScreenBufferInfoEx.srWindow))
 		ErrorHandler("Failed to set console window info!");
 }
+void consoleInformations::setCursorPosition(unsigned int X, unsigned int Y) const {
+	if (this->cHandle == NULL) throw std::runtime_error("setCursor error: cHandle was NULL!");
+	if(!SetConsoleCursorPosition(this->cHandle, COORD(X, Y)))
+		ErrorHandler("Failed to set cursor position!");
+}
