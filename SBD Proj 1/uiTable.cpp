@@ -1,10 +1,14 @@
 #include "uiTable.h"
 
 std::string uiTable::cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const {
-	if (str.size() <= length) return str;
+	if (str.size() < length) {
+		str.append(std::string(length - str.size(), ' ')); // TODO - check if length is correct
+		return str;
+	}
+	if(str.size() == length)
+		return str;
 
 	std::string retStr = str.substr(0, length);
-
 	if (length > cutoffLength)
 		retStr.replace(retStr.size() - 3, 3, 3, '.');
 
@@ -43,20 +47,40 @@ void uiTable::setPositionToText() {
 	this->position.W = maxLength;
 }
 
+unsigned int uiTable::getContentHeight() const {
+	return this->position.H - 1;
+}
+
+
 std::string uiTable::getTitle() const {
 	return cutoffString(this->titleField, this->position.W, stringCutOffMin);
 }
-std::vector<std::string> uiTable::getContent() const {
-	// TODO - add vertical cutoff with position retention
-	// TODO - add empty strings to fill to height
+std::vector<std::string> uiTable::getFullContent() const {
 	std::vector<std::string> retCont;
 	for (unsigned int i = 0; i < this->contentField.size(); i++) {
 		retCont.push_back(this->cutoffString(this->contentField[i], this->position.W, stringCutOffMin));
 	}
-
 	return retCont;
 }
-std::string uiTable::getContent(unsigned int n) const {
+std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
+	std::vector<std::string> fullContent = this->getFullContent();
+	unsigned int contentHeight = this->getContentHeight();
+
+	// Adding empty lines to centent
+	if (fullContent.size() < contentHeight) {
+		for (unsigned int i = 0; i < contentHeight - fullContent.size(); i++)
+			fullContent.push_back(std::string(this->position.W, ' '));
+	}
+
+
+	// TODO - SCROLL
+	unsigned int realScroll = scroll % contentHeight;
+
+
+
+}
+
+std::string uiTable::getContentLine(unsigned int n) const {
 	if (n >= this->contentField.size())
 		throw std::runtime_error("getContent error: n(" + std::to_string(n) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	return cutoffString(this->contentField[n], this->position.W, stringCutOffMin);

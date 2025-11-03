@@ -23,10 +23,12 @@ public:
 	// This function sets W & H parameters of position so there wont be any text cutoff
 	void setPositionToText();
 
+	unsigned int getContentHeight() const;
 
 	std::string getTitle() const;
-	std::vector<std::string> getContent() const;
-	std::string getContent(unsigned int n) const;
+	std::vector<std::string> getFullContent() const; // returns full content, with all lines
+	std::vector<std::string> getContent(unsigned int scroll) const; // returns content with lines fitting content height
+	std::string getContentLine(unsigned int n) const;
 
 	REC getTitleRectangle() const;
 	REC getContentRectangle() const;
