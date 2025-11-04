@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <optional>
 
 #define BLOCK_SIZE 16
 

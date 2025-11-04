@@ -93,7 +93,7 @@ std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
 		fullContent.erase(fullContent.begin() + this->getContentHeight(), fullContent.end());
 	}
 
-	return fullContent; // TODO - CHECK IF CORRECT
+	return fullContent;
 }
 
 std::string uiTable::getContentLine(unsigned int n) const {

@@ -138,6 +138,7 @@
     <ClCompile Include="fileTape.cpp" />
     <ClCompile Include="record.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
+    <ClCompile Include="tableMetadata.cpp" />
     <ClCompile Include="tapeSorter.cpp" />
     <ClCompile Include="ui.cpp" />
     <ClCompile Include="uiTable.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="dataManager.h" />
     <ClInclude Include="fileTape.h" />
     <ClInclude Include="record.h" />
+    <ClInclude Include="tableMetadata.h" />
     <ClInclude Include="tapeSorter.h" />
     <ClInclude Include="ui.h" />
     <ClInclude Include="uiTable.h" />
