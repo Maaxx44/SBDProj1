@@ -28,9 +28,9 @@
 #define defaultSelectColor FOREGROUND_GREEN | FOREGROUND_INTENSITY
 
 typedef struct RECTANGLE {
-	int X, Y, W, H;
+	unsigned int X, Y, W, H;
 } RECTANGLE, REC;
 
 typedef struct COORDINATES {
-	int X, Y;
+	unsigned int X, Y;
 } COORDINATES, COR;

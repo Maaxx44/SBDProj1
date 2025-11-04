@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "consoleInformations.h"
+#include "tableMetadata.h"
 #include "uiTable.h"
 
 class ui {

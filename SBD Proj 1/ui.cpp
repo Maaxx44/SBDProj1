@@ -27,7 +27,7 @@ void ui::drawTable(uiTable& table) const {
 
 	// Writing content
 	std::vector<std::string> drawContent = table.getContent(0);
-	for (unsigned int i = 0; i < contentBox.H; i++) {
+	for (unsigned int i = 0; i < (unsigned int)contentBox.H; i++) {
 		this->cInfo.setCursorPosition(contentBox.X, contentBox.Y + i);
 
 		// Upper and lower barier

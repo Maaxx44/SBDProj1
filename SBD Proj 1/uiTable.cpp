@@ -37,12 +37,12 @@ void uiTable::setContentPart(std::string newContentPart, unsigned int contentLin
 }
 
 void uiTable::setPositionToText() {
-	this->position.H = this->contentField.size() + 1;
+	this->position.H = (int)this->contentField.size() + 1;
 
-	unsigned int maxLength = this->titleField.size();
+	unsigned int maxLength = (unsigned int)this->titleField.size();
 
 	for (std::string s : this->contentField)
-		maxLength = (maxLength < s.size()) ? s.size() : maxLength;
+		maxLength = (maxLength < (unsigned int)s.size()) ? (unsigned int)s.size() : maxLength;
 	
 	this->position.W = maxLength;
 }
