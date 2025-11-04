@@ -54,21 +54,15 @@ ui::ui() {
 
 	//this->cInfo.setConsoleSize(150, 40);
 
-	uiTable testTable = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 5 }, "TitleTitle", { "File 1", "File 2", "File 3", "File 4", "File 5"});
-	std::vector<std::string> testFiles = testTable.getContent(2);
-
-	//std::cout << testTable.getTitle() << std::endl;
-	//for (unsigned int i = 0; i < testFiles.size(); i++)
-	//	std::cout << testFiles[i] << "  -  length: " << testFiles[i] .size() << std::endl;
-
-	testTable.titleColor = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-	testTable.contentColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+	uiTable testTable = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 5 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5"});
+	//testTable.titleColor = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+	//testTable.contentColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 	this->drawTable(testTable);
 
-	testTable.resizeTable({ .X = 17, .Y = 1, .W = 15, .H = 5 });
-	testTable.titleColor = FOREGROUND_RED;
-	testTable.contentColor =  FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-	this->drawTable(testTable);
+	uiTable testTable2 = uiTable({ .X = 2, .Y = 7, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"});
+	this->drawTable(testTable2);
+
+
 
 	//testTable.setPositionToText();
 	//testFiles = testTable.getFullContent();
