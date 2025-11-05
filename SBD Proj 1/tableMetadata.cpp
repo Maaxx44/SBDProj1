@@ -1,5 +1,9 @@
 #include "tableMetadata.h"
 
 std::optional<unsigned int> tableMetadata::getSelectedContentIndex() const {
-	return (this->contentSelectedIndex % this->table.getFullContent().size() <= this->table.getContentHeight()) ? std::optional<unsigned int>{(this->contentSelectedIndex% this->table.getFullContent().size())} : std::nullopt; // ouch
+	if (!this->isContentSelected) return std::nullopt;
+	
+	unsigned int selectedItem = this->contentSelectedIndex % (unsigned int)this->table.getFullContent().size();
+	if (selectedItem >= this->table.getContentHeight()) return std::nullopt;
+	else return std::optional<unsigned int>(selectedItem - this->contentOffset);
 }

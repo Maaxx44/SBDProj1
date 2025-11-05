@@ -11,23 +11,36 @@ void ui::changeColor(WORD colorParameters) const{
 		ErrorHandler("Failed to set console font attributes!");
 }
 
-void ui::drawTable(uiTable& table) const {
+void ui::drawTable(tableMetadata& table) const {
 	//Assume that console size is big enaugh to fit table
-	REC titleBox = table.getTitleRectangle();
-	REC contentBox = table.getContentRectangle();
+	REC titleBox = table.table.getTitleRectangle();
+	REC contentBox = table.table.getContentRectangle();
 
 	// Writing title box
+	// Getting color for title
+	WORD titleColor = table.table.titleColor;
+	std::string titleString = table.table.getTitle();
+	if (table.isTitleHighlighted) titleColor = table.table.highlightColor;
+	else if (table.isTitleSelected) titleColor = table.table.selectColor;
+
 	this->cInfo.setCursorPosition(titleBox.X, titleBox.Y);
-	this->changeColor(table.titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_LVERTICAL);
-	printf("%c", table.getTitle()[0]);
-	this->changeColor(table.titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL);
-	printf("%s", table.getTitle().substr(1, titleBox.W - 2).c_str());
-	this->changeColor(table.titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_RVERTICAL);
-	printf("%c", table.getTitle()[14]);
+	this->changeColor(titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_LVERTICAL);
+	printf("%c", titleString[0]);
+	this->changeColor(titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL);
+	printf("%s", titleString.substr(1, titleBox.W - 2).c_str());
+	this->changeColor(titleColor | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_RVERTICAL);
+	printf("%c", titleString[14]);
+
 
 	// Writing content
-	std::vector<std::string> drawContent = table.getContent(0);
+	std::vector<std::string> drawContent = table.table.getContent(table.contentOffset);
+	std::optional<unsigned int> selectedIndex = table.getSelectedContentIndex();
 	for (unsigned int i = 0; i < (unsigned int)contentBox.H; i++) {
+		// Getting color for this line
+		WORD contentColor = table.table.contentColor;
+		if (selectedIndex != std::nullopt && i == selectedIndex) contentColor = table.table.selectColor;
+		std::string contentString = drawContent[i];
+
 		this->cInfo.setCursorPosition(contentBox.X, contentBox.Y + i);
 
 		// Upper and lower barier
@@ -36,12 +49,12 @@ void ui::drawTable(uiTable& table) const {
 		if (i == contentBox.H - 1)	modifiers |= COMMON_LVB_UNDERSCORE;
 
 		// Writing Line
-		this->changeColor(table.contentColor | modifiers | COMMON_LVB_GRID_LVERTICAL);
-		printf("%c", drawContent[i][0]);
-		this->changeColor(table.contentColor | modifiers);
-		printf("%s", drawContent[i].substr(1, titleBox.W - 2).c_str());
-		this->changeColor(table.contentColor | modifiers | COMMON_LVB_GRID_RVERTICAL);
-		printf("%c", drawContent[i][14]);
+		this->changeColor(contentColor | modifiers | COMMON_LVB_GRID_LVERTICAL);
+		printf("%c", contentString[0]);
+		this->changeColor(contentColor | modifiers);
+		printf("%s", contentString.substr(1, titleBox.W - 2).c_str());
+		this->changeColor(contentColor | modifiers | COMMON_LVB_GRID_RVERTICAL);
+		printf("%c", contentString[14]);
 
 	}
 }
@@ -53,13 +66,14 @@ ui::ui() {
 	this->initConsole();
 
 	//this->cInfo.setConsoleSize(150, 40);
-
-	uiTable testTable = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 5 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5"});
-	//testTable.titleColor = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-	//testTable.contentColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+	tableMetadata testTable = { .table = uiTable({.X = 2, .Y = 1, .W = 15, .H = 5 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" }) };
+	testTable.isTitleSelected = true;
+	testTable.isContentSelected = true;
+	testTable.contentSelectedIndex = 3;
+	testTable.contentOffset = 3;
 	this->drawTable(testTable);
 
-	uiTable testTable2 = uiTable({ .X = 2, .Y = 7, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"});
+	tableMetadata testTable2 = { .table = uiTable({.X = 2, .Y = 7, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"}) };
 	this->drawTable(testTable2);
 
 

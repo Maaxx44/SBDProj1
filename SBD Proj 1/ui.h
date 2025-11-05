@@ -7,13 +7,13 @@
 class ui {
 private:
 	cInfo cInfo;
-	std::vector<uiTable> tables;
+	std::vector<tableMetadata> tables;
 	
 	void initConsole() const;
 	void changeColor(WORD colorParameters) const;
 	void resetColor() const;
 
-	void drawTable(uiTable& table) const;
+	void drawTable(tableMetadata& table) const;
 
 public:
 	ui();
