@@ -27,7 +27,7 @@ void consoleInformations::refreshAllConsoleInformations() {
 void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	// converting string to char array (yay windows...)
 	char* cTitle = new char[(unsigned int)newConsoleTitle.length() + 1];
-	strcpy(cTitle, newConsoleTitle.c_str());
+	strncpy_s(cTitle, (unsigned int)newConsoleTitle.length() + 1, newConsoleTitle.c_str(), newConsoleTitle.length());
 
 	if (!SetConsoleTitleA(cTitle))
 		ErrorHandler("Failed to set console window title!");
