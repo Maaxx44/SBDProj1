@@ -9,11 +9,13 @@ private:
 	cInfo cInfo;
 	std::vector<tableMetadata> tables;
 	
-	void initConsole() const;
+	void initConsole();
 	void changeColor(WORD colorParameters) const;
 	void resetColor() const;
 
 	void drawTable(tableMetadata& table) const;
+
+	void initTables();
 
 public:
 	ui();

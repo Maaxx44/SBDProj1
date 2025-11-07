@@ -26,16 +26,13 @@ void consoleInformations::refreshAllConsoleInformations() {
 }
 void consoleInformations::setConsoleTitle(std::string newConsoleTitle) {
 	// converting string to char array (yay windows...)
-	unsigned int titleLength = (unsigned int)newConsoleTitle.length();
-	char* cTitle = new char[titleLength + 1];
-
-	for (unsigned int i = 0; i < titleLength; i++) {
-		cTitle[i] = newConsoleTitle[i];
-	}
-	cTitle[titleLength] = '\0';
+	char* cTitle = new char[(unsigned int)newConsoleTitle.length() + 1];
+	strcpy(cTitle, newConsoleTitle.c_str());
 
 	if (!SetConsoleTitleA(cTitle))
 		ErrorHandler("Failed to set console window title!");
+
+	delete[] cTitle;
 }
 void consoleInformations::setConsoleSize(unsigned int X, unsigned int Y) {
 	if (this->cHandle == NULL) throw std::runtime_error("setConsoleSize error: cHandle was NULL!");

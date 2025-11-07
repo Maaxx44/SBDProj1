@@ -1,7 +1,9 @@
 #include "ui.h"
 
-void ui::initConsole() const {
+void ui::initConsole() {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+	this->cInfo.setConsoleTitle("SBD Proj 1");
+	this->cInfo.setConsoleSize(150, 50);
 }
 void ui::resetColor() const {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
@@ -59,18 +61,22 @@ void ui::drawTable(tableMetadata& table) const {
 	}
 }
 
+void ui::initTables() {
+
+}
+
+
 
 
 ui::ui() {
-	this->cInfo.setConsoleTitle("SBD Proj 1");
 	this->initConsole();
 
 	//this->cInfo.setConsoleSize(150, 40);
 	tableMetadata testTable = { .table = uiTable({.X = 2, .Y = 1, .W = 15, .H = 5 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" }) };
-	testTable.isTitleSelected = true;
-	testTable.isContentSelected = true;
-	testTable.contentSelectedIndex = 3;
-	testTable.contentOffset = 3;
+	//testTable.isTitleHighlighted = true;
+	//testTable.isContentSelected = true;
+	//testTable.contentSelectedIndex = 3;
+	//testTable.contentOffset = 3;
 	this->drawTable(testTable);
 
 	tableMetadata testTable2 = { .table = uiTable({.X = 2, .Y = 7, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"}) };
