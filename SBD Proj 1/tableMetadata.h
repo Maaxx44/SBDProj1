@@ -31,7 +31,12 @@ struct tableMetadata {
 	WORD contentHighlightedColor = defaultHighLightColor;
 	WORD contentSelectedHighlightedColor = defaultSelectHighlightColor;
 
-	// TODO - timing data
+	// Timing data
+	std::chrono::time_point<std::chrono::system_clock> tUpdateDiff; // timestamp of the start of update highlight flash for title
+	std::chrono::time_point<std::chrono::system_clock> tSelectionDiff; // timestamp of the start of selection highlight (on/off, depends on isTitleHighlighted) for title
+	std::chrono::time_point<std::chrono::system_clock> cUpdateDiff; // timestamp of the start of update highlight flash for content
+	std::chrono::time_point<std::chrono::system_clock> cSelectionDiff; // timestamp of the start of selection highlight (on/off, depends on isTitleHighlighted) for content
+
 
 	std::optional<unsigned int> getSelectedContentIndex() const; // calculates line number for selected item (or none!)
 	std::optional<unsigned int> getHighlightedContentIndex() const; // calculates line number for selected item (or none!)

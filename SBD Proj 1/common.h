@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <optional>
+#include <chrono>
 
 #define BLOCK_SIZE 16
 
@@ -34,7 +35,12 @@
 #define defaultConsoleTitle "SBD Proj 1"
 //  Console parameters
 #define consoleNoTextMode 0x0000 | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_LVB_GRID_WORLDWIDE | DISABLE_NEWLINE_AUTO_RETURN 
-
+//  Timing parameters
+#define isSelectionFlashingEnabled true 
+#define isUpdateHighlightingEnabled true
+#define selectionOnTimeMs 250
+#define selectionOffTimeMs 150
+#define highlightUpdateLengthMs 100
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;
