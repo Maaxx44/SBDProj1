@@ -3,7 +3,17 @@
 consoleInformations::consoleInformations() {
 	// getting handle
 	this->cHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (this->cHandle == NULL) ErrorHandler("Failed to get output hande!");
+	if (this->cHandle == NULL)
+		ErrorHandler("Failed to get output hande!");
+
+	// getting default console mode
+	if (this->cHandle != NULL && !GetConsoleMode(this->cHandle, &this->cMode))
+		ErrorHandler("Failed to get console mode!");
+
+	// getting cursor informations
+	ZeroMemory(&this->cCursorInfo, sizeof(cCursorInfo));
+	if(this->cHandle != NULL && !GetConsoleCursorInfo(this->cHandle, &this->cCursorInfo))
+		ErrorHandler("Failed to get console cursor info!");
 
 	// getting console informations
 	ZeroMemory(&this->cScreenBufferInfoEx, sizeof(cScreenBufferInfoEx));
@@ -15,6 +25,15 @@ consoleInformations::~consoleInformations() {
 	// Setting font to oryginal
 	if(this->cHandle != NULL && !SetConsoleTextAttribute(this->cHandle, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY))
 		ErrorHandler("Failed to set console font attributes!");
+
+	// Setting console mode to oryginal
+	if (this->cHandle != NULL && !SetConsoleMode(this->cHandle, this->cMode))
+		ErrorHandler("Failed to set oryginal console mode!");
+
+	// Setting cursor to visible
+	this->cCursorInfo.bVisible = true;
+	if (this->cHandle != NULL && !SetConsoleCursorInfo(this->cHandle, &this->cCursorInfo))
+		ErrorHandler("Failed to set cursor to visible!");
 }
 
 void consoleInformations::refreshAllConsoleInformations() {
@@ -48,6 +67,22 @@ void consoleInformations::setConsoleSize(unsigned int X, unsigned int Y) {
 
 	if(!SetConsoleWindowInfo(this->cHandle, TRUE, &this->cScreenBufferInfoEx.srWindow))
 		ErrorHandler("Failed to set console window info!");
+}
+void consoleInformations::setConsoleMode(DWORD newMode) {
+	if (this->cHandle == NULL) throw std::runtime_error("setConsoleMode error: cHandle was NULL!");
+
+	if(!SetConsoleMode(this->cHandle, newMode))
+		ErrorHandler("Failed to set new console mode!");
+}
+void consoleInformations::setConsoleDefaultMode() {
+	this->setConsoleMode(this->cMode);
+}
+void consoleInformations::setCursorVisibility(bool isVisible) {
+	if (this->cHandle == NULL) throw std::runtime_error("setCursorVisibility error: cHandle was NULL!");
+
+	this->cCursorInfo.bVisible = isVisible;
+	if(!SetConsoleCursorInfo(this->cHandle, &this->cCursorInfo))
+		ErrorHandler("Failed to set cursor visibility!");
 }
 void consoleInformations::setCursorPosition(unsigned int X, unsigned int Y) const {
 	if (this->cHandle == NULL) throw std::runtime_error("setCursor error: cHandle was NULL!");

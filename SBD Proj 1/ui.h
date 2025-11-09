@@ -7,7 +7,8 @@
 class ui {
 private:
 	cInfo cInfo;
-	std::vector<tableMetadata> tables;
+	tableMetadata tFiles, tOptions;
+	std::vector<tableMetadata> tSubOptions;
 	
 	void initConsole();
 	void changeColor(WORD colorParameters) const;
@@ -18,6 +19,9 @@ private:
 	void initTables();
 
 public:
+	// TODO - add time delta to make interface flashy
+	void draw();
+
 	ui();
 	~ui();
 };

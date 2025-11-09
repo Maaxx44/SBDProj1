@@ -13,11 +13,6 @@ private:
 	std::string cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const;
 
 public:
-	WORD titleColor = defaultTextColor;
-	WORD contentColor = defaultTextColor;
-	WORD highlightColor = defaultHighLightColor;
-	WORD selectColor = defaultSelectColor;
-
 	uiTable();
 	uiTable(REC newPosition);
 	uiTable(REC newPosition, std::string title);
