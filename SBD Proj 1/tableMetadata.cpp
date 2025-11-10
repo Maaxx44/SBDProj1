@@ -17,9 +17,6 @@ std::optional<unsigned int> tableMetadata::getSelectedContentIndex() const {
 		if(selectedIndex >= minSelectedIndexIndex) return selectedIndex - this->contentOffset;
 		else if(selectedIndex <= maxSelectedIndexIndex) return selectedIndex + (unsigned int)this->table.getFullContent().size() - this->contentOffset;
 	}
-
-	//if (selectedItem >= this->table.getContentHeight() + this->contentOffset) return std::nullopt;
-	//else return std::optional<unsigned int>(selectedItem - this->contentOffset);
 }
 std::optional<unsigned int> tableMetadata::getHighlightedContentIndex() const {
 	if (!this->isContentHighlighted) return std::nullopt;
@@ -38,10 +35,4 @@ std::optional<unsigned int> tableMetadata::getHighlightedContentIndex() const {
 		if (HighlightedIndex >= minHighlightedIndexIndex) return HighlightedIndex - this->contentOffset;
 		else if (HighlightedIndex <= maxHighlightedIndexIndex) return HighlightedIndex + (unsigned int)this->table.getFullContent().size() - this->contentOffset;
 	}
-
-
-
-	//unsigned int selectedItem = this->contentHighlightedIndex % (unsigned int)this->table.getFullContent().size();
-	//if (selectedItem >= this->table.getContentHeight() + this->contentOffset) return std::nullopt;
-	//else return std::optional<unsigned int>(selectedItem - this->contentOffset);
 }

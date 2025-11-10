@@ -140,6 +140,7 @@
     <ClCompile Include="SBD Proj 1.cpp" />
     <ClCompile Include="tableMetadata.cpp" />
     <ClCompile Include="tapeSorter.cpp" />
+    <ClCompile Include="textModifiers.cpp" />
     <ClCompile Include="ui.cpp" />
     <ClCompile Include="uiTable.cpp" />
     <ClCompile Include="winErrorHandlers.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="record.h" />
     <ClInclude Include="tableMetadata.h" />
     <ClInclude Include="tapeSorter.h" />
+    <ClInclude Include="textModifiers.h" />
     <ClInclude Include="ui.h" />
     <ClInclude Include="uiTable.h" />
     <ClInclude Include="winErrorHandlers.h" />

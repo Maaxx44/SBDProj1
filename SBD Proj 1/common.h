@@ -11,6 +11,8 @@
 #include <sstream>
 #include <optional>
 #include <chrono>
+#include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
+
 
 #define BLOCK_SIZE 16
 

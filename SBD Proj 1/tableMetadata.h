@@ -7,7 +7,7 @@ struct tableMetadata {
 	// Main options(s)
 	bool isTableVisible = true;
 	
-	// Styling options
+	// Styling options - for drawing functions
 	//  Title options
 	bool isTitleHighlighted = false;
 	bool isTitleSelected = false;
@@ -32,10 +32,10 @@ struct tableMetadata {
 	WORD contentSelectedHighlightedColor = defaultSelectHighlightColor;
 
 	// Timing data
-	std::chrono::time_point<std::chrono::system_clock> tUpdateDiff; // timestamp of the start of update highlight flash for title
-	std::chrono::time_point<std::chrono::system_clock> tSelectionDiff; // timestamp of the start of selection highlight (on/off, depends on isTitleHighlighted) for title
-	std::chrono::time_point<std::chrono::system_clock> cUpdateDiff; // timestamp of the start of update highlight flash for content
-	std::chrono::time_point<std::chrono::system_clock> cSelectionDiff; // timestamp of the start of selection highlight (on/off, depends on isTitleHighlighted) for content
+	std::chrono::time_point<std::chrono::system_clock> tUpdateDiff = std::chrono::system_clock::now(); // timestamp of the start of update highlight flash for title
+	std::chrono::time_point<std::chrono::system_clock> tSelectionDiff = std::chrono::system_clock::now(); // timestamp of the start of selection highlight (on/off, depends on isTitleHighlighted) for title
+	std::chrono::time_point<std::chrono::system_clock> cUpdateDiff = std::chrono::system_clock::now(); // timestamp of the start of update highlight flash for content
+	std::chrono::time_point<std::chrono::system_clock> cSelectionDiff = std::chrono::system_clock::now(); // timestamp of the start of selection highlight (on/off, depends on isContentHighlighted) for content
 
 
 	std::optional<unsigned int> getSelectedContentIndex() const; // calculates line number for selected item (or none!)
