@@ -19,22 +19,57 @@ std::string uiTable::cutoffString(std::string str, unsigned int length, unsigned
 uiTable::uiTable() : position({ 0, 0, 0, 0 }) {}
 uiTable::uiTable(REC newPosition) : position(newPosition) { }
 uiTable::uiTable(REC newPosition, std::string title) : position(newPosition), titleField(title) {}
-uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content) : position(newPosition), titleField(title), contentField(content) {}
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content) : position(newPosition), titleField(title), contentField(content) {
+	this->contentMod.resize(contentField.size());
+}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
 
 void uiTable::resizeTable(REC newPosition) {
 	this->position = newPosition;
 }
 void uiTable::setTitle(std::string newTitle) {
 	this->titleField = newTitle;
+	this->titleMod = textModifiers(); // TODO - CHECK LATER
 }
 void uiTable::setContent(std::vector<std::string> newContent) {
 	this->contentField = newContent;
+	this->contentMod.clear();
+	this->contentMod.resize(contentField.size());
 }
 void uiTable::setContentPart(std::string newContentPart, unsigned int contentLine) {
 	if (contentLine >= this->contentField.size())
-		throw std::runtime_error("getContent error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
+		throw std::runtime_error("setContentPart error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	this->contentField[contentLine] = newContentPart;
+	this->contentMod[contentLine] = textModifiers(); // TODO - CHECK LATER
 }
+
+void uiTable::setTitleMod(textModifiers newTitleMod) {
+	this->titleMod = newTitleMod;
+}
+void uiTable::setContentMod(std::vector<textModifiers> newContentMod) {
+	if (newContentMod.size() != this->contentMod.size()) throw std::runtime_error("setContentMod error: newContentMod.size() was not equal to contentMod.size()!");
+	this->contentMod = newContentMod;
+}
+void uiTable::setContentPartMod(textModifiers newContentMod, unsigned int contentLine) {
+	if (contentLine >= this->contentField.size())
+		throw std::runtime_error("setContentPartMod error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
+	this->contentMod[contentLine] = newContentMod;
+}
+
+void uiTable::setContentOffset(unsigned int newContentOffset) {
+	this->contentOffset = newContentOffset % contentField.size();
+}
+unsigned int uiTable::getContentOffset() const {
+	return this->contentOffset;
+}
+
+void uiTable::setTableVisible(bool isTableVisible) {
+	this->isTableVisible = isTableVisible;
+}
+bool uiTable::getTableVisible() const {
+	return this->isTableVisible;
+}
+
 
 void uiTable::setPositionToText() {
 	this->position.H = (int)this->contentField.size() + 1;
@@ -46,7 +81,6 @@ void uiTable::setPositionToText() {
 	
 	this->position.W = maxLength;
 }
-
 unsigned int uiTable::getContentHeight() const {
 	return this->position.H - 1;
 }
@@ -62,11 +96,11 @@ std::vector<std::string> uiTable::getFullContent() const {
 	}
 	return retCont;
 }
-std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
-	std::vector<std::string> fullContent = this->getFullContent();
+std::vector<std::string> uiTable::getContent() const {
+	std::vector<std::string> fullContent = this->getFullContent(); // getting cut-off lines
 
 	// 1. Scrolling lines
-	unsigned int realScroll = scroll % fullContent.size();
+	unsigned int realScroll = this->contentOffset % fullContent.size();
 
 	if(realScroll != 0) {
 		// Copying block out of beg.
@@ -79,7 +113,7 @@ std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
 
 		// Appending block at the end
 		fullContent.reserve(fullContent.size() + block.size());
-		fullContent.insert(std::end(fullContent), std::begin(block), std::end(block)); // if performance suffers I could use std::move() for strings
+		fullContent.insert(std::end(fullContent), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
 	}
 
 	// 2. Add empty lines ro remove extra lines (to fit into context's height)
@@ -95,12 +129,56 @@ std::vector<std::string> uiTable::getContent(unsigned int scroll) const {
 
 	return fullContent;
 }
-
 std::string uiTable::getContentLine(unsigned int n) const {
 	if (n >= this->contentField.size())
 		throw std::runtime_error("getContent error: n(" + std::to_string(n) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	return cutoffString(this->contentField[n], this->position.W, stringCutOffMin);
 }
+
+textModifiers uiTable::getTitleMod() const {
+	return this->titleMod;
+}
+std::vector<textModifiers> uiTable::getFullContentMod() const {
+	return this->contentMod;
+}
+std::vector<textModifiers> uiTable::getContentMod() const { // TODO - CHECK IF WORKS
+	std::vector<textModifiers> fullContentMod = this->getContentMod();
+
+	unsigned int realScroll = this->contentOffset % fullContentMod.size();
+
+	if (realScroll != 0) {
+		// Copying block out of beg.
+		std::vector<textModifiers>::const_iterator blockFirst = fullContentMod.begin();
+		std::vector<textModifiers>::const_iterator blockLast = fullContentMod.begin() + realScroll;
+		std::vector<textModifiers> block(blockFirst, blockLast);
+
+		// Removing block from oryginal vector
+		fullContentMod.erase(fullContentMod.begin(), fullContentMod.begin() + realScroll);
+
+		// Appending block at the end
+		fullContentMod.reserve(fullContentMod.size() + block.size());
+		fullContentMod.insert(std::end(fullContentMod), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
+	}
+
+	// 2. Add empty lines ro remove extra lines (to fit into context's height)
+	if (fullContentMod.size() < this->getContentHeight()) {
+		// Adding empty lines
+		for (unsigned int i = 0; i < this->getContentHeight() - fullContentMod.size(); i++)
+			fullContentMod.push_back(textModifiers());
+	}
+	else if (fullContentMod.size() > this->getContentHeight()) {
+		// Removing extra lines
+		fullContentMod.erase(fullContentMod.begin() + this->getContentHeight(), fullContentMod.end());
+	}
+
+	return fullContentMod;
+}
+textModifiers uiTable::getContentLineMod(unsigned int n) const {
+	if (n >= this->contentField.size())
+		throw std::runtime_error("getContentLineMod error: n(" + std::to_string(n) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
+	return this->contentMod[n];
+}
+
 
 REC uiTable::getTitleRectangle() const {
 	return { .X = this->position.X, .Y = this->position.Y, .W = this->position.W, .H = 1 };

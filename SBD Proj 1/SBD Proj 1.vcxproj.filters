@@ -48,9 +48,6 @@
     <ClCompile Include="uiTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tableMetadata.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="textModifiers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="uiTable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tableMetadata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textModifiers.h">
