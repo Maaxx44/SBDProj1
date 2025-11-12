@@ -4,7 +4,7 @@
 struct textModifiers {
 	// Booleans for constant color
 	bool isTextVisible = true;
-	bool isTextHighLighted = false;
+	bool isTextHighlighted = false;
 	bool isTextSelected = false;
 
 	// Booleans for flashing lights

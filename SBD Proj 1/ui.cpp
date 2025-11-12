@@ -16,26 +16,24 @@ void ui::changeColor(WORD colorParameters) const{
 }
 
 void ui::drawTableTitle(uiTable& table) const {
-	std::string titleString = table.table.getTitle();
-	if (!table.titleMod.isTextVisible) return;
+	REC titleBox = table.getTitleRectangle();
+	WORD titleModifiers = table.getTitleMod().getTextModifier(this->currentFrameTS);
+	std::string titleString = std::string(titleBox.W, ' ');
+	if (table.getTitleMod().isTextVisible) titleString = table.getTitle(); // If title is visible - get title string
 
-	REC titleBox = table.table.getTitleRectangle();
-	std::string titleString = table.table.getTitle();
-	WORD titleModifiers = table.titleMod.getTextModifier(this->currentFrameTS);
 
 	this->cInfo.setCursorPosition(titleBox.X, titleBox.Y);
 	this->changeColor(titleModifiers | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_LVERTICAL);
-	printf("%c", titleString[0]);
+	printf("%c", titleString.front());
 	this->changeColor(titleModifiers | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL);
 	printf("%s", titleString.substr(1, titleBox.W - 2).c_str());
 	this->changeColor(titleModifiers | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_RVERTICAL);
-	printf("%c", titleString[14]);
+	printf("%c", titleString.back());
 }
-void ui::drawTableContentLine(uiTable& table, std::string contentString, unsigned int laneIndex) const {
-	if (!table.contentMod[laneIndex].isTextVisible) return;
-
-	WORD contentColor = table.contentMod[laneIndex].getTextModifier(this->currentFrameTS);
-	REC contentBox = table.table.getContentRectangle();
+void ui::drawTableContentLine(uiTable& table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const {
+	REC contentBox = table.getContentRectangle();
+	WORD contentColor = contentMod.getTextModifier(this->currentFrameTS);
+	if (!contentMod.isTextVisible) contentString = std::string(contentBox.W, ' ');
 
 	//  Getting modifiers for drawing box around content
 	WORD modifiers = NULL;
@@ -45,24 +43,25 @@ void ui::drawTableContentLine(uiTable& table, std::string contentString, unsigne
 	// Writing Line
 	this->cInfo.setCursorPosition(contentBox.X, contentBox.Y + laneIndex);
 	this->changeColor(contentColor | modifiers | COMMON_LVB_GRID_LVERTICAL);
-	printf("%c", contentString[0]);
+	printf("%c", contentString.front());
 	this->changeColor(contentColor | modifiers);
 	printf("%s", contentString.substr(1, contentBox.W - 2).c_str());
 	this->changeColor(contentColor | modifiers | COMMON_LVB_GRID_RVERTICAL);
-	printf("%c", contentString[14]);
+	printf("%c", contentString.back());
 }
 void ui::drawTableContent(uiTable& table) const {
-	REC contentBox = table.table.getContentRectangle();
-	std::vector<std::string> drawContent = table.table.getContent(table.contentOffset);
+	REC contentBox = table.getContentRectangle();
+	std::vector<std::string> drawContent = table.getContent();
+	std::vector<textModifiers> drawMod = table.getContentMod();
 
 	for (unsigned int i = 0; i < (unsigned int)contentBox.H; i++) {
-		drawTableContentLine(table, drawContent[i], i);
+		drawTableContentLine(table, drawContent[i], drawMod[i], i);
 	}
 }
 
 void ui::drawTable(uiTable& table) const {
 	// If table is invisible - don't draw it lul
-	if (!table.isTableVisible) return;
+	if (!table.getTableVisible()) return;
 
 	// Draw table title
 	drawTableTitle(table);
@@ -73,11 +72,15 @@ void ui::drawTable(uiTable& table) const {
 
 void ui::initTables() {
 	// Creating files table
-	this->tFiles = tableMetadata({ .table = uiTable({.X = 2, .Y = 1, .W = 15, .H = 5 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" }) });
-	this->tFiles.contentOffset = 2;
+	this->tFiles = uiTable({.X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
+	this->tFiles.getContentLineMod(0).isTextSelected = true;
+	this->tFiles.getContentLineMod(2).isTextSelected = true;
+	this->tFiles.getContentLineMod(4).isTextHighlighted = true;
+
+	this->tFiles.setContentOffset(1);
 
 	// Creating Options table
-	this->tOptions = tableMetadata({ .table = uiTable({.X = 2, .Y = 7, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"}) });
+	this->tOptions = uiTable({.X = 2, .Y = 9, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"});
 
 	// TODO - create sub-options tables
 }
@@ -90,7 +93,7 @@ void ui::draw() {
 	// Draw tables
 	this->drawTable(this->tFiles);
 	this->drawTable(this->tOptions);
-	for (tableMetadata tSubOption : this->tSubOptions)
+	for (uiTable tSubOption : this->tSubOptions)
 		this->drawTable(tSubOption);
 }
 

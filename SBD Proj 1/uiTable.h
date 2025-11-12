@@ -57,10 +57,10 @@ public:
 	std::vector<std::string> getContent() const; // returns content with lines fitting content height
 	std::string getContentLine(unsigned int n) const;
 
-	textModifiers getTitleMod() const;
-	std::vector<textModifiers> getFullContentMod() const; // just returns all contentmods
-	std::vector<textModifiers> getContentMod() const; // same as getContent()
-	textModifiers getContentLineMod(unsigned int n) const;
+	textModifiers& getTitleMod();
+	std::vector<textModifiers>& getFullContentMod(); // just returns all contentmods
+	std::vector<textModifiers> getContentMod(); // same as getContent()
+	textModifiers& getContentLineMod(unsigned int n);
 
 
 

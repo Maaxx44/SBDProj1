@@ -10,7 +10,7 @@ WORD textModifiers::getTextModifier(std::chrono::time_point<std::chrono::system_
 
 	// 1. Checking for static modifiers
 	WORD currentColor = 0x00;
-	switch (isTextHighLighted ? 1 : 0 + isTextSelected ? 2 : 0) {
+	switch (isTextHighlighted ? 1 : 0 + isTextSelected ? 2 : 0) {
 	case 0: // text is normal
 		currentColor = cDefault;
 		break;

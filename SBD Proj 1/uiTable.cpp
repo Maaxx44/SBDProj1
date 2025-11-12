@@ -135,14 +135,14 @@ std::string uiTable::getContentLine(unsigned int n) const {
 	return cutoffString(this->contentField[n], this->position.W, stringCutOffMin);
 }
 
-textModifiers uiTable::getTitleMod() const {
+textModifiers& uiTable::getTitleMod() {
 	return this->titleMod;
 }
-std::vector<textModifiers> uiTable::getFullContentMod() const {
+std::vector<textModifiers>& uiTable::getFullContentMod() {
 	return this->contentMod;
 }
-std::vector<textModifiers> uiTable::getContentMod() const { // TODO - CHECK IF WORKS
-	std::vector<textModifiers> fullContentMod = this->getContentMod();
+std::vector<textModifiers> uiTable::getContentMod() { // TODO - CHECK IF WORKS
+	std::vector<textModifiers> fullContentMod = this->getFullContentMod();
 
 	unsigned int realScroll = this->contentOffset % fullContentMod.size();
 
@@ -162,9 +162,10 @@ std::vector<textModifiers> uiTable::getContentMod() const { // TODO - CHECK IF W
 
 	// 2. Add empty lines ro remove extra lines (to fit into context's height)
 	if (fullContentMod.size() < this->getContentHeight()) {
+		textModifiers emptyMod;
 		// Adding empty lines
 		for (unsigned int i = 0; i < this->getContentHeight() - fullContentMod.size(); i++)
-			fullContentMod.push_back(textModifiers());
+			fullContentMod.push_back(emptyMod);
 	}
 	else if (fullContentMod.size() > this->getContentHeight()) {
 		// Removing extra lines
@@ -173,7 +174,7 @@ std::vector<textModifiers> uiTable::getContentMod() const { // TODO - CHECK IF W
 
 	return fullContentMod;
 }
-textModifiers uiTable::getContentLineMod(unsigned int n) const {
+textModifiers& uiTable::getContentLineMod(unsigned int n) {
 	if (n >= this->contentField.size())
 		throw std::runtime_error("getContentLineMod error: n(" + std::to_string(n) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	return this->contentMod[n];

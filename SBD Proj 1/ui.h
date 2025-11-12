@@ -17,7 +17,7 @@ private:
 
 	//Helpoer functions for drawing tables
 	void drawTableTitle(uiTable& table) const;
-	void drawTableContentLine(uiTable& table, std::string contentString, unsigned int laneIndex) const;
+	void drawTableContentLine(uiTable& table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const;
 	void drawTableContent(uiTable& table) const;
 
 
