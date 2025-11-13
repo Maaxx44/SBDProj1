@@ -31,6 +31,10 @@
 #define defaultHighLightColor FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO
 #define defaultSelectColor FOREGROUND_GREEN
 #define defaultSelectHighlightColor FOREGROUND_GREEN | COMMON_LVB_REVERSE_VIDEO
+#define defaultBlinkColor FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO
+#define defaultFlashColor FOREGROUND_RED | FOREGROUND_INTENSITY
+
+#define returnNoColorOnInvisible false
 //  Console drawing
 #define defaultConsoleSizeX 150
 #define defaultConsoleSizeY 50
@@ -40,9 +44,9 @@
 //  Timing parameters
 #define isSelectionFlashingEnabled true 
 #define isUpdateHighlightingEnabled true
-#define selectionOnTimeMs 250
-#define selectionOffTimeMs 150
-#define highlightUpdateLengthMs 100
+#define blinkOnTimeMs 450
+#define blinkOffTimeMs 150
+#define flashOnTimeMs 250		// flash does not repeat so it wont need offf time
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;

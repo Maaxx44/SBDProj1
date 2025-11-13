@@ -17,7 +17,7 @@ void ui::changeColor(WORD colorParameters) const{
 
 void ui::drawTableTitle(uiTable& table) const {
 	REC titleBox = table.getTitleRectangle();
-	WORD titleModifiers = table.getTitleMod().getTextModifier(this->currentFrameTS);
+	WORD titleModifiers = table.getTitleMod().getTextModifier();
 	std::string titleString = std::string(titleBox.W, ' ');
 	if (table.getTitleMod().isTextVisible) titleString = table.getTitle(); // If title is visible - get title string
 
@@ -32,7 +32,7 @@ void ui::drawTableTitle(uiTable& table) const {
 }
 void ui::drawTableContentLine(uiTable& table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const {
 	REC contentBox = table.getContentRectangle();
-	WORD contentColor = contentMod.getTextModifier(this->currentFrameTS);
+	WORD contentColor = contentMod.getTextModifier();
 	if (!contentMod.isTextVisible) contentString = std::string(contentBox.W, ' ');
 
 	//  Getting modifiers for drawing box around content
@@ -60,6 +60,8 @@ void ui::drawTableContent(uiTable& table) const {
 }
 
 void ui::drawTable(uiTable& table) const {
+	table.updateTiming();
+
 	// If table is invisible - don't draw it lul
 	if (!table.getTableVisible()) return;
 
@@ -76,6 +78,7 @@ void ui::initTables() {
 	this->tFiles.getContentLineMod(0).isTextSelected = true;
 	this->tFiles.getContentLineMod(2).isTextSelected = true;
 	this->tFiles.getContentLineMod(4).isTextHighlighted = true;
+	this->tFiles.getContentLineMod(1).startBlink();
 
 	this->tFiles.setContentOffset(1);
 
@@ -86,14 +89,10 @@ void ui::initTables() {
 }
 
 void ui::draw() {
-	// Handle timing
-	//  Get current timestamp
-	this->currentFrameTS = std::chrono::system_clock::now();
-
 	// Draw tables
 	this->drawTable(this->tFiles);
 	this->drawTable(this->tOptions);
-	for (uiTable tSubOption : this->tSubOptions)
+	for (uiTable& tSubOption : this->tSubOptions)
 		this->drawTable(tSubOption);
 }
 

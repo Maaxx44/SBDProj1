@@ -29,7 +29,7 @@ void uiTable::resizeTable(REC newPosition) {
 }
 void uiTable::setTitle(std::string newTitle) {
 	this->titleField = newTitle;
-	this->titleMod = textModifiers(); // TODO - CHECK LATER
+	this->titleMod = textModifiers();
 }
 void uiTable::setContent(std::vector<std::string> newContent) {
 	this->contentField = newContent;
@@ -40,7 +40,7 @@ void uiTable::setContentPart(std::string newContentPart, unsigned int contentLin
 	if (contentLine >= this->contentField.size())
 		throw std::runtime_error("setContentPart error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	this->contentField[contentLine] = newContentPart;
-	this->contentMod[contentLine] = textModifiers(); // TODO - CHECK LATER
+	this->contentMod[contentLine] = textModifiers();
 }
 
 void uiTable::setTitleMod(textModifiers newTitleMod) {
@@ -68,6 +68,11 @@ void uiTable::setTableVisible(bool isTableVisible) {
 }
 bool uiTable::getTableVisible() const {
 	return this->isTableVisible;
+}
+
+void uiTable::updateTiming() {
+	for (textModifiers& contentLineMod : this->contentMod)
+		contentLineMod.updateTiming();
 }
 
 
@@ -141,7 +146,7 @@ textModifiers& uiTable::getTitleMod() {
 std::vector<textModifiers>& uiTable::getFullContentMod() {
 	return this->contentMod;
 }
-std::vector<textModifiers> uiTable::getContentMod() { // TODO - CHECK IF WORKS
+std::vector<textModifiers> uiTable::getContentMod() {
 	std::vector<textModifiers> fullContentMod = this->getFullContentMod();
 
 	unsigned int realScroll = this->contentOffset % fullContentMod.size();
