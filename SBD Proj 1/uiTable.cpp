@@ -24,7 +24,7 @@ uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> co
 }
 uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
 
-void uiTable::resizeTable(REC newPosition) {
+void uiTable::setTableSize(REC newPosition) {
 	this->position = newPosition;
 }
 void uiTable::setTitle(std::string newTitle) {
