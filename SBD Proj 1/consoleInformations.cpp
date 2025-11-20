@@ -119,7 +119,7 @@ std::vector<INPUT_RECORD> consoleInformations::getUserInput() const {
 	std::vector<INPUT_RECORD> inputBufferVector(inputBufferArray, inputBufferArray + eventRead); // TODO - check if correct
 
 	/// delete this dynamic mess and return our vector
-	delete inputBufferArray;
+	delete[] inputBufferArray;
 
 	return inputBufferVector;
 }
