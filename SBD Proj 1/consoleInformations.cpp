@@ -7,6 +7,7 @@ consoleInformations::consoleInformations() {
 		ErrorHandler("Failed to get output hande!");
 
 	// getting default console mode
+	ZeroMemory(&this->cMode, sizeof(cMode));
 	if (this->cHandle != NULL && !GetConsoleMode(this->cHandle, &this->cMode))
 		ErrorHandler("Failed to get console mode!");
 
@@ -88,4 +89,37 @@ void consoleInformations::setCursorPosition(unsigned int X, unsigned int Y) cons
 	if (this->cHandle == NULL) throw std::runtime_error("setCursor error: cHandle was NULL!");
 	if(!SetConsoleCursorPosition(this->cHandle, COORD(X, Y)))
 		ErrorHandler("Failed to set cursor position!");
+}
+
+std::vector<INPUT_RECORD> consoleInformations::getUserInput() const {
+	// Getting INPUT handle, because we need this rather than out cHandle that is OUTPUT handle (I hate windows I hate windows I hate windows)
+	HANDLE cInputHandle = GetStdHandle(STD_INPUT_HANDLE);
+	if(cInputHandle == INVALID_HANDLE_VALUE)
+		ErrorHandler("Failed to get input handle!");
+
+	DWORD eventCount = 0x0000;
+
+	// Checking if there is any event to be read
+	if(!GetNumberOfConsoleInputEvents(cInputHandle, &eventCount))
+		ErrorHandler("Failed to get number of console input events!");
+
+	// If there are no events - there was no input, so return empty vector
+	if (eventCount == 0) return std::vector<INPUT_RECORD>();
+
+	// If there WERE events - get array of that events, convert to vector and return
+	/// create dynamic array with the size of eventCount
+	INPUT_RECORD* inputBufferArray = new INPUT_RECORD[eventCount];
+
+	/// get all events
+	DWORD eventRead = 0x0000;
+	if(!ReadConsoleInput(cInputHandle, inputBufferArray, eventCount, &eventRead))
+		ErrorHandler("Failed to read console input!");
+
+	/// convert array of events to vector
+	std::vector<INPUT_RECORD> inputBufferVector(inputBufferArray, inputBufferArray + eventRead); // TODO - check if correct
+
+	/// delete this dynamic mess and return our vector
+	delete inputBufferArray;
+
+	return inputBufferVector;
 }

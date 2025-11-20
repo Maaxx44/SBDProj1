@@ -14,6 +14,7 @@ public:
 	consoleInformations();
 	~consoleInformations();
 
+	// Console manipulation functions
 	void refreshAllConsoleInformations();
 	void setConsoleTitle(std::string newConsoleTitle);
 	void setConsoleSize(unsigned int X, unsigned int Y);
@@ -21,5 +22,7 @@ public:
 	void setConsoleDefaultMode();
 	void setCursorVisibility(bool isVisible);
 	void setCursorPosition(unsigned int X, unsigned int Y) const;
+
+	std::vector<INPUT_RECORD> getUserInput() const;
 };
 typedef consoleInformations cInfo;

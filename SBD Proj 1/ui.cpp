@@ -94,6 +94,11 @@ void ui::draw() {
 	this->drawTable(this->tOptions);
 	for (uiTable& tSubOption : this->tSubOptions)
 		this->drawTable(tSubOption);
+
+	//DEBUG - get user input - TODO - remove after testing
+	auto test = this->cInfo.getUserInput();
+
+
 }
 
 

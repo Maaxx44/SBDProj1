@@ -22,6 +22,8 @@ private:
 	void initTables();
 
 public:
+	void getUserInput();
+
 	void draw();
 
 	ui();
