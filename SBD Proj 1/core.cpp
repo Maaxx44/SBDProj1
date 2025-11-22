@@ -5,7 +5,7 @@
 
 core::core() {
 	while (true) {
-		this->userInterface.draw();
+		this->userInterface.runFrame();
 		//std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }

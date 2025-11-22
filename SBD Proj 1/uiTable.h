@@ -1,11 +1,15 @@
 #pragma once
 #include "common.h"
 #include "textModifiers.h"
+#include "uiTablePointer.h"
 
 
 
 class uiTable {
 private:
+	// Relative position of other tables
+	uiTablePointer tablePointers;
+
 	// Text fields
 	std::string titleField;
 	std::vector<std::string> contentField;
@@ -44,6 +48,9 @@ public:
 	void setTableVisible(bool isTableVisible);
 	void setTableSize(REC newPosition);
 
+	/// Setting pointers
+	void setTablePointers(uiTablePointer newTablePointers);
+
 	// -----------------
 
 
@@ -68,6 +75,10 @@ public:
 	unsigned int getContentHeight() const;
 	unsigned int getContentOffset() const;
 	bool getTableVisible() const;
+
+	/// Getting pointers
+	uiTablePointer& getTablePointers();
+	// -----------------
 
 
 	// ---- Unique logic functions ----

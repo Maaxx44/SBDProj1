@@ -88,24 +88,29 @@ void ui::initTables() {
 	// TODO - create sub-options tables
 }
 
+void ui::parseUserInput() {
+	//DEBUG - get user input - TODO - remove after testing
+	//auto test = this->cInfo.getUserInput();
+	
+	//this->cInfo.setConsoleSize(defaultConsoleSizeX + 10, defaultConsoleSizeY + 5);
+	
+	//auto test2 = this->cInfo.getUserInput();
+	
+	// TODO - LATER -after getting evens check if there was resize window event
+	// TODO - PARSE USER INPUT
+}
 void ui::draw() {
 	// Draw tables
 	this->drawTable(this->tFiles);
 	this->drawTable(this->tOptions);
 	for (uiTable& tSubOption : this->tSubOptions)
 		this->drawTable(tSubOption);
-
-	//DEBUG - get user input - TODO - remove after testing
-	auto test = this->cInfo.getUserInput();
-
-	this->cInfo.setConsoleSize(defaultConsoleSizeX + 10, defaultConsoleSizeY + 5);
-
-	auto test2 = this->cInfo.getUserInput();
-
-	// TODO - LATER -after getting evens check if there was resize window event
-	// TODO - PARSE USER INPUT
 }
 
+void ui::runFrame() {
+	this->parseUserInput();
+	this->draw();
+}
 
 ui::ui() {
 	this->initConsole();

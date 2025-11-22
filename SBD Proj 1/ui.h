@@ -1,12 +1,14 @@
 #pragma once
 #include "common.h"
 #include "consoleInformations.h"
+#include "cursorInformations.h"
 #include "uiTable.h"
 
 class ui {
 private:
 	cInfo cInfo;
 	uiTable tFiles, tOptions;
+	cursorInformations cursInfo;
 	std::vector<uiTable> tSubOptions;
 	
 	void initConsole();
@@ -22,9 +24,9 @@ private:
 	void initTables();
 
 public:
-	void getUserInput();
-
-	void draw();
+	void parseUserInput();
+	void draw(); // draws in console
+	void runFrame(); // doesn't actually num frame per-se, but the spirit is there
 
 	ui();
 	~ui();

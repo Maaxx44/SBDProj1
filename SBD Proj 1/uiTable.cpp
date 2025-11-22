@@ -15,7 +15,6 @@ std::string uiTable::cutoffString(std::string str, unsigned int length, unsigned
 	return retStr;
 }
 
-
 uiTable::uiTable() : position({ 0, 0, 0, 0 }) {}
 uiTable::uiTable(REC newPosition) : position(newPosition) { }
 uiTable::uiTable(REC newPosition, std::string title) : position(newPosition), titleField(title) {}
@@ -24,9 +23,7 @@ uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> co
 }
 uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
 
-void uiTable::setTableSize(REC newPosition) {
-	this->position = newPosition;
-}
+// ---- SETTERS ----
 void uiTable::setTitle(std::string newTitle) {
 	this->titleField = newTitle;
 	this->titleMod = textModifiers();
@@ -59,38 +56,19 @@ void uiTable::setContentPartMod(textModifiers newContentMod, unsigned int conten
 void uiTable::setContentOffset(unsigned int newContentOffset) {
 	this->contentOffset = newContentOffset % contentField.size();
 }
-unsigned int uiTable::getContentOffset() const {
-	return this->contentOffset;
-}
-
 void uiTable::setTableVisible(bool isTableVisible) {
 	this->isTableVisible = isTableVisible;
 }
-bool uiTable::getTableVisible() const {
-	return this->isTableVisible;
+void uiTable::setTableSize(REC newPosition) {
+	this->position = newPosition;
 }
 
-void uiTable::updateTiming() {
-	for (textModifiers& contentLineMod : this->contentMod)
-		contentLineMod.updateTiming();
+void uiTable::setTablePointers(uiTablePointer newTablePointers) {
+	this->tablePointers = newTablePointers;
 }
+// -----------------
 
-
-void uiTable::setPositionToText() {
-	this->position.H = (int)this->contentField.size() + 1;
-
-	unsigned int maxLength = (unsigned int)this->titleField.size();
-
-	for (std::string s : this->contentField)
-		maxLength = (maxLength < (unsigned int)s.size()) ? (unsigned int)s.size() : maxLength;
-	
-	this->position.W = maxLength;
-}
-unsigned int uiTable::getContentHeight() const {
-	return this->position.H - 1;
-}
-
-
+// ---- GETTERS ----
 std::string uiTable::getTitle() const {
 	return cutoffString(this->titleField, this->position.W, stringCutOffMin);
 }
@@ -185,10 +163,39 @@ textModifiers& uiTable::getContentLineMod(unsigned int n) {
 	return this->contentMod[n];
 }
 
-
 REC uiTable::getTitleRectangle() const {
 	return { .X = this->position.X, .Y = this->position.Y, .W = this->position.W, .H = 1 };
 }
 REC uiTable::getContentRectangle() const {
 	return { .X = this->position.X, .Y = this->position.Y + 1, .W = this->position.W, .H = this->position.H - 1 };
+}
+
+unsigned int uiTable::getContentHeight() const {
+	return this->position.H - 1;
+}
+unsigned int uiTable::getContentOffset() const {
+	return this->contentOffset;
+}
+bool uiTable::getTableVisible() const {
+	return this->isTableVisible;
+}
+
+uiTablePointer& uiTable::getTablePointers() {
+	return this->tablePointers;
+}
+// -----------------
+
+void uiTable::updateTiming() {
+	for (textModifiers& contentLineMod : this->contentMod)
+		contentLineMod.updateTiming();
+}
+void uiTable::setPositionToText() {
+	this->position.H = (int)this->contentField.size() + 1;
+
+	unsigned int maxLength = (unsigned int)this->titleField.size();
+
+	for (std::string s : this->contentField)
+		maxLength = (maxLength < (unsigned int)s.size()) ? (unsigned int)s.size() : maxLength;
+
+	this->position.W = maxLength;
 }

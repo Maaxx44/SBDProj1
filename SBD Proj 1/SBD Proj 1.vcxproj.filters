@@ -51,6 +51,12 @@
     <ClCompile Include="textModifiers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cursorInformations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uiTablePointer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -87,6 +93,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textModifiers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cursorInformations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uiTablePointer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
