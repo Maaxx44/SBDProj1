@@ -210,3 +210,50 @@ INPUT_RECORD consoleInformations::getOneKeyUserInput() const {
 
 	return inputBuffer;
 }
+bool consoleInformations::isInputAvalible() const {
+	if (this->cInputHandle == NULL) throw std::runtime_error("isInputAvalible error: cInputHandle was NULL!");
+	INPUT_RECORD inputBuffer;
+	DWORD eventCount = 0x0000;
+
+	if (!PeekConsoleInput(this->cInputHandle, &inputBuffer, 1, &eventCount))
+		ErrorHandler("Failed to read console input!");
+
+	return eventCount != 0x000;
+}
+bool consoleInformations::isKeyInputAvalible() const {
+	if (this->cInputHandle == NULL) throw std::runtime_error("isKeyInputAvalible error: cInputHandle was NULL!");
+	INPUT_RECORD inputBuffer;
+	DWORD eventCount = 0x0000;
+
+	if (!PeekConsoleInput(this->cInputHandle, &inputBuffer, 1, &eventCount))
+		ErrorHandler("Failed to peek console input!");
+
+	return eventCount != 0x000 && inputBuffer.EventType == KEY_EVENT && inputBuffer.Event.KeyEvent.bKeyDown;
+}
+std::optional<KEY_EVENT_RECORD> consoleInformations::getFirstKeyInput() const {
+	if (this->cInputHandle == NULL) throw std::runtime_error("getFirstKeyInput error: cInputHandle was NULL!");
+
+	INPUT_RECORD inputBuffer;
+	DWORD eventCount = 0x0000;
+	bool keyEventReached = false;
+
+	while (!keyEventReached) {
+		// Checking if there is anything in the queue
+		if (!PeekConsoleInput(this->cInputHandle, &inputBuffer, 1, &eventCount))
+			ErrorHandler("Failed to peek console input!");
+		if (eventCount == 0) return std::nullopt;
+
+		// Getting input event
+		if (!ReadConsoleInput(this->cInputHandle, &inputBuffer, 1, &eventCount))
+			ErrorHandler("Failed to read console input!");
+
+		// Checking if we reched key down event or the end of queue
+		else if (inputBuffer.EventType == KEY_EVENT && inputBuffer.Event.KeyEvent.bKeyDown) {
+			keyEventReached = true;
+			break;
+		}
+
+	}
+
+	return std::optional<KEY_EVENT_RECORD>(inputBuffer.Event.KeyEvent);
+}

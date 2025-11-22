@@ -31,6 +31,9 @@ public:
 	void startBlink();
 	void startFlash();
 
+	void stopBlink();
+	void stopFlash();
+
 	void updateTiming();
 };
 

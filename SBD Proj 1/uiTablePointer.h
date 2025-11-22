@@ -5,5 +5,8 @@ class uiTable;
 
 struct uiTablePointer {
 	uiTable *up, *down, *left, *right; // raw pointer - OUCH!
+
+	uiTablePointer();
+	uiTablePointer(uiTable* up, uiTable *down, uiTable *left, uiTable *right);
 };
 

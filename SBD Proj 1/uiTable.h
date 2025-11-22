@@ -73,6 +73,7 @@ public:
 
 	/// This function gets size of the WHOLE content
 	unsigned int getContentHeight() const;
+	unsigned int getContentSize() const;
 	unsigned int getContentOffset() const;
 	bool getTableVisible() const;
 

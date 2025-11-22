@@ -31,5 +31,9 @@ public:
 	std::vector<INPUT_RECORD> getUserInput(std::vector<char> cBreak) const; // Stops reading input buffer at selected character/s keyboard input
 	INPUT_RECORD getOneUserInput() const; // Returns next event
 	INPUT_RECORD getOneKeyUserInput() const; // Returns next event with keydown
+	bool isInputAvalible() const; // checks if there is input in input buffer
+	bool isKeyInputAvalible() const; // checks if there is key input in input buffer
+	std::optional< KEY_EVENT_RECORD> getFirstKeyInput() const; // if there is any key event in the queue  - get first and return - else - empty queue
+
 };
 typedef consoleInformations cInfo;

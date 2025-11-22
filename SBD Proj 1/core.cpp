@@ -4,8 +4,7 @@
 
 
 core::core() {
-	while (true) {
-		this->userInterface.runFrame();
+	while (this->userInterface.runFrame()) {
 		//std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }

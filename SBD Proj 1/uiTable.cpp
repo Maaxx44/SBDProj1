@@ -173,6 +173,9 @@ REC uiTable::getContentRectangle() const {
 unsigned int uiTable::getContentHeight() const {
 	return this->position.H - 1;
 }
+unsigned int uiTable::getContentSize() const {
+	return this->contentField.size();
+}
 unsigned int uiTable::getContentOffset() const {
 	return this->contentOffset;
 }

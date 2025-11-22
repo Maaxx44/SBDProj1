@@ -7,6 +7,35 @@ void ui::initConsole() {
 	this->cInfo.setConsoleMode(consoleNoTextMode);
 	this->cInfo.setCursorVisibility(false);
 }
+void ui::initTables() {
+	// Creating files table
+	this->tFiles = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
+
+	//this->tFiles.getContentLineMod(0).isTextSelected = true;
+	//this->tFiles.getContentLineMod(2).isTextSelected = true;
+	//this->tFiles.getContentLineMod(4).isTextHighlighted = true;
+	//this->tFiles.getContentLineMod(1).startBlink();
+	//
+	//this->tFiles.setContentOffset(1);
+
+	// Creating Options table
+	this->tOptions = uiTable({ .X = 2, .Y = 9, .W = 15, .H = 5 }, "Options", { "Add File", "Edit File", "Sort File", "Quit" });
+
+	this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
+	this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
+
+
+
+	// TODO - create sub-options tables
+
+	// Initializing cursor with it pointing to options table
+	this->cursorInfo.cType = tablePointer;
+	this->cursorInfo.currentContentCursorPoint = 0;
+	this->cursorInfo.currentTableCursorPoint = &this->tOptions;
+	this->cursorInfo.selectedTables.clear();
+	this->selectTable(&this->tOptions);
+}
+
 void ui::resetColor() const {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 }
@@ -72,32 +101,160 @@ void ui::drawTable(uiTable& table) const {
 	drawTableContent(table);
 }
 
-void ui::initTables() {
-	// Creating files table
-	this->tFiles = uiTable({.X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
-	this->tFiles.getContentLineMod(0).isTextSelected = true;
-	this->tFiles.getContentLineMod(2).isTextSelected = true;
-	this->tFiles.getContentLineMod(4).isTextHighlighted = true;
-	this->tFiles.getContentLineMod(1).startBlink();
-
-	this->tFiles.setContentOffset(1);
-
-	// Creating Options table
-	this->tOptions = uiTable({.X = 2, .Y = 9, .W = 15, .H = 5 }, "Options", {"Add File", "Edit File", "Sort File", "Quit"});
-
-	// TODO - create sub-options tables
+void ui::selectTable(uiTable* table) {
+	table->getTitleMod().startBlink();
+}
+void ui::deselectTable(uiTable* table) {
+	table->getTitleMod().stopBlink();
+}
+void ui::changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable) {
+	selectTable(newSelectedTable);
+	deselectTable(oldDeselectedTable);
 }
 
-void ui::parseUserInput() {
-	//DEBUG - get user input - TODO - remove after testing
-	//auto test = this->cInfo.getUserInput();
-	
-	//this->cInfo.setConsoleSize(defaultConsoleSizeX + 10, defaultConsoleSizeY + 5);
-	
-	//auto test2 = this->cInfo.getUserInput();
-	
-	// TODO - LATER -after getting evens check if there was resize window event
-	// TODO - PARSE USER INPUT
+
+void ui::selectContent(unsigned int contentLine) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
+	this->cursorInfo.currentTableCursorPoint->getContentLineMod(contentLine).startBlink();
+}
+void ui::deselectContent(unsigned int contentLine) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
+	this->cursorInfo.currentTableCursorPoint->getContentLineMod(contentLine).stopBlink();
+}
+void ui::changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
+	selectContent(newSelectedLine);
+	deselectContent(oldDeselectedLine);
+}
+
+
+
+bool ui::parseUserInput() {
+	if (cursorInfo.cType == disabled) return true;
+	if (this->cursorInfo.currentTableCursorPoint == nullptr)
+		this->cursorInfo.currentTableCursorPoint = &this->tOptions;
+
+
+	// While there is input to be read - read it 
+	// side note - this is sub-optimal solution. If there is input spam we can have ui lags. But I don't care right now
+	std::optional<KEY_EVENT_RECORD> keyRecord = this->cInfo.getFirstKeyInput();
+	while (keyRecord != std::nullopt) {
+		// Getting pressed key code (virtual code is device independent)
+		KEY_EVENT_RECORD inputKey = keyRecord.value();
+		WORD keyCode = inputKey.wVirtualKeyCode;
+
+
+		// Parse input according to cursor Informations
+		switch (cursorInfo.cType) {
+		case tablePointer:
+			// Check for arrows, enter and escape and change / select tables
+			switch (keyCode) {
+			case VK_UP:
+				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().up != nullptr) {
+					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().up, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().up; // change cursor to new selected table
+				}
+				break;
+			case VK_DOWN:
+				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().down != nullptr) {
+					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().down, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().down; // change cursor to new selected table
+				}
+				break;
+			case VK_LEFT:
+				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().left != nullptr) {
+					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().left, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().left; // change cursor to new selected table
+				}
+				break;
+			case VK_RIGHT:
+				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().right != nullptr) {
+					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().right, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().right; // change cursor to new selected table
+				}
+				break;
+			case VK_ESCAPE:
+				// go back to prev. selected table - TODO
+				if (cursorInfo.selectedTables.size() == 0) //end program
+					return false;
+				else {
+					if (cursorInfo.selectedTables.back() != this->cursorInfo.currentTableCursorPoint) {
+						this->changeSelectedTable(cursorInfo.selectedTables.back(), this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+						this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back(); // change cursor to new selected table
+						cursorInfo.selectedTables.pop_back(); // just remove last element
+					}
+				}
+				break;
+			case VK_RETURN:
+				// First - highlight current table title and disable blinking
+				this->deselectTable(this->cursorInfo.currentTableCursorPoint);
+				this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextHighlighted = true;
+
+				// Change cursor settings
+				this->cursorInfo.cType = contentPointer;
+				this->cursorInfo.currentContentCursorPoint = 0;
+
+				// Set content blinking
+				selectContent(this->cursorInfo.currentContentCursorPoint);
+
+				// Add this table to selected tables
+				cursorInfo.selectedTables.push_back(this->cursorInfo.currentTableCursorPoint);
+
+				break;
+			}
+			break;
+		case contentPointer:
+			// Check for arrows, enter and escape and change / select content
+			switch (keyCode) {
+			case VK_UP:
+				if (this->cursorInfo.currentContentCursorPoint == 0) {
+					unsigned int newContentCirsorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
+					this->changeSelectedContent(newContentCirsorPointer, this->cursorInfo.currentContentCursorPoint);
+					this->cursorInfo.currentContentCursorPoint = newContentCirsorPointer;
+				}
+				else {
+					this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint - 1, this->cursorInfo.currentContentCursorPoint);
+					this->cursorInfo.currentContentCursorPoint--;
+				}
+				break;
+			case VK_DOWN:
+				if (this->cursorInfo.currentContentCursorPoint == this->cursorInfo.currentTableCursorPoint->getContentSize() - 1) {
+					this->changeSelectedContent(0, this->cursorInfo.currentContentCursorPoint);
+					this->cursorInfo.currentContentCursorPoint = 0;
+				}
+				else {
+					this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint + 1, this->cursorInfo.currentContentCursorPoint);
+					this->cursorInfo.currentContentCursorPoint++;
+				}
+				break;
+			case VK_ESCAPE:
+				// Change cursor type
+				this->cursorInfo.cType = tablePointer;
+
+				// Deselect content
+				this->deselectContent(this->cursorInfo.currentContentCursorPoint);
+
+				// Select last table, disable title highlight and enable blinking
+				this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back();
+				cursorInfo.selectedTables.back()->getTitleMod().isTextHighlighted = false;
+				this->selectTable(cursorInfo.selectedTables.back());
+				cursorInfo.selectedTables.pop_back();
+
+				break;
+			case VK_RETURN:
+				// TODO - call function corresponding to this line !!!!!!!!!!!!!!!!!!
+				break;
+			}
+			break;
+		default:
+			throw std::runtime_error("UI cursor state was incorrect.");
+		}
+		
+		// getting next record
+		keyRecord = this->cInfo.getFirstKeyInput();
+	}
+
+	return true;
 }
 void ui::draw() {
 	// Draw tables
@@ -107,9 +264,13 @@ void ui::draw() {
 		this->drawTable(tSubOption);
 }
 
-void ui::runFrame() {
-	this->parseUserInput();
+bool ui::runFrame() {
+	// hackjob with return values - change to something nicer when I have some more time
+	if (!this->parseUserInput())
+		return false;
 	this->draw();
+
+	return true;
 }
 
 ui::ui() {

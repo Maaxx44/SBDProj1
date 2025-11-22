@@ -66,6 +66,13 @@ void textModifiers::startFlash() {
 	this->isTextFlashing = true;
 }
 
+void textModifiers::stopBlink() {
+	this->isTextBlinking = false;
+}
+void textModifiers::stopFlash() {
+	this->isTextFlashing = false;
+}
+
 void textModifiers::updateTiming() {
 	std::chrono::time_point<std::chrono::steady_clock> currentTS = std::chrono::steady_clock::now();
 

@@ -8,10 +8,12 @@ class ui {
 private:
 	cInfo cInfo;
 	uiTable tFiles, tOptions;
-	cursorInformations cursInfo;
+	cursorInformations cursorInfo;
 	std::vector<uiTable> tSubOptions;
 	
 	void initConsole();
+	void initTables();
+
 	void changeColor(WORD colorParameters) const;
 	void resetColor() const;
 
@@ -21,12 +23,18 @@ private:
 	void drawTableContent(uiTable& table) const;
 	void drawTable(uiTable& table) const;
 
-	void initTables();
+	void selectTable(uiTable* table); // enables blinking mode in table
+	void deselectTable(uiTable* table); // disables blinking mode in table
+	void changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable);
+
+	void selectContent(unsigned int contentLine);
+	void deselectContent(unsigned int contentLine);
+	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 
 public:
-	void parseUserInput();
+	bool parseUserInput();
 	void draw(); // draws in console
-	void runFrame(); // doesn't actually num frame per-se, but the spirit is there
+	bool runFrame(); // doesn't actually num frame per-se, but the spirit is there - returns false if program is to exiasdfam[fiuyh8gtw
 
 	ui();
 	~ui();
