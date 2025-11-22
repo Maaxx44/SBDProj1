@@ -11,7 +11,7 @@ void ui::resetColor() const {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 }
 void ui::changeColor(WORD colorParameters) const{
-	if (this->cInfo.cHandle != NULL && !SetConsoleTextAttribute(this->cInfo.cHandle, colorParameters))
+	if (this->cInfo.cOutputHandle != NULL && !SetConsoleTextAttribute(this->cInfo.cOutputHandle, colorParameters))
 		ErrorHandler("Failed to set console font attributes!");
 }
 
@@ -98,7 +98,12 @@ void ui::draw() {
 	//DEBUG - get user input - TODO - remove after testing
 	auto test = this->cInfo.getUserInput();
 
+	this->cInfo.setConsoleSize(defaultConsoleSizeX + 10, defaultConsoleSizeY + 5);
 
+	auto test2 = this->cInfo.getUserInput();
+
+	// TODO - LATER -after getting evens check if there was resize window event
+	// TODO - PARSE USER INPUT
 }
 
 

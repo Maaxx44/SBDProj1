@@ -38,6 +38,7 @@
 //  Console drawing
 #define defaultConsoleSizeX 150
 #define defaultConsoleSizeY 50
+#define defaultConsoleSizeToBufferOffset 1 // console API requires console buffer to be larger than size (i don't know how that works, documentation is shit about that) so we add default offset to buffer
 #define defaultConsoleTitle "SBD Proj 1"
 //  Console parameters
 #define consoleNoTextMode 0x0000 | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_LVB_GRID_WORLDWIDE | DISABLE_NEWLINE_AUTO_RETURN 
@@ -47,6 +48,8 @@
 #define blinkOnTimeMs 450
 #define blinkOffTimeMs 150
 #define flashOnTimeMs 250		// flash does not repeat so it wont need offf time
+//  UserInput Parameters
+#define ignoredInputEvents (FOCUS_EVENT | MENU_EVENT | MOUSE_EVENT)
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;
