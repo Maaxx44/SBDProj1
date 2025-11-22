@@ -11,22 +11,14 @@ void ui::initTables() {
 	// Creating files table
 	this->tFiles = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
 
-	//this->tFiles.getContentLineMod(0).isTextSelected = true;
-	//this->tFiles.getContentLineMod(2).isTextSelected = true;
-	//this->tFiles.getContentLineMod(4).isTextHighlighted = true;
-	//this->tFiles.getContentLineMod(1).startBlink();
-	//
-	//this->tFiles.setContentOffset(1);
-
 	// Creating Options table
 	this->tOptions = uiTable({ .X = 2, .Y = 9, .W = 15, .H = 5 }, "Options", { "Add File", "Edit File", "Sort File", "Quit" });
 
+	// TODO - create sub-options tables
+
+	// Setting tables pointers
 	this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
 	this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
-
-
-
-	// TODO - create sub-options tables
 
 	// Initializing cursor with it pointing to options table
 	this->cursorInfo.cType = tablePointer;
@@ -111,8 +103,6 @@ void ui::changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTa
 	selectTable(newSelectedTable);
 	deselectTable(oldDeselectedTable);
 }
-
-
 void ui::selectContent(unsigned int contentLine) {
 	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
 	this->cursorInfo.currentTableCursorPoint->getContentLineMod(contentLine).startBlink();
@@ -127,7 +117,107 @@ void ui::changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDes
 	deselectContent(oldDeselectedLine);
 }
 
+bool ui::parseTableInput(WORD keyCode) {
+	switch (keyCode) {
+	case VK_UP:
+		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().up != nullptr) {
+			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().up, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().up; // change cursor to new selected table
+		}
+		break;
+	case VK_DOWN:
+		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().down != nullptr) {
+			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().down, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().down; // change cursor to new selected table
+		}
+		break;
+	case VK_LEFT:
+		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().left != nullptr) {
+			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().left, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().left; // change cursor to new selected table
+		}
+		break;
+	case VK_RIGHT:
+		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().right != nullptr) {
+			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().right, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().right; // change cursor to new selected table
+		}
+		break;
+	case VK_ESCAPE:
+		// go back to prev. selected table - TODO
+		if (cursorInfo.selectedTables.size() == 0) //end program
+			return false;
+		else {
+			if (cursorInfo.selectedTables.back() != this->cursorInfo.currentTableCursorPoint) {
+				this->changeSelectedTable(cursorInfo.selectedTables.back(), this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+				this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back(); // change cursor to new selected table
+				cursorInfo.selectedTables.pop_back(); // just remove last element
+			}
+		}
+		break;
+	case VK_RETURN:
+		// First - highlight current table title and disable blinking
+		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
+		this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextHighlighted = true;
 
+		// Change cursor settings
+		this->cursorInfo.cType = contentPointer;
+		this->cursorInfo.currentContentCursorPoint = 0;
+
+		// Set content blinking
+		selectContent(this->cursorInfo.currentContentCursorPoint);
+
+		// Add this table to selected tables
+		cursorInfo.selectedTables.push_back(this->cursorInfo.currentTableCursorPoint);
+
+		break;
+	}
+	return true;
+}
+bool ui::parseContentInput(WORD keyCode) {
+	// Check for arrows, enter and escape and change / select content
+	switch (keyCode) {
+	case VK_UP:
+		if (this->cursorInfo.currentContentCursorPoint == 0) {
+			unsigned int newContentCirsorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
+			this->changeSelectedContent(newContentCirsorPointer, this->cursorInfo.currentContentCursorPoint);
+			this->cursorInfo.currentContentCursorPoint = newContentCirsorPointer;
+		}
+		else {
+			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint - 1, this->cursorInfo.currentContentCursorPoint);
+			this->cursorInfo.currentContentCursorPoint--;
+		}
+		break;
+	case VK_DOWN:
+		if (this->cursorInfo.currentContentCursorPoint == this->cursorInfo.currentTableCursorPoint->getContentSize() - 1) {
+			this->changeSelectedContent(0, this->cursorInfo.currentContentCursorPoint);
+			this->cursorInfo.currentContentCursorPoint = 0;
+		}
+		else {
+			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint + 1, this->cursorInfo.currentContentCursorPoint);
+			this->cursorInfo.currentContentCursorPoint++;
+		}
+		break;
+	case VK_ESCAPE:
+		// Change cursor type
+		this->cursorInfo.cType = tablePointer;
+
+		// Deselect content
+		this->deselectContent(this->cursorInfo.currentContentCursorPoint);
+
+		// Select last table, disable title highlight and enable blinking
+		this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back();
+		cursorInfo.selectedTables.back()->getTitleMod().isTextHighlighted = false;
+		this->selectTable(cursorInfo.selectedTables.back());
+		cursorInfo.selectedTables.pop_back();
+
+		break;
+	case VK_RETURN:
+		// TODO - call function corresponding to this line !!!!!!!!!!!!!!!!!!
+		break;
+	}
+	return true;
+}
 
 bool ui::parseUserInput() {
 	if (cursorInfo.cType == disabled) return true;
@@ -143,108 +233,13 @@ bool ui::parseUserInput() {
 		KEY_EVENT_RECORD inputKey = keyRecord.value();
 		WORD keyCode = inputKey.wVirtualKeyCode;
 
-
 		// Parse input according to cursor Informations
 		switch (cursorInfo.cType) {
 		case tablePointer:
-			// Check for arrows, enter and escape and change / select tables
-			switch (keyCode) {
-			case VK_UP:
-				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().up != nullptr) {
-					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().up, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
-					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().up; // change cursor to new selected table
-				}
-				break;
-			case VK_DOWN:
-				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().down != nullptr) {
-					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().down, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
-					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().down; // change cursor to new selected table
-				}
-				break;
-			case VK_LEFT:
-				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().left != nullptr) {
-					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().left, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
-					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().left; // change cursor to new selected table
-				}
-				break;
-			case VK_RIGHT:
-				if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().right != nullptr) {
-					this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().right, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
-					this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().right; // change cursor to new selected table
-				}
-				break;
-			case VK_ESCAPE:
-				// go back to prev. selected table - TODO
-				if (cursorInfo.selectedTables.size() == 0) //end program
-					return false;
-				else {
-					if (cursorInfo.selectedTables.back() != this->cursorInfo.currentTableCursorPoint) {
-						this->changeSelectedTable(cursorInfo.selectedTables.back(), this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
-						this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back(); // change cursor to new selected table
-						cursorInfo.selectedTables.pop_back(); // just remove last element
-					}
-				}
-				break;
-			case VK_RETURN:
-				// First - highlight current table title and disable blinking
-				this->deselectTable(this->cursorInfo.currentTableCursorPoint);
-				this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextHighlighted = true;
-
-				// Change cursor settings
-				this->cursorInfo.cType = contentPointer;
-				this->cursorInfo.currentContentCursorPoint = 0;
-
-				// Set content blinking
-				selectContent(this->cursorInfo.currentContentCursorPoint);
-
-				// Add this table to selected tables
-				cursorInfo.selectedTables.push_back(this->cursorInfo.currentTableCursorPoint);
-
-				break;
-			}
+			if (!parseTableInput(keyCode)) return false;
 			break;
 		case contentPointer:
-			// Check for arrows, enter and escape and change / select content
-			switch (keyCode) {
-			case VK_UP:
-				if (this->cursorInfo.currentContentCursorPoint == 0) {
-					unsigned int newContentCirsorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
-					this->changeSelectedContent(newContentCirsorPointer, this->cursorInfo.currentContentCursorPoint);
-					this->cursorInfo.currentContentCursorPoint = newContentCirsorPointer;
-				}
-				else {
-					this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint - 1, this->cursorInfo.currentContentCursorPoint);
-					this->cursorInfo.currentContentCursorPoint--;
-				}
-				break;
-			case VK_DOWN:
-				if (this->cursorInfo.currentContentCursorPoint == this->cursorInfo.currentTableCursorPoint->getContentSize() - 1) {
-					this->changeSelectedContent(0, this->cursorInfo.currentContentCursorPoint);
-					this->cursorInfo.currentContentCursorPoint = 0;
-				}
-				else {
-					this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint + 1, this->cursorInfo.currentContentCursorPoint);
-					this->cursorInfo.currentContentCursorPoint++;
-				}
-				break;
-			case VK_ESCAPE:
-				// Change cursor type
-				this->cursorInfo.cType = tablePointer;
-
-				// Deselect content
-				this->deselectContent(this->cursorInfo.currentContentCursorPoint);
-
-				// Select last table, disable title highlight and enable blinking
-				this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back();
-				cursorInfo.selectedTables.back()->getTitleMod().isTextHighlighted = false;
-				this->selectTable(cursorInfo.selectedTables.back());
-				cursorInfo.selectedTables.pop_back();
-
-				break;
-			case VK_RETURN:
-				// TODO - call function corresponding to this line !!!!!!!!!!!!!!!!!!
-				break;
-			}
+			if (!parseContentInput(keyCode)) return false;
 			break;
 		default:
 			throw std::runtime_error("UI cursor state was incorrect.");

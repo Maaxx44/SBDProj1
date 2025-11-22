@@ -17,20 +17,23 @@ private:
 	void changeColor(WORD colorParameters) const;
 	void resetColor() const;
 
-	//Helper functions for drawing tables
+	// Helper functions for drawing tables
 	void drawTableTitle(uiTable& table) const;
 	void drawTableContentLine(uiTable& table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const;
 	void drawTableContent(uiTable& table) const;
 	void drawTable(uiTable& table) const;
 
+	// Helper functions for cursor manipulation
 	void selectTable(uiTable* table); // enables blinking mode in table
 	void deselectTable(uiTable* table); // disables blinking mode in table
 	void changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable);
-
 	void selectContent(unsigned int contentLine);
 	void deselectContent(unsigned int contentLine);
 	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 
+	// Helper functions for input parsing
+	bool parseTableInput(WORD keyCode); // returns false if needs program to exit
+	bool parseContentInput(WORD keyCode); // returns false if needs program to exit
 public:
 	bool parseUserInput();
 	void draw(); // draws in console
