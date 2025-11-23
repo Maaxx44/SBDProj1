@@ -245,24 +245,38 @@ double ui::parseNumberInput() {
 	std::cin >> returnValue;
 
 	this->cInfo.setCursorPosition(0, 0);
-	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().Y; i++)
+	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().X; i++)
+		std::cout << " ";
+
+	return returnValue;
+}
+double ui::parseNumberInput(std::string customMessage) {
+	// dirty hack! CHANGE LATER
+	this->cInfo.setCursorPosition(0, 0);
+	std::cout << customMessage;
+	double returnValue = 0;
+	std::cin >> returnValue;
+
+	this->cInfo.setCursorPosition(0, 0);
+	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().X; i++)
 		std::cout << " ";
 
 	return returnValue;
 }
 
+
 void ui::executeUserInput() {
 	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
 		switch (this->cursorInfo.currentContentCursorPoint) {
 		case 0: // "Make random file"
-			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput());
+			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records:"));
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
 			break;
 		case 1: // "Make empty file"
 			this->openedFile.clear();
-			this->openedFile.setSize((unsigned int)parseNumberInput());
+			this->openedFile.setSize((unsigned int)parseNumberInput("Enter no. records:"));
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
@@ -277,7 +291,17 @@ void ui::executeUserInput() {
 			break;
 		}
 	}
-	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) { /*edit file*/ }
+	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) {
+		this->cursorInfo.currentContentCursorPoint;
+		double userAngle = std::fmod(parseNumberInput("Enter angle:"), 360.0);
+		double userRadius = parseNumberInput("Enter radius:");
+		if (userRadius <= 0.0) userRadius = 5;
+
+		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
+		this->updateFilePreview();
+		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
+		this->selectContent(this->cursorInfo.currentContentCursorPoint);
+	}
 }
 void ui::updateFilePreview() {
 	// aprsing numbers into strings
