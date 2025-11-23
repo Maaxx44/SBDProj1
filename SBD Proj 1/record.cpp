@@ -24,3 +24,7 @@ bool compareRecords(record A, record B) {
 bool compareRecordsRef(record& A, record& B) {
 	return A.calculateArea() > B.calculateArea();
 }
+
+bool compareRecordsRef(const record& A, const record& B) {
+	return A.calculateArea() > B.calculateArea();
+}

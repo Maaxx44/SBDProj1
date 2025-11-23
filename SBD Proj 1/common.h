@@ -17,8 +17,8 @@
 #include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
 
 // Data parameters
-#define BLOCK_SIZE 16 // how many records in a block
-#define blocksPerMemory 8 // how many block can we read into memory
+#define BLOCK_SIZE 8 // how many records in a block
+#define blocksPerMemory 1 // how many block can we read into memory
 
 // Random data generation
 #define randomRadiusMin 3.0

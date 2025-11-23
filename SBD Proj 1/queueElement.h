@@ -8,4 +8,5 @@ struct queueElement {
 
 	// Used by queue to compare recprds
 	bool operator() (queueElement& A, queueElement& B);
+	bool operator< (const queueElement& B) const;
 };

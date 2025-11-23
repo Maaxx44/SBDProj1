@@ -15,7 +15,7 @@ core::core() {
 	newSorter.addTapeToSort(&randomTape);
 	newSorter.sortTapeFull();
 
-	for (unsigned int i = 0; i < 16/*randomTape.getSize()*/; i++) {
+	for (unsigned int i = 0; i < 24/*randomTape.getSize()*/; i++) {
 		std::cout << i << ": [A=" << randomTape.getRecord(i).getAngle() << ", R=" << randomTape.getRecord(i).getRadius() << "] => Area: " << randomTape.getRecord(i).calculateArea() << std::endl;
 	}
 }

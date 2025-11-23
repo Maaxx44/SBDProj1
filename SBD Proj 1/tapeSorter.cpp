@@ -40,6 +40,13 @@ void tapeSorter::clean() {
 	this->numberOfRuns = 0;
 }
 
+class Compare {
+public:
+	bool operator() (queueElement A, queueElement B) {
+		return A.rData.calculateArea() < B.rData.calculateArea();
+	}
+};
+
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
 
@@ -76,7 +83,7 @@ void tapeSorter::sortTapeFull() {
 	this->mainTape->clear();
 	this->mainTape->setSize(this->tapeSize);
 	//  Creating prio. queue for mering runs
-	std::priority_queue<queueElement, std::vector<queueElement>, queueElement> mergingQueue;
+	std::priority_queue<queueElement, std::vector<queueElement>, Compare> mergingQueue;
 	// Iterating over every run and pushing first value to PQ
 	for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
 		mergingQueue.push(queueElement{

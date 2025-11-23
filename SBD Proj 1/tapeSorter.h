@@ -2,6 +2,7 @@
 #include "common.h"
 #include "fileTape.h"
 #include "queueElement.h"
+#include <functional>
 
 class tapeSorter {
 private:
