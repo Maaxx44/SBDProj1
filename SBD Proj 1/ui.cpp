@@ -9,7 +9,7 @@ void ui::initConsole() {
 }
 void ui::initTables() {
 	// Creating tables
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 21 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
 	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work file preview", {}); // work file preview will not be editable
 
@@ -275,6 +275,10 @@ void ui::executeUserInput() {
 		case 2: // "Open File"
 			break;
 		case 3: // "Clear File"
+			this->openedFile.clear();
+			this->sorter.clean();
+			this->updateFilePreview();
+			this->updateWorkFilePreview();
 			break;
 		case 4: // "Sort file"
 			this->sorter.clean();
