@@ -4,6 +4,11 @@
 #include "queueElement.h"
 #include <functional>
 
+enum sortingStage {
+	stage1,
+	stage2
+};
+
 class tapeSorter {
 private:
 	// Disk files
@@ -17,6 +22,9 @@ private:
 	unsigned int tapeSize;
 	const unsigned int runSize = (blocksPerMemory*BLOCK_SIZE);
 	unsigned int numberOfRuns;
+	
+	// for partial sorting - unaffected by whole sorting
+	sortingStage currentSortStage;
 
 public:
 	tapeSorter();
@@ -26,9 +34,9 @@ public:
 	void clean();
 
 	void sortTapeFull(); // Sorts full tape in one go, without stopping
+	void sortNextStage(); // Iterates over every step of sorting
 
 	bool isTapeLoaded() const;
 
-	void sortFileLegacy(fileTape* inputTape);
 };
 

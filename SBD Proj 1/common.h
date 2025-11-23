@@ -49,9 +49,9 @@
 //  Timing parameters
 #define isSelectionFlashingEnabled true 
 #define isUpdateHighlightingEnabled true
-#define blinkOnTimeMs 450
-#define blinkOffTimeMs 150
-#define flashOnTimeMs 250		// flash does not repeat so it wont need off time
+#define blinkOnTimeMs 250
+#define blinkOffTimeMs 250
+#define flashOnTimeMs 750		// flash does not repeat so it wont need off time
 //  UserInput Parameters
 #define ignoredInputEvents (FOCUS_EVENT | MENU_EVENT | MOUSE_EVENT)
 

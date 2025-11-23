@@ -20,7 +20,7 @@ void ui::initTables() {
 	//this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
 	//this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
 
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Make random file", "Make empty file", "Fully sort file", "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" });
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Make random file", "Make empty file", "Fully sort file" });
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
 
 	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tFilePreview));
