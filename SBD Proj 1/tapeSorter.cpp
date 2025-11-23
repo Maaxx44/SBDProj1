@@ -1,21 +1,23 @@
 #include "tapeSorter.h"
 
-tapeSorter::tapeSorter(): mainTape(nullptr), mainMemory(nullptr), tapeSize(0), runSize(0), numberOfRuns(0) {}
-tapeSorter::~tapeSorter() {
-	if (mainMemory != nullptr) delete[] this->mainMemory;
+tapeSorter::tapeSorter(): mainTape(nullptr), tapeSize(0), numberOfRuns(0) {
+	for (unsigned int i = 0; i < this->runSize; i++) {
+		this->mainMemory[i].setAngle(0);
+		this->mainMemory[i].setRadius(0);
+	}
 }
+tapeSorter::~tapeSorter() { }
 
 void tapeSorter::addTapeToSort(fileTape* inputTape) {
 	if (inputTape == nullptr) throw std::runtime_error("addTapeToSort error: inputTape was nullptr!");
-	if (mainMemory != nullptr) delete[] this->mainMemory;
+	for (unsigned int i = 0; i < this->runSize; i++) {
+		this->mainMemory[i].setAngle(0);
+		this->mainMemory[i].setRadius(0);
+	}
 
 	// Calculating necesarry informations
 	this->tapeSize = inputTape->getSize();
-	this->runSize  = blocksPerMemory * BLOCK_SIZE;
 	this->numberOfRuns = (unsigned int)std::ceil((double)this->tapeSize / (double)this->runSize);
-
-	// Creating main memory (aka. RAM)
-	this->mainMemory = new record[runSize];
 
 	// Saving input tape pointer
 	this->mainTape = inputTape;
@@ -26,7 +28,10 @@ void tapeSorter::addTapeToSort(fileTape* inputTape) {
 }
 void tapeSorter::clean() {
 	// Clearing main memory
-	if (mainMemory != nullptr) delete[] this->mainMemory;
+	for (unsigned int i = 0; i < this->runSize; i++) {
+		this->mainMemory[i].setAngle(0);
+		this->mainMemory[i].setRadius(0);
+	}
 
 	// Clearing work tape
 	this->workTape.clear();
@@ -36,7 +41,6 @@ void tapeSorter::clean() {
 
 	// Clearing informations
 	this->tapeSize = 0;
-	this->runSize = 0;
 	this->numberOfRuns = 0;
 }
 bool tapeSorter::isTapeLoaded() const {
@@ -53,18 +57,19 @@ public:
 
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
+	if (this->mainTape->getSize() <= 1) return;
 
 	// Stage 1
 	for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
 		// load one run into memory
-		for(unsigned int runElementIndex = 0; runElementIndex < this->runSize; runElementIndex++)
+		for(unsigned int runElementIndex = 0; runElementIndex < min(this->runSize, this->mainTape->getSize() - runIndex * runSize); runElementIndex++)
 			mainMemory[runElementIndex] = this->mainTape->getRecord(runIndex * runSize + runElementIndex);
 
 		// sort records
-		std::sort(mainMemory, mainMemory + runSize, compareRecordsRef);
+		std::sort(mainMemory, mainMemory + min(this->runSize, this->mainTape->getSize() - runIndex * runSize), compareRecordsRef);
 
 		// save record to disk
-		for (unsigned int runElementIndex = 0; runElementIndex < this->runSize; runElementIndex++) {
+		for (unsigned int runElementIndex = 0; runElementIndex < min(this->runSize, this->mainTape->getSize() - runIndex * runSize); runElementIndex++) {
 			this->workTape.setRecord(runIndex * runSize + runElementIndex, mainMemory[runElementIndex]);
 		}
 
@@ -98,7 +103,7 @@ void tapeSorter::sortTapeFull() {
 	}
 
 	// Stage 2
-	for (unsigned int outputIndex = 0; mergingQueue.size() > 0; outputIndex++) {
+	for (unsigned int outputIndex = 0; mergingQueue.size() > 0 && outputIndex < this->tapeSize; outputIndex++) {
 		/// getting smallest/largest value and removing from queue
 		queueElement edgeElement = mergingQueue.top();
 		mergingQueue.pop();
@@ -107,7 +112,7 @@ void tapeSorter::sortTapeFull() {
 		this->mainTape->setRecord(outputIndex, edgeElement.rData);
 
 		/// pushing new element from the same run to queue (if there are any left from this run)
-		if (edgeElement.rElement < runSize - 1) {
+		if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
 			mergingQueue.push(queueElement{
 				.rIndex = edgeElement.rIndex, // Same index of the run
 				.rElement = edgeElement.rElement + 1, // Get next element of the run

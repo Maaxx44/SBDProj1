@@ -11,14 +11,12 @@ private:
 	fileTape  workTape;
 
 	// Main memory
-	record* mainMemory;
+	record mainMemory[(blocksPerMemory*BLOCK_SIZE)];
 
 	// Sorting data
 	unsigned int tapeSize;
-	unsigned int runSize;
+	const unsigned int runSize = (blocksPerMemory*BLOCK_SIZE);
 	unsigned int numberOfRuns;
-
-
 
 public:
 	tapeSorter();

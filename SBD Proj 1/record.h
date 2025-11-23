@@ -18,8 +18,8 @@ public:
 	double calculateArea() const;
 
 	record static getRandomRecord() {
-		double randomAngle = randomAngleMin + ((rand() % 100) / (randomAngleMax - randomAngleMin));
-		double randomRadius = randomRadiusMin + ((rand() % 100) / (randomRadiusMax - randomRadiusMin));
+		double randomAngle = randomAngleMin + (std::fmod(((double)rand()/100.0), (randomAngleMax - randomAngleMin)));
+		double randomRadius = randomRadiusMin + (std::fmod(((double)rand()/100.0), (randomRadiusMax - randomRadiusMin)));
 
 		return record(randomAngle, randomRadius);
 	}

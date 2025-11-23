@@ -256,15 +256,20 @@ void ui::executeUserInput() {
 		switch (this->cursorInfo.currentContentCursorPoint) {
 		case 0: // "Make random file"
 			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput());
+			this->sorter.clean();
+			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
 			break;
 		case 1: // "Make empty file"
 			this->openedFile.clear();
 			this->openedFile.setSize((unsigned int)parseNumberInput());
+			this->sorter.clean();
+			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
 			break;
 		case 2: // "Fully sort file"
-			if (!this->sorter.isTapeLoaded()) this->sorter.addTapeToSort(&this->openedFile);
+			this->sorter.clean();
+			this->sorter.addTapeToSort(&this->openedFile);
 			this->sorter.sortTapeFull();
 			this->updateFilePreview();
 			break;
