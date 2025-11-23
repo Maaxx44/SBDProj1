@@ -9,9 +9,8 @@
 class ui {
 private:
 	cInfo cInfo;
-	uiTable tFiles, tOptions, tFilePreview, tWorkFilePreview;
+	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 	cursorInformations cursorInfo;
-	std::vector<uiTable> tSubOptions;
 
 	// DIRTY HACK
 	fileTape openedFile;
@@ -47,6 +46,7 @@ private:
 	void executeUserInput(); // Executes functions based on selected table and content
 	void updateFilePreview();
 	void updateWorkFilePreview();
+	void updateSortingDataPreview();
 
 public:
 	functionExitCode parseUserInput();

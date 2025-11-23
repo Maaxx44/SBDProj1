@@ -9,14 +9,16 @@ void ui::initConsole() {
 }
 void ui::initTables() {
 	// Creating tables
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 21 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
-	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work file preview", {}); // work file preview will not be editable
+	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // work file preview will not be editable
+	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {});
 
 	// Creating links
-	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tWorkFilePreview, &this->tFilePreview));
+	this->tOptions.setTablePointers(uiTablePointer(&this->tSortingMetadata, &this->tSortingMetadata, &this->tWorkFilePreview, &this->tFilePreview));
 	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tWorkFilePreview));
 	this->tWorkFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tOptions));
+	this->tSortingMetadata.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, &this->tWorkFilePreview, &this->tFilePreview));
 
 
 	// Initializing cursor with it pointing to options table
@@ -259,14 +261,14 @@ void ui::executeUserInput() {
 			//TODO - SET TO FINAL FUNCTIONS !!!!
 		case 0: // "Empty File"
 			this->openedFile.clear();
-			this->openedFile.setSize((unsigned int)parseNumberInput("Enter no. records:"));
+			this->openedFile.setSize((unsigned int)parseNumberInput("Enter no. records: "));
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
 			this->updateWorkFilePreview();
 			break;
 		case 1: // "Random File"
-			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records:"));
+			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records: "));
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
@@ -286,16 +288,19 @@ void ui::executeUserInput() {
 			this->sorter.sortTapeFull();
 			this->updateFilePreview();
 			this->updateWorkFilePreview();
-			break;
+			this->updateSortingDataPreview();
+				break;
 		case 5: // "Sort step"
 			this->sorter.sortNextPart();
 			this->updateFilePreview();
 			this->updateWorkFilePreview();
-			break;
+			this->updateSortingDataPreview();
+				break;
 		case 6: // "Reset sorting"
 			this->sorter.resetSorting();
 			this->updateFilePreview();
 			this->updateWorkFilePreview();
+			this->updateSortingDataPreview();
 			break;
 		}
 	}
@@ -327,6 +332,13 @@ void ui::updateWorkFilePreview() {
 		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
 	}
 	this->tWorkFilePreview.setContent(parsedFile);
+}
+void ui::updateSortingDataPreview() {
+	std::pair<unsigned int, unsigned int> IOOperations = this->sorter.getIOperationsCount();
+	std::vector<std::string> sortingMetadata;
+	sortingMetadata.push_back("Reads: " + std::to_string(IOOperations.first));
+	sortingMetadata.push_back("Writes: " + std::to_string(IOOperations.second));
+	this->tSortingMetadata.setContent(sortingMetadata);
 }
 
 
@@ -368,6 +380,7 @@ void ui::draw() {
 	this->drawTable(this->tOptions);
 	this->drawTable(this->tFilePreview);
 	this->drawTable(this->tWorkFilePreview);
+	this->drawTable(this->tSortingMetadata);
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);

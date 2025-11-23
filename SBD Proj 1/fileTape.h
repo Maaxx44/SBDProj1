@@ -7,6 +7,9 @@ private:
 	std::vector<dataBlock> dataFile;
 	unsigned int dataLength;
 
+	unsigned int readCount;
+	unsigned int writeCount;
+
 	unsigned int getBlockOffset(unsigned int recordIndex) const;
 	unsigned int getOffsetIndex(unsigned int recordIndex) const;
 
@@ -14,11 +17,16 @@ public:
 	fileTape();
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
-	record getRecord(unsigned int recordIndex);
 	dataBlock getBlock(unsigned int blockIndex);
+	record getRecord(unsigned int recordIndex);
+	unsigned int getReadOperations() const;
+	unsigned int getWriteOperations() const;
+	unsigned int getSize() const;
+
+	void resetReadOperations();
+	void resetWriteOperations();
 	void setRecord(unsigned int recordIndex, record newRecord);
 	void addRecord(record newRecord);
-	unsigned int getSize() const;
 	void setSize(unsigned int newSize);
 	void clear();
 

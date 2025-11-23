@@ -30,6 +30,10 @@ private:
 	unsigned int tapeSize;
 	const unsigned int runSize = (blocksPerMemory*BLOCK_SIZE);
 	unsigned int numberOfRuns;
+
+	// Sorting metadata
+	unsigned int readOperations = 0;
+	unsigned int writeOperations = 0;
 	
 	// for partial sorting - unaffected by whole sorting
 	sortingStage currentSortStage;
@@ -41,17 +45,22 @@ public:
 	tapeSorter();
 	~tapeSorter();
 
-	void addTapeToSort(fileTape* inputTape);
-	fileTape& getWorkTapeP();
-	void clean();
 
+	// Sorting functions
 	void sortTapeFull(); // Sorts full tape in one go, without stopping
 	void sortNextStage(); // Iterates over every step of sorting
-	void sortNextPart(); // Sorts just barely and sends data back to UI
-	
+	void sortNextPart(); // Sorts just barely
 	void resetSorting();
 
+	// Metadata functions
+	void addTapeToSort(fileTape* inputTape);
+	fileTape& getWorkTapeP();
+	std::pair<unsigned int, unsigned int> getIOperationsCount() const;
+	
+
+	// Misc functions
 	bool isTapeLoaded() const;
+	void clean();
 
 };
 
