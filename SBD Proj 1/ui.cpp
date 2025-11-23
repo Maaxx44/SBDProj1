@@ -319,25 +319,37 @@ void ui::executeUserInput() {
 void ui::updateFilePreview() {
 	// aprsing numbers into strings
 	std::vector<std::string> parsedFile;
+	std::vector<textModifiers> parsedFileMod;
 	for (unsigned int i = 0; i < this->openedFile.getSize(); i++) {
 		record nextRecord = this->openedFile.getRecord(i);
+		this->openedFile.setReadOperations(this->openedFile.getReadOperations() - 1); // adjusting for dispalying
 		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+		parsedFileMod.push_back(tableLinesModInterA[i % 2]);
 	}
 	this->tFilePreview.setContent(parsedFile);
+	this->tFilePreview.setContentMod(parsedFileMod);
 }
 void ui::updateWorkFilePreview() {
 	std::vector<std::string> parsedFile;
+	std::vector<textModifiers> parsedFileMod;
 	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
 		record nextRecord = this->sorter.getWorkTapeP().getRecord(i);
+		this->sorter.getWorkTapeP().setReadOperations(this->sorter.getWorkTapeP().getReadOperations() - 1); // adjusting for dispalying
 		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+		parsedFileMod.push_back(tableLinesModInterB[i % 2]);
 	}
 	this->tWorkFilePreview.setContent(parsedFile);
+	this->tWorkFilePreview.setContentMod(parsedFileMod);
 }
 void ui::updateSortingDataPreview() {
 	std::pair<unsigned int, unsigned int> IOOperations = this->sorter.getIOperationsCount();
+	unsigned int runsCount = this->sorter.getRunsCount();
+	unsigned int runSize = this->sorter.getRunSize();
 	std::vector<std::string> sortingMetadata;
 	sortingMetadata.push_back("Reads: " + std::to_string(IOOperations.first));
 	sortingMetadata.push_back("Writes: " + std::to_string(IOOperations.second));
+	sortingMetadata.push_back("Run size: " + std::to_string(runSize));
+	sortingMetadata.push_back("Runs: " + std::to_string(runsCount));
 	this->tSortingMetadata.setContent(sortingMetadata);
 }
 

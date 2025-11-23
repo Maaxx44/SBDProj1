@@ -56,6 +56,8 @@ public:
 	void addTapeToSort(fileTape* inputTape);
 	fileTape& getWorkTapeP();
 	std::pair<unsigned int, unsigned int> getIOperationsCount() const;
+	unsigned int getRunSize() const;
+	unsigned int getRunsCount() const;
 	
 
 	// Misc functions

@@ -25,6 +25,8 @@ public:
 
 	void resetReadOperations();
 	void resetWriteOperations();
+	void setReadOperations(unsigned int operationsCount);
+	void setWriteOperations(unsigned int operationsCount);
 	void setRecord(unsigned int recordIndex, record newRecord);
 	void addRecord(record newRecord);
 	void setSize(unsigned int newSize);

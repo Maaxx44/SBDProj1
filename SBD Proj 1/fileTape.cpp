@@ -22,6 +22,13 @@ dataBlock fileTape::getBlock(unsigned int blockIndex) {
 	return this->dataFile[blockIndex];
 }
 
+void fileTape::setReadOperations(unsigned int operationsCount) {
+	this->readCount = operationsCount;
+}
+void fileTape::setWriteOperations(unsigned int operationsCount) {
+	this->writeCount = operationsCount;
+}
+
 void fileTape::setRecord(unsigned int recordIndex, record newRecord) {
 	if (recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
 	this->writeCount++;

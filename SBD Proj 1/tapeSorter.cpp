@@ -49,6 +49,14 @@ void tapeSorter::clean() {
 bool tapeSorter::isTapeLoaded() const {
 	return (this->mainTape != nullptr);
 }
+unsigned int tapeSorter::getRunSize() const {
+	return this->runSize;
+}
+unsigned int tapeSorter::getRunsCount() const {
+	return this->numberOfRuns;
+}
+
+
 
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
@@ -219,6 +227,9 @@ void tapeSorter::sortNextPart() {
 				this->workTape.setRecord(PSRunIndex * runSize + runElementIndex, mainMemory[runElementIndex]);
 			}
 			this->PSRunIndex++;
+
+			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
+			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
 		}
 		else {
 			// Stage 1.5 (Stage 2 setup)
@@ -236,6 +247,9 @@ void tapeSorter::sortNextPart() {
 
 			this->currentSortStage = stage2;
 			this->PSRunIndex = 0;
+
+			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
+			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
 		}
 		break;
 	case stage2:
@@ -256,6 +270,9 @@ void tapeSorter::sortNextPart() {
 					});
 			}
 			this->PSOutputIndex++;
+
+			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
+			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
 		}
 		else {
 			// Metadata

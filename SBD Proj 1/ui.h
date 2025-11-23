@@ -12,6 +12,10 @@ private:
 	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 	cursorInformations cursorInfo;
 
+	// Another shady solution
+	textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
+	textModifiers tableLinesModInterB[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
+
 	// DIRTY HACK
 	fileTape openedFile;
 	tapeSorter sorter;

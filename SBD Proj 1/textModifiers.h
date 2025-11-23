@@ -25,6 +25,10 @@ public:
 	WORD cFlashing = defaultFlashColor;
 	WORD cBlinking = defaultBlinkColor;
 
+	// Thats... one way to write constructor
+	textModifiers(bool isTextVisible = true, bool isTextHighlighted = false, bool isTextSelected = false, WORD cDefault = defaultTextColor, WORD cHighlighted = defaultHighLightColor, WORD cSelected = defaultSelectColor, WORD cSelectedHighlighted = defaultSelectHighlightColor, WORD cFlashing = defaultFlashColor, WORD cBlinking = defaultBlinkColor);
+
+
 	// Get text modifier - with dynamic lighting and advance the timing
 	WORD getTextModifier() const;
 

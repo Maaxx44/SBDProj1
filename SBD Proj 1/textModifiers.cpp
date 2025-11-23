@@ -86,3 +86,15 @@ void textModifiers::updateTiming() {
 	if (fullBlinkDiff >= tBlinkCycle) // Advancing tBlinkStart by floor of times of cycles
 		this->tBlinkStart += std::chrono::milliseconds((unsigned int)((double)tBlinkCycle.count() * (double)std::floor(fullBlinkDiff.count() / tBlinkCycle.count())));
 }
+
+textModifiers::textModifiers(bool isTextVisible, bool isTextHighlighted, bool isTextSelected, WORD cDefault, WORD cHighlighted, WORD cSelected, WORD cSelectedHighlighted, WORD cFlashing, WORD cBlinking) {
+	this->isTextVisible = isTextVisible;
+	this->isTextHighlighted = isTextHighlighted;
+	this->isTextSelected = isTextSelected;
+	this->cDefault = cDefault;
+	this->cHighlighted = cHighlighted;
+	this->cSelected = cSelected;
+	this->cSelectedHighlighted = cSelectedHighlighted;
+	this->cFlashing = cFlashing;
+	this->cBlinking = cBlinking;
+}
