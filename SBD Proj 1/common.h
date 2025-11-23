@@ -23,7 +23,7 @@
 // Random data generation
 #define randomRadiusMin 3.0
 #define randomRadiusMax 10.0
-#define randomAngleMin 15.0
+#define randomAngleMin 45.0
 #define randomAngleMax 360.0
 #define randomRecordsMin 48
 #define randomRecordsMax 150

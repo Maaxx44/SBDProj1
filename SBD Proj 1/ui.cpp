@@ -21,7 +21,7 @@ void ui::initTables() {
 	//this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
 
 	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Make random file", "Make empty file", "Fully sort file", "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" });
-	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 25, .H = 25 }, "File Preview", {});
+	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
 
 	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tFilePreview));
 	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tOptions));
@@ -232,11 +232,59 @@ bool ui::parseContentInput(WORD keyCode) {
 
 		break;
 	case VK_RETURN:
-		// TODO - call function corresponding to this line !!!!!!!!!!!!!!!!!!
+		executeUserInput();
 		break;
 	}
 	return true;
 }
+double ui::parseNumberInput() {
+	// dirty hack! CHANGE LATER
+	this->cInfo.setCursorPosition(0, 0);
+	std::cout << "Enter number: ";
+	double returnValue = 0;
+	std::cin >> returnValue;
+
+	this->cInfo.setCursorPosition(0, 0);
+	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().Y; i++)
+		std::cout << " ";
+
+	return returnValue;
+}
+
+void ui::executeUserInput() {
+	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
+		switch (this->cursorInfo.currentContentCursorPoint) {
+		case 0: // "Make random file"
+			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput());
+			this->updateFilePreview();
+			break;
+		case 1: // "Make empty file"
+			this->openedFile.clear();
+			this->openedFile.setSize((unsigned int)parseNumberInput());
+			this->updateFilePreview();
+			break;
+		case 2: // "Fully sort file"
+			if (!this->sorter.isTapeLoaded()) this->sorter.addTapeToSort(&this->openedFile);
+			this->sorter.sortTapeFull();
+			this->updateFilePreview();
+			break;
+		case 3:
+			break;
+		}
+	}
+	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) { /*edit file*/ }
+}
+void ui::updateFilePreview() {
+	// aprsing numbers into strings
+	std::vector<std::string> parsedFile;
+	for (unsigned int i = 0; i < this->openedFile.getSize(); i++) {
+		record nextRecord = this->openedFile.getRecord(i);
+		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+	}
+
+	this->tFilePreview.setContent(parsedFile);
+}
+
 
 bool ui::parseUserInput() {
 	if (cursorInfo.cType == disabled) return true;

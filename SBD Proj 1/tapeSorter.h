@@ -29,7 +29,7 @@ public:
 
 	void sortTapeFull(); // Sorts full tape in one go, without stopping
 
-
+	bool isTapeLoaded() const;
 
 	void sortFileLegacy(fileTape* inputTape);
 };

@@ -39,6 +39,10 @@ void tapeSorter::clean() {
 	this->runSize = 0;
 	this->numberOfRuns = 0;
 }
+bool tapeSorter::isTapeLoaded() const {
+	return (this->mainTape != nullptr);
+}
+
 
 class Compare {
 public:
@@ -46,9 +50,6 @@ public:
 		return A.rData.calculateArea() < B.rData.calculateArea();
 	}
 };
-
-
-
 
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
