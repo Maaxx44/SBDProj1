@@ -47,6 +47,9 @@ public:
 	}
 };
 
+
+
+
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
 
@@ -112,7 +115,6 @@ void tapeSorter::sortTapeFull() {
 		}
 	}
 }
-
 void tapeSorter::sortFileLegacy(fileTape* inputTape) {
 	// Stage 0 (Stage 1 setup)
 	/// Create runs (reserve space on disk) and get variables

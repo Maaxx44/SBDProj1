@@ -83,7 +83,7 @@ std::vector<std::string> uiTable::getContent() const {
 	std::vector<std::string> fullContent = this->getFullContent(); // getting cut-off lines
 
 	// 1. Scrolling lines
-	unsigned int realScroll = this->contentOffset % fullContent.size();
+	unsigned int realScroll = (fullContent.size() > 0) ? this->contentOffset % fullContent.size() : 0;
 
 	if(realScroll != 0) {
 		// Copying block out of beg.
@@ -102,7 +102,8 @@ std::vector<std::string> uiTable::getContent() const {
 	// 2. Add empty lines ro remove extra lines (to fit into context's height)
 	if (fullContent.size() < this->getContentHeight()) {
 		// Adding empty lines
-		for (unsigned int i = 0; i < this->getContentHeight() - fullContent.size(); i++)
+		unsigned int sizeBeforeUpdating = fullContent.size();
+		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
 			fullContent.push_back(std::string(this->position.W, ' '));
 	}
 	else if (fullContent.size() > this->getContentHeight()) {
@@ -127,7 +128,7 @@ std::vector<textModifiers>& uiTable::getFullContentMod() {
 std::vector<textModifiers> uiTable::getContentMod() {
 	std::vector<textModifiers> fullContentMod = this->getFullContentMod();
 
-	unsigned int realScroll = this->contentOffset % fullContentMod.size();
+	unsigned int realScroll = (fullContentMod.size() > 0) ? this->contentOffset % fullContentMod.size() : 0;
 
 	if (realScroll != 0) {
 		// Copying block out of beg.
@@ -147,7 +148,8 @@ std::vector<textModifiers> uiTable::getContentMod() {
 	if (fullContentMod.size() < this->getContentHeight()) {
 		textModifiers emptyMod;
 		// Adding empty lines
-		for (unsigned int i = 0; i < this->getContentHeight() - fullContentMod.size(); i++)
+		unsigned int sizeBeforeUpdating = fullContentMod.size();
+		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
 			fullContentMod.push_back(emptyMod);
 	}
 	else if (fullContentMod.size() > this->getContentHeight()) {
@@ -201,4 +203,18 @@ void uiTable::setPositionToText() {
 		maxLength = (maxLength < (unsigned int)s.size()) ? (unsigned int)s.size() : maxLength;
 
 	this->position.W = maxLength;
+}
+
+/// This function checks if given line is visible ( is not cut off )
+bool uiTable::isContentLineVisible(unsigned int lineIndex) const {
+	if (this->contentOffset > 0 && lineIndex < this->contentOffset) return false;
+	else if (this->contentOffset + this->getContentHeight() <= lineIndex) return false;
+	return true;
+}
+
+/// This function calculates offset needed to make content line visible
+unsigned int uiTable::getOffsetForLine(unsigned int lineIndex) const {
+	if (this->contentOffset > 0 && lineIndex < this->contentOffset) return lineIndex;
+	else if (this->contentOffset + this->getContentHeight() <= lineIndex) return lineIndex - this->getContentHeight() + 1;
+	else return 0;
 }

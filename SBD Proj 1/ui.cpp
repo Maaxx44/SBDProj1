@@ -9,16 +9,26 @@ void ui::initConsole() {
 }
 void ui::initTables() {
 	// Creating files table
-	this->tFiles = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
+	//this->tFiles = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
 
 	// Creating Options table
-	this->tOptions = uiTable({ .X = 2, .Y = 9, .W = 15, .H = 5 }, "Options", { "Add File", "Edit File", "Sort File", "Quit" });
+	//this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 5 }, "Options", { "Create File", "Edit File", "Sort File", "Quit" });
 
 	// TODO - create sub-options tables
 
 	// Setting tables pointers
-	this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
-	this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
+	//this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
+	//this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
+
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Make random file", "Make empty file", "Fully sort file", "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" , "File 4", "File 5" });
+	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 25, .H = 25 }, "File Preview", {});
+
+	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tFilePreview));
+	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tOptions));
+
+
+
+
 
 	// Initializing cursor with it pointing to options table
 	this->cursorInfo.cType = tablePointer;
@@ -156,6 +166,9 @@ bool ui::parseTableInput(WORD keyCode) {
 		}
 		break;
 	case VK_RETURN:
+		// If there is no table content - dont go
+		if (this->cursorInfo.currentTableCursorPoint->getContentSize() == 0) break;
+
 		// First - highlight current table title and disable blinking
 		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
 		this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextHighlighted = true;
@@ -179,14 +192,17 @@ bool ui::parseContentInput(WORD keyCode) {
 	switch (keyCode) {
 	case VK_UP:
 		if (this->cursorInfo.currentContentCursorPoint == 0) {
-			unsigned int newContentCirsorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
-			this->changeSelectedContent(newContentCirsorPointer, this->cursorInfo.currentContentCursorPoint);
-			this->cursorInfo.currentContentCursorPoint = newContentCirsorPointer;
+			unsigned int newContentCursorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
+			this->changeSelectedContent(newContentCursorPointer, this->cursorInfo.currentContentCursorPoint);
+			this->cursorInfo.currentContentCursorPoint = newContentCursorPointer;
 		}
 		else {
 			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint - 1, this->cursorInfo.currentContentCursorPoint);
 			this->cursorInfo.currentContentCursorPoint--;
 		}
+		// Check if out element is in visible range
+		if (!this->cursorInfo.currentTableCursorPoint->isContentLineVisible(this->cursorInfo.currentContentCursorPoint))
+			this->cursorInfo.currentTableCursorPoint->setContentOffset(this->cursorInfo.currentTableCursorPoint->getOffsetForLine(this->cursorInfo.currentContentCursorPoint));
 		break;
 	case VK_DOWN:
 		if (this->cursorInfo.currentContentCursorPoint == this->cursorInfo.currentTableCursorPoint->getContentSize() - 1) {
@@ -197,6 +213,9 @@ bool ui::parseContentInput(WORD keyCode) {
 			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint + 1, this->cursorInfo.currentContentCursorPoint);
 			this->cursorInfo.currentContentCursorPoint++;
 		}
+		// Check if out element is in visible range
+		if (!this->cursorInfo.currentTableCursorPoint->isContentLineVisible(this->cursorInfo.currentContentCursorPoint))
+			this->cursorInfo.currentTableCursorPoint->setContentOffset(this->cursorInfo.currentTableCursorPoint->getOffsetForLine(this->cursorInfo.currentContentCursorPoint));
 		break;
 	case VK_ESCAPE:
 		// Change cursor type
@@ -253,10 +272,11 @@ bool ui::parseUserInput() {
 }
 void ui::draw() {
 	// Draw tables
-	this->drawTable(this->tFiles);
 	this->drawTable(this->tOptions);
-	for (uiTable& tSubOption : this->tSubOptions)
-		this->drawTable(tSubOption);
+	this->drawTable(this->tFilePreview);
+	//this->drawTable(this->tOptions);
+	//for (uiTable& tSubOption : this->tSubOptions)
+	//	this->drawTable(tSubOption);
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);

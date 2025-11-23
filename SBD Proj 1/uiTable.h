@@ -88,5 +88,11 @@ public:
 
 	/// This function sets W & H parameters of position so there wont be any text cutoff
 	void setPositionToText();
+
+	/// This function checks if given line is visible ( is not cut off )
+	bool isContentLineVisible(unsigned int lineIndex) const;
+
+	/// This function calculates offset needed to make content line visible
+	unsigned int getOffsetForLine(unsigned int lineIndex) const;
 };
 

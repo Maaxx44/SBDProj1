@@ -7,7 +7,7 @@
 class ui {
 private:
 	cInfo cInfo;
-	uiTable tFiles, tOptions;
+	uiTable tFiles, tOptions, tFilePreview;
 	cursorInformations cursorInfo;
 	std::vector<uiTable> tSubOptions;
 	
