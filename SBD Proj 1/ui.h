@@ -38,8 +38,8 @@ private:
 	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 
 	// Helper functions for input parsing
-	bool parseTableInput(WORD keyCode); // returns false if needs program to exit
-	bool parseContentInput(WORD keyCode); // returns false if needs program to exit
+	functionExitCode parseTableInput(WORD keyCode);
+	functionExitCode parseContentInput(WORD keyCode);
 
 	// DIRTY HACK!
 	double parseNumberInput(); // return number
@@ -48,9 +48,9 @@ private:
 	void updateFilePreview();
 
 public:
-	bool parseUserInput();
+	functionExitCode parseUserInput();
 	void draw(); // draws in console
-	bool runFrame(); // doesn't actually num frame per-se, but the spirit is there - returns false if program is to exiasdfam[fiuyh8gtw
+	functionExitCode runFrame(); // doesn't actually num frame per-se, but the spirit is there
 
 	ui();
 	~ui();

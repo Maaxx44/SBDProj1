@@ -127,7 +127,7 @@ void ui::changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDes
 	deselectContent(oldDeselectedLine);
 }
 
-bool ui::parseTableInput(WORD keyCode) {
+functionExitCode ui::parseTableInput(WORD keyCode) {
 	switch (keyCode) {
 	case VK_UP:
 		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().up != nullptr) {
@@ -154,9 +154,8 @@ bool ui::parseTableInput(WORD keyCode) {
 		}
 		break;
 	case VK_ESCAPE:
-		// go back to prev. selected table - TODO
 		if (cursorInfo.selectedTables.size() == 0) //end program
-			return false;
+			return exitProgram;
 		else {
 			if (cursorInfo.selectedTables.back() != this->cursorInfo.currentTableCursorPoint) {
 				this->changeSelectedTable(cursorInfo.selectedTables.back(), this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
@@ -169,9 +168,9 @@ bool ui::parseTableInput(WORD keyCode) {
 		// If there is no table content - dont go
 		if (this->cursorInfo.currentTableCursorPoint->getContentSize() == 0) break;
 
-		// First - highlight current table title and disable blinking
+		// First - *select *current table title and disable blinking
 		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
-		this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextHighlighted = true;
+		this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextSelected = true;
 
 		// Change cursor settings
 		this->cursorInfo.cType = contentPointer;
@@ -185,9 +184,9 @@ bool ui::parseTableInput(WORD keyCode) {
 
 		break;
 	}
-	return true;
+	return continueProgram;
 }
-bool ui::parseContentInput(WORD keyCode) {
+functionExitCode ui::parseContentInput(WORD keyCode) {
 	// Check for arrows, enter and escape and change / select content
 	switch (keyCode) {
 	case VK_UP:
@@ -226,7 +225,7 @@ bool ui::parseContentInput(WORD keyCode) {
 
 		// Select last table, disable title highlight and enable blinking
 		this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back();
-		cursorInfo.selectedTables.back()->getTitleMod().isTextHighlighted = false;
+		cursorInfo.selectedTables.back()->getTitleMod().isTextSelected = false;
 		this->selectTable(cursorInfo.selectedTables.back());
 		cursorInfo.selectedTables.pop_back();
 
@@ -235,7 +234,7 @@ bool ui::parseContentInput(WORD keyCode) {
 		executeUserInput();
 		break;
 	}
-	return true;
+	return continueProgram;
 }
 double ui::parseNumberInput() {
 	// dirty hack! CHANGE LATER
@@ -315,8 +314,8 @@ void ui::updateFilePreview() {
 }
 
 
-bool ui::parseUserInput() {
-	if (cursorInfo.cType == disabled) return true;
+functionExitCode ui::parseUserInput() {
+	if (cursorInfo.cType == disabled) return continueProgram;
 	if (this->cursorInfo.currentTableCursorPoint == nullptr)
 		this->cursorInfo.currentTableCursorPoint = &this->tOptions;
 
@@ -332,10 +331,10 @@ bool ui::parseUserInput() {
 		// Parse input according to cursor Informations
 		switch (cursorInfo.cType) {
 		case tablePointer:
-			if (!parseTableInput(keyCode)) return false;
+			if (parseTableInput(keyCode) == exitProgram) return exitProgram;
 			break;
 		case contentPointer:
-			if (!parseContentInput(keyCode)) return false;
+			if (parseContentInput(keyCode) == exitProgram) return exitProgram;
 			break;
 		default:
 			throw std::runtime_error("UI cursor state was incorrect.");
@@ -345,7 +344,7 @@ bool ui::parseUserInput() {
 		keyRecord = this->cInfo.getFirstKeyInput();
 	}
 
-	return true;
+	return continueProgram;
 }
 void ui::draw() {
 	// Draw tables
@@ -359,13 +358,10 @@ void ui::draw() {
 	this->changeColor(defaultTextColor);
 }
 
-bool ui::runFrame() {
-	// hackjob with return values - change to something nicer when I have some more time
-	if (!this->parseUserInput())
-		return false;
+functionExitCode ui::runFrame() {
+	if (this->parseUserInput() == exitProgram) return exitProgram;
 	this->draw();
-
-	return true;
+	return continueProgram;
 }
 
 ui::ui() {

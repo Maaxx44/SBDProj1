@@ -102,7 +102,7 @@ std::vector<std::string> uiTable::getContent() const {
 	// 2. Add empty lines ro remove extra lines (to fit into context's height)
 	if (fullContent.size() < this->getContentHeight()) {
 		// Adding empty lines
-		unsigned int sizeBeforeUpdating = fullContent.size();
+		unsigned int sizeBeforeUpdating = (unsigned int)fullContent.size();
 		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
 			fullContent.push_back(std::string(this->position.W, ' '));
 	}
@@ -148,7 +148,7 @@ std::vector<textModifiers> uiTable::getContentMod() {
 	if (fullContentMod.size() < this->getContentHeight()) {
 		textModifiers emptyMod;
 		// Adding empty lines
-		unsigned int sizeBeforeUpdating = fullContentMod.size();
+		unsigned int sizeBeforeUpdating = (unsigned int)fullContentMod.size();
 		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
 			fullContentMod.push_back(emptyMod);
 	}

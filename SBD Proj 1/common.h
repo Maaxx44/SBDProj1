@@ -62,3 +62,8 @@ typedef struct RECTANGLE {
 typedef struct COORDINATES {
 	unsigned int X, Y;
 } COORDINATES, COR;
+
+enum functionExitCode {
+	continueProgram,
+	exitProgram
+};
