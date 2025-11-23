@@ -1,10 +1,10 @@
 #include "fileTape.h"
 
 unsigned int fileTape::getBlockOffset(unsigned int recordIndex) const {
-	return (unsigned int)ceil((double)recordIndex / (double)BLOCK_SIZE);
+	return (unsigned int)floor((double)recordIndex / (double)BLOCK_SIZE);
 }
 unsigned int fileTape::getOffsetIndex(unsigned int recordIndex) const {
-	return recordIndex - (getBlockOffset(recordIndex) - 1) * BLOCK_SIZE;
+	return recordIndex - (getBlockOffset(recordIndex)) * BLOCK_SIZE;
 }
 
 fileTape::fileTape(): dataLength(0) {}
@@ -15,11 +15,12 @@ fileTape::fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength): da
 record fileTape::getRecord(unsigned int recordIndex) {
 	if(recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
 	return this->dataFile[getBlockOffset(recordIndex)].getRecord(getOffsetIndex(recordIndex));
-
-	//unsigned int blockIndex = (unsigned int)ceil((double)recordIndex / (double)BLOCK_SIZE);
-	//unsigned int offsetIndex = recordIndex - (blockIndex - 1) * BLOCK_SIZE;
-	//return this->dataFile[blockIndex].getRecord(offsetIndex);
 }
+dataBlock fileTape::getBlock(unsigned int blockIndex) {
+	if(blockIndex >= this->dataFile.size()) throw std::runtime_error("getBlock error: blockIndex(" + std::to_string(blockIndex) + ") out of range(" + std::to_string(this->dataFile.size()) + ")");
+	return this->dataFile[blockIndex];
+}
+
 void fileTape::setRecord(unsigned int recordIndex, record newRecord) {
 	if (recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
 	this->dataFile[getBlockOffset(recordIndex)].setRecord(getOffsetIndex(recordIndex), newRecord);
@@ -38,4 +39,12 @@ void fileTape::addRecord(record newRecord) {
 }
 unsigned int fileTape::getSize() const {
 	return this->dataLength;
+}
+void fileTape::setSize(unsigned int newSize) {
+	this->dataFile.resize(newSize, dataBlock());
+	this->dataLength = newSize;
+}
+void fileTape::clear() {
+	this->dataFile.clear();
+	this->dataLength = 0;
 }

@@ -10,11 +10,15 @@
 #include <string>
 #include <sstream>
 #include <optional>
+#include <thread>
 #include <chrono>
+#include <algorithm>
+#include <queue>
 #include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
 
-
-#define BLOCK_SIZE 16
+// Data parameters
+#define BLOCK_SIZE 16 // how many records in a block
+#define blocksPerMemory 8 // how many block can we read into memory
 
 // Random data generation
 #define randomRadiusMin 3.0
@@ -33,7 +37,7 @@
 #define defaultSelectHighlightColor FOREGROUND_GREEN | COMMON_LVB_REVERSE_VIDEO
 #define defaultBlinkColor FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO
 #define defaultFlashColor FOREGROUND_RED | FOREGROUND_INTENSITY
-
+//  Small toggle to define behavoiur
 #define returnNoColorOnInvisible false
 //  Console drawing
 #define defaultConsoleSizeX 150
@@ -47,7 +51,7 @@
 #define isUpdateHighlightingEnabled true
 #define blinkOnTimeMs 450
 #define blinkOffTimeMs 150
-#define flashOnTimeMs 250		// flash does not repeat so it wont need offf time
+#define flashOnTimeMs 250		// flash does not repeat so it wont need off time
 //  UserInput Parameters
 #define ignoredInputEvents (FOCUS_EVENT | MENU_EVENT | MOUSE_EVENT)
 

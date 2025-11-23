@@ -257,6 +257,9 @@ void ui::draw() {
 	this->drawTable(this->tOptions);
 	for (uiTable& tSubOption : this->tSubOptions)
 		this->drawTable(tSubOption);
+
+	// Return cursor to normal modifiers
+	this->changeColor(defaultTextColor);
 }
 
 bool ui::runFrame() {

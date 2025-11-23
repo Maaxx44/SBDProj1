@@ -137,6 +137,7 @@
     <ClCompile Include="dataBlock.cpp" />
     <ClCompile Include="dataManager.cpp" />
     <ClCompile Include="fileTape.cpp" />
+    <ClCompile Include="queueElement.cpp" />
     <ClCompile Include="record.cpp" />
     <ClCompile Include="SBD Proj 1.cpp" />
     <ClCompile Include="tapeSorter.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="dataBlock.h" />
     <ClInclude Include="dataManager.h" />
     <ClInclude Include="fileTape.h" />
+    <ClInclude Include="queueElement.h" />
     <ClInclude Include="record.h" />
     <ClInclude Include="tapeSorter.h" />
     <ClInclude Include="textModifiers.h" />

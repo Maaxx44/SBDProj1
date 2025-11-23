@@ -25,3 +25,5 @@ public:
 	}
 };
 
+bool compareRecords(record A, record B);
+bool compareRecordsRef(record& A, record& B);

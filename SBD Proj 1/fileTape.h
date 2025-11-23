@@ -15,9 +15,12 @@ public:
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
 	record getRecord(unsigned int recordIndex);
+	dataBlock getBlock(unsigned int blockIndex);
 	void setRecord(unsigned int recordIndex, record newRecord);
 	void addRecord(record newRecord);
 	unsigned int getSize() const;
+	void setSize(unsigned int newSize);
+	void clear();
 
 	fileTape static getFileTapeFromDisk(std::ifstream* filePath) {
 		if (filePath == nullptr || !filePath->is_open()) throw std::runtime_error("getFileTapeFromDisk error: filePath was NULL");

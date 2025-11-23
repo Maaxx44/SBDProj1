@@ -57,6 +57,9 @@
     <ClCompile Include="uiTablePointer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="queueElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="uiTablePointer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="queueElement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

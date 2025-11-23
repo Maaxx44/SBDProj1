@@ -16,3 +16,11 @@ double record::calculateArea() const {
 	else return (M_PI * pow(this->radius, 2)) * (this->angle / 360.0);
 
 }
+
+bool compareRecords(record A, record B) {
+	return A.calculateArea() > B.calculateArea();
+}
+
+bool compareRecordsRef(record& A, record& B) {
+	return A.calculateArea() > B.calculateArea();
+}
