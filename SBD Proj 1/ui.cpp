@@ -14,12 +14,15 @@ void ui::initTables() {
 	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // work file preview will not be editable
 	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {});
 
+	// Changing title select color to corresponding one
+	this->tFilePreview.getTitleMod().cSelected = tableLinesModInterA[1].cSelected;
+	this->tWorkFilePreview.getTitleMod().cSelected = tableLinesModInterB[1].cSelected;
+
 	// Creating links
 	this->tOptions.setTablePointers(uiTablePointer(&this->tSortingMetadata, &this->tSortingMetadata, &this->tWorkFilePreview, &this->tFilePreview));
 	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tWorkFilePreview));
 	this->tWorkFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tOptions));
 	this->tSortingMetadata.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, &this->tWorkFilePreview, &this->tFilePreview));
-
 
 	// Initializing cursor with it pointing to options table
 	this->cursorInfo.cType = tablePointer;
@@ -317,17 +320,30 @@ void ui::executeUserInput() {
 	}
 }
 void ui::updateFilePreview() {
-	// aprsing numbers into strings
+	// Required fields for table
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
+
+	// For every content in opened file - get and parse its values into string
 	for (unsigned int i = 0; i < this->openedFile.getSize(); i++) {
 		record nextRecord = this->openedFile.getRecord(i);
-		this->openedFile.setReadOperations(this->openedFile.getReadOperations() - 1); // adjusting for dispalying
-		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+
+		// Get values and parse them into stringstream (we cau use setw)
+		std::stringstream ss;
+		ss << " A: " << std::setw(10) << std::to_string(nextRecord.getAngle()) << ", R: " << std::setw(10) << std::to_string(nextRecord.getRadius()) << " = " << std::setw(11) << std::to_string(nextRecord.calculateArea());
+
+		// Push back values into vectors
+		parsedFile.push_back(ss.str());
 		parsedFileMod.push_back(tableLinesModInterA[i % 2]);
 	}
+
+	// Setting tables content
 	this->tFilePreview.setContent(parsedFile);
 	this->tFilePreview.setContentMod(parsedFileMod);
+
+	// Adjusting file readn and write counter, because we use those operations to display data
+	this->openedFile.setReadOperations(this->openedFile.getReadOperations() - this->openedFile.getSize());
+
 }
 void ui::updateWorkFilePreview() {
 	std::vector<std::string> parsedFile;
@@ -335,7 +351,9 @@ void ui::updateWorkFilePreview() {
 	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
 		record nextRecord = this->sorter.getWorkTapeP().getRecord(i);
 		this->sorter.getWorkTapeP().setReadOperations(this->sorter.getWorkTapeP().getReadOperations() - 1); // adjusting for dispalying
-		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+		std::stringstream ss;
+		ss << " A: " << std::setw(10) << std::to_string(nextRecord.getAngle()) << ", R: " << std::setw(10) << std::to_string(nextRecord.getRadius()) << " = " << std::setw(11) << std::to_string(nextRecord.calculateArea());
+		parsedFile.push_back(ss.str());
 		parsedFileMod.push_back(tableLinesModInterB[i % 2]);
 	}
 	this->tWorkFilePreview.setContent(parsedFile);
