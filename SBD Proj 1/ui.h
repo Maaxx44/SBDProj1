@@ -9,7 +9,7 @@
 class ui {
 private:
 	cInfo cInfo;
-	uiTable tFiles, tOptions, tFilePreview;
+	uiTable tFiles, tOptions, tFilePreview, tWorkFilePreview;
 	cursorInformations cursorInfo;
 	std::vector<uiTable> tSubOptions;
 
@@ -46,6 +46,7 @@ private:
 	double parseNumberInput(std::string customMessage); // return number
 	void executeUserInput(); // Executes functions based on selected table and content
 	void updateFilePreview();
+	void updateWorkFilePreview();
 
 public:
 	functionExitCode parseUserInput();

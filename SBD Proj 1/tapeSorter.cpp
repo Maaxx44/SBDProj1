@@ -26,6 +26,9 @@ void tapeSorter::addTapeToSort(fileTape* inputTape) {
 	this->workTape.clear();
 	this->workTape.setSize(this->tapeSize);
 }
+fileTape& tapeSorter::getWorkTapeP() {
+	return this->workTape;
+}
 void tapeSorter::clean() {
 	// Clearing main memory
 	for (unsigned int i = 0; i < this->runSize; i++) {
@@ -46,14 +49,6 @@ void tapeSorter::clean() {
 bool tapeSorter::isTapeLoaded() const {
 	return (this->mainTape != nullptr);
 }
-
-
-class Compare {
-public:
-	bool operator() (queueElement A, queueElement B) {
-		return A.rData.calculateArea() < B.rData.calculateArea();
-	}
-};
 
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
@@ -141,6 +136,7 @@ void tapeSorter::sortNextStage() {
 				this->workTape.setRecord(runIndex * runSize + runElementIndex, mainMemory[runElementIndex]);
 			}
 		}
+		this->currentSortStage = stage2;
 		break;
 	case stage2:
 		// Stage 1.5 (Stage 2 setup)
@@ -176,6 +172,84 @@ void tapeSorter::sortNextStage() {
 					});
 			}
 		}
+		this->currentSortStage = sorted;
 		break;
 	}
+}
+void tapeSorter::sortNextPart() {
+	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
+	if (this->mainTape->getSize() <= 1) return;
+
+	switch (this->currentSortStage) {
+	case stage1:
+		// Stage 1
+		if (this->PSRunIndex < this->numberOfRuns) {
+			// load one run into memory
+			for (unsigned int runElementIndex = 0; runElementIndex < min(this->runSize, this->mainTape->getSize() - PSRunIndex * runSize); runElementIndex++)
+				mainMemory[runElementIndex] = this->mainTape->getRecord(PSRunIndex * runSize + runElementIndex);
+
+			// sort records
+			std::sort(mainMemory, mainMemory + min(this->runSize, this->mainTape->getSize() - PSRunIndex * runSize), compareRecordsRef);
+
+			// save record to disk
+			for (unsigned int runElementIndex = 0; runElementIndex < min(this->runSize, this->mainTape->getSize() - PSRunIndex * runSize); runElementIndex++) {
+				this->workTape.setRecord(PSRunIndex * runSize + runElementIndex, mainMemory[runElementIndex]);
+			}
+			this->PSRunIndex++;
+		}
+		else {
+			// Stage 1.5 (Stage 2 setup)
+			//  Clearing up main tape to make room for sorted elements (I think it might not be necesarry if we override all elements with sorted ones, but I guess it is nicer)
+			this->mainTape->clear();
+			this->mainTape->setSize(this->tapeSize);
+			// Iterating over every run and pushing first value to PQ
+			for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
+				this->PSMergingQueue.push(queueElement{
+					.rIndex = runIndex,
+					.rElement = 0,
+					.rData = this->workTape.getRecord(runIndex * runSize)
+					});
+			}
+
+			this->currentSortStage = stage2;
+			this->PSRunIndex = 0;
+		}
+		break;
+	case stage2:
+		if (PSMergingQueue.size() > 0 && PSOutputIndex < this->tapeSize) {
+			/// getting smallest/largest value and removing from queue
+			queueElement edgeElement = PSMergingQueue.top();
+			PSMergingQueue.pop();
+
+			/// saving element to disk
+			this->mainTape->setRecord(PSOutputIndex, edgeElement.rData);
+
+			/// pushing new element from the same run to queue (if there are any left from this run)
+			if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
+				PSMergingQueue.push(queueElement{
+					.rIndex = edgeElement.rIndex, // Same index of the run
+					.rElement = edgeElement.rElement + 1, // Get next element of the run
+					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
+					});
+			}
+			this->PSOutputIndex++;
+		}
+		else {
+			this->currentSortStage = sorted;
+			this->PSOutputIndex = 0;
+		}
+		break;
+	}
+}
+
+void tapeSorter::resetSorting() {
+	// Clearing sorting data
+	this->currentSortStage = stage1;
+	this->PSMergingQueue = std::priority_queue<queueElement, std::vector<queueElement>, Compare>();
+	unsigned int PSRunIndex = 0;
+	unsigned int PSOutputIndex = 0;
+
+	// Clearing work data
+	this->workTape.clear();
+	this->workTape.setSize(this->tapeSize);
 }

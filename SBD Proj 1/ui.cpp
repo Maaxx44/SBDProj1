@@ -8,26 +8,15 @@ void ui::initConsole() {
 	this->cInfo.setCursorVisibility(false);
 }
 void ui::initTables() {
-	// Creating files table
-	//this->tFiles = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 7 }, "Files", { "File 1", "File 2", "File 3", "File 4", "File 5" });
-
-	// Creating Options table
-	//this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 15, .H = 5 }, "Options", { "Create File", "Edit File", "Sort File", "Quit" });
-
-	// TODO - create sub-options tables
-
-	// Setting tables pointers
-	//this->tFiles.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, nullptr, nullptr));
-	//this->tOptions.setTablePointers(uiTablePointer(&this->tFiles, &this->tFiles, nullptr, nullptr));
-
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Make random file", "Make empty file", "Fully sort file" });
+	// Creating tables
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 7 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
+	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work file preview", {}); // work file preview will not be editable
 
-	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tFilePreview));
-	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tOptions));
-
-
-
+	// Creating links
+	this->tOptions.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tWorkFilePreview, &this->tFilePreview));
+	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tWorkFilePreview));
+	this->tWorkFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tOptions));
 
 
 	// Initializing cursor with it pointing to options table
@@ -267,26 +256,42 @@ double ui::parseNumberInput(std::string customMessage) {
 void ui::executeUserInput() {
 	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
 		switch (this->cursorInfo.currentContentCursorPoint) {
-		case 0: // "Make random file"
-			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records:"));
-			this->sorter.clean();
-			this->sorter.addTapeToSort(&this->openedFile);
-			this->updateFilePreview();
-			break;
-		case 1: // "Make empty file"
+			//TODO - SET TO FINAL FUNCTIONS !!!!
+		case 0: // "Empty File"
 			this->openedFile.clear();
 			this->openedFile.setSize((unsigned int)parseNumberInput("Enter no. records:"));
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->updateFilePreview();
+			this->updateWorkFilePreview();
 			break;
-		case 2: // "Fully sort file"
+		case 1: // "Random File"
+			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records:"));
+			this->sorter.clean();
+			this->sorter.addTapeToSort(&this->openedFile);
+			this->updateFilePreview();
+			this->updateWorkFilePreview();
+			break;
+		case 2: // "Open File"
+			break;
+		case 3: // "Clear File"
+			break;
+		case 4: // "Sort file"
 			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->sorter.sortTapeFull();
 			this->updateFilePreview();
+			this->updateWorkFilePreview();
 			break;
-		case 3:
+		case 5: // "Sort step"
+			this->sorter.sortNextPart();
+			this->updateFilePreview();
+			this->updateWorkFilePreview();
+			break;
+		case 6: // "Reset sorting"
+			this->sorter.resetSorting();
+			this->updateFilePreview();
+			this->updateWorkFilePreview();
 			break;
 		}
 	}
@@ -309,9 +314,17 @@ void ui::updateFilePreview() {
 		record nextRecord = this->openedFile.getRecord(i);
 		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
 	}
-
 	this->tFilePreview.setContent(parsedFile);
 }
+void ui::updateWorkFilePreview() {
+	std::vector<std::string> parsedFile;
+	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
+		record nextRecord = this->sorter.getWorkTapeP().getRecord(i);
+		parsedFile.push_back("A: " + std::to_string(nextRecord.getAngle()) + ", R: " + std::to_string(nextRecord.getRadius()) + " = " + std::to_string(nextRecord.calculateArea()));
+	}
+	this->tWorkFilePreview.setContent(parsedFile);
+}
+
 
 
 functionExitCode ui::parseUserInput() {
@@ -350,9 +363,7 @@ void ui::draw() {
 	// Draw tables
 	this->drawTable(this->tOptions);
 	this->drawTable(this->tFilePreview);
-	//this->drawTable(this->tOptions);
-	//for (uiTable& tSubOption : this->tSubOptions)
-	//	this->drawTable(tSubOption);
+	this->drawTable(this->tWorkFilePreview);
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);
@@ -367,6 +378,7 @@ functionExitCode ui::runFrame() {
 ui::ui() {
 	this->initConsole();
 	this->initTables();
+
 }
 ui::~ui() {
 	//return console to normal functions
