@@ -1,6 +1,6 @@
 #include "tapeSorter.h"
 
-tapeSorter::tapeSorter(): mainTape(nullptr), tapeSize(0), numberOfRuns(0) {
+tapeSorter::tapeSorter(): mainTape(nullptr), tapeSize(0), numberOfRuns(0), currentSortStage(stage1) {
 	for (unsigned int i = 0; i < this->runSize; i++) {
 		this->mainMemory[i].setAngle(0);
 		this->mainMemory[i].setRadius(0);
@@ -10,10 +10,9 @@ tapeSorter::~tapeSorter() { }
 
 void tapeSorter::addTapeToSort(fileTape* inputTape) {
 	if (inputTape == nullptr) throw std::runtime_error("addTapeToSort error: inputTape was nullptr!");
-	for (unsigned int i = 0; i < this->runSize; i++) {
-		this->mainMemory[i].setAngle(0);
-		this->mainMemory[i].setRadius(0);
-	}
+
+	// Clean existing data
+	this->clear();
 
 	// Calculating necesarry informations
 	this->tapeSize = inputTape->getSize();
@@ -23,13 +22,12 @@ void tapeSorter::addTapeToSort(fileTape* inputTape) {
 	this->mainTape = inputTape;
 
 	// Resizing work tape
-	this->workTape.clear();
 	this->workTape.setSize(this->tapeSize);
 }
 fileTape& tapeSorter::getWorkTapeP() {
 	return this->workTape;
 }
-void tapeSorter::clean() {
+void tapeSorter::clear() {
 	// Clearing main memory
 	for (unsigned int i = 0; i < this->runSize; i++) {
 		this->mainMemory[i].setAngle(0);

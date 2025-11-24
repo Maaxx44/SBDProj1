@@ -13,8 +13,8 @@ private:
 	cursorInformations cursorInfo;
 
 	// Another shady solution
-	textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
-	textModifiers tableLinesModInterB[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
+	const textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
+	const textModifiers tableLinesModInterB[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
 
 	// DIRTY HACK
 	fileTape openedFile;
@@ -32,6 +32,13 @@ private:
 	void drawTableContent(uiTable& table) const;
 	void drawTable(uiTable& table) const;
 
+	// Helper functions for updating tables content
+	void updateFilePreviewTable();
+	void updateWorkFilePreviewTable();
+	void updateSortingDataPreviewTable();
+	void updateTables();
+
+
 	// Helper functions for cursor manipulation
 	void selectTable(uiTable* table); // enables blinking mode in table
 	void deselectTable(uiTable* table); // disables blinking mode in table
@@ -39,6 +46,9 @@ private:
 	void selectContent(unsigned int contentLine);
 	void deselectContent(unsigned int contentLine);
 	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
+
+
+
 
 	// Helper functions for input parsing
 	functionExitCode parseTableInput(WORD keyCode);
@@ -48,13 +58,13 @@ private:
 	double parseNumberInput(); // return number
 	double parseNumberInput(std::string customMessage); // return number
 	void executeUserInput(); // Executes functions based on selected table and content
-	void updateFilePreview();
-	void updateWorkFilePreview();
-	void updateSortingDataPreview();
 
-public:
+
+	// Main functions
 	functionExitCode parseUserInput();
 	void draw(); // draws in console
+public:
+
 	functionExitCode runFrame(); // doesn't actually num frame per-se, but the spirit is there
 
 	ui();

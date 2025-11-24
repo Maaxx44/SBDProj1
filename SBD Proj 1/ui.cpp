@@ -11,8 +11,8 @@ void ui::initTables() {
 	// Creating tables
 	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
-	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // work file preview will not be editable
-	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {});
+	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // not editable
+	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
 
 	// Changing title select color to corresponding one
 	this->tFilePreview.getTitleMod().cSelected = tableLinesModInterA[1].cSelected;
@@ -265,45 +265,30 @@ void ui::executeUserInput() {
 		case 0: // "Empty File"
 			this->openedFile.clear();
 			this->openedFile.setSize((unsigned int)parseNumberInput("Enter no. records: "));
-			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
 			break;
 		case 1: // "Random File"
 			this->openedFile = fileTape::getRandomFileTape((unsigned int)parseNumberInput("Enter no. records: "));
-			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
 			break;
 		case 2: // "Open File"
+			// TODO
 			break;
 		case 3: // "Clear File"
 			this->openedFile.clear();
-			this->sorter.clean();
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
+			this->sorter.clear();
 			break;
 		case 4: // "Sort file"
-			this->sorter.clean();
 			this->sorter.addTapeToSort(&this->openedFile);
 			this->sorter.sortTapeFull();
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
-			this->updateSortingDataPreview();
 				break;
 		case 5: // "Sort step"
+			if(!this->sorter.isTapeLoaded())
+				this->sorter.addTapeToSort(&this->openedFile);
 			this->sorter.sortNextPart();
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
-			this->updateSortingDataPreview();
 				break;
 		case 6: // "Reset sorting"
 			this->sorter.resetSorting();
-			this->updateFilePreview();
-			this->updateWorkFilePreview();
-			this->updateSortingDataPreview();
 			break;
 		}
 	}
@@ -314,12 +299,12 @@ void ui::executeUserInput() {
 		if (userRadius <= 0.0) userRadius = 5;
 
 		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
-		this->updateFilePreview();
 		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
 		this->selectContent(this->cursorInfo.currentContentCursorPoint);
 	}
+	this->updateTables();
 }
-void ui::updateFilePreview() {
+void ui::updateFilePreviewTable() {
 	// Required fields for table
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
@@ -345,7 +330,7 @@ void ui::updateFilePreview() {
 	this->openedFile.setReadOperations(this->openedFile.getReadOperations() - this->openedFile.getSize());
 
 }
-void ui::updateWorkFilePreview() {
+void ui::updateWorkFilePreviewTable() {
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
 	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
@@ -359,7 +344,7 @@ void ui::updateWorkFilePreview() {
 	this->tWorkFilePreview.setContent(parsedFile);
 	this->tWorkFilePreview.setContentMod(parsedFileMod);
 }
-void ui::updateSortingDataPreview() {
+void ui::updateSortingDataPreviewTable() {
 	std::pair<unsigned int, unsigned int> IOOperations = this->sorter.getIOperationsCount();
 	unsigned int runsCount = this->sorter.getRunsCount();
 	unsigned int runSize = this->sorter.getRunSize();
@@ -370,7 +355,11 @@ void ui::updateSortingDataPreview() {
 	sortingMetadata.push_back("Runs: " + std::to_string(runsCount));
 	this->tSortingMetadata.setContent(sortingMetadata);
 }
-
+void ui::updateTables() {
+	this->updateFilePreviewTable();
+	this->updateWorkFilePreviewTable();
+	this->updateSortingDataPreviewTable();
+}
 
 
 functionExitCode ui::parseUserInput() {
@@ -425,7 +414,6 @@ functionExitCode ui::runFrame() {
 ui::ui() {
 	this->initConsole();
 	this->initTables();
-
 }
 ui::~ui() {
 	//return console to normal functions

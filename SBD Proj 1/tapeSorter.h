@@ -62,7 +62,7 @@ public:
 
 	// Misc functions
 	bool isTapeLoaded() const;
-	void clean();
+	void clear();
 
 };
 
