@@ -398,33 +398,6 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 	}
 	return continueProgram;
 }
-double ui::parseNumberInput() {
-	// dirty hack! CHANGE LATER
-	this->cInfo.setCursorPosition(0, 0);
-	std::cout << "Enter number: ";
-	double returnValue = 0;
-	std::cin >> returnValue;
-
-	this->cInfo.setCursorPosition(0, 0);
-	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().X; i++)
-		std::cout << " ";
-
-	return returnValue;
-}
-double ui::parseNumberInput(std::string customMessage) {
-	// dirty hack! CHANGE LATER
-	this->cInfo.setCursorPosition(0, 0);
-	std::cout << customMessage;
-	double returnValue = 0;
-	std::cin >> returnValue;
-
-	this->cInfo.setCursorPosition(0, 0);
-	for (unsigned int i = 0; i < this->cInfo.getCurrentDwSize().X; i++)
-		std::cout << " ";
-
-	return returnValue;
-}
-
 
 void ui::executeUserInput() {
 	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 

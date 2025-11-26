@@ -61,8 +61,6 @@ private:
 	functionExitCode parseContentInput(WORD keyCode);
 
 	// DIRTY HACK!
-	double parseNumberInput(); // return number
-	double parseNumberInput(std::string customMessage); // return number
 	void executeUserInput(); // Executes functions based on selected table and content
 
 
