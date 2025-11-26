@@ -15,6 +15,7 @@
 #include <chrono>
 #include <algorithm>
 #include <queue>
+#include <functional>
 #include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
 
 // Data parameters

@@ -548,7 +548,6 @@ void ui::updateTables() {
 	this->updateSortingDataPreviewTable();
 }
 
-
 functionExitCode ui::parseUserInput() {
 	if (cursorInfo.cType == disabled) return continueProgram;
 	if (this->cursorInfo.currentTableCursorPoint == nullptr)
@@ -581,6 +580,7 @@ functionExitCode ui::parseUserInput() {
 
 	return continueProgram;
 }
+
 void ui::draw() {
 	// Draw tables
 	this->drawTable(this->tOptions);
@@ -591,14 +591,13 @@ void ui::draw() {
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);
 }
-
 functionExitCode ui::runFrame() {
 	if (this->parseUserInput() == exitProgram) return exitProgram;
 	this->draw();
 	return continueProgram;
 }
 
-ui::ui() {
+ui::ui(core&appCore): appCore(appCore) {
 	this->initConsole();
 	this->initTables();
 	this->updateTables();

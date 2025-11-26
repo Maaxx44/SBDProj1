@@ -6,11 +6,19 @@
 
 #include "tapeSorter.h"
 
+// FWD declaration
+class core;
+
+
 class ui {
 private:
+	// UI Data
 	cInfo cInfo;
 	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 	cursorInformations cursorInfo;
+
+	// Reference to core for ability of calling Interface <-> Sorter functionality
+	core& appCore;
 
 	// Another shady solution
 	const textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
@@ -71,7 +79,7 @@ public:
 
 	functionExitCode runFrame(); // doesn't actually num frame per-se, but the spirit is there
 
-	ui();
+	ui(core& appCore);
 	~ui();
 };
 

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "textModifiers.h"
 #include "uiTablePointer.h"
+#include "functionParameterUnion.h"
 
 
 
@@ -22,6 +23,12 @@ private:
 	REC position;
 	bool isTableVisible = true;
 	unsigned int contentOffset = 0;
+	
+	// Functions for interaction with program
+	bool isGlobalFunctionActive = false; // if true then any interaction with content will call this function with else - every line will have individual function called
+	std::function<fParUnion(std::vector<fParUnion>)> groupContentFunction;
+	std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunctions;
+
 
 	std::string cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const;
 
@@ -31,6 +38,8 @@ public:
 	uiTable(REC newPosition, std::string title);
 	uiTable(REC newPosition, std::string title, std::vector<std::string> content);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod);
+	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> groupContentFunc);
+	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc);
 
 	// ---- SETTERS ----
 	/// Setting text
