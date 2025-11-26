@@ -102,6 +102,7 @@ void ui::clearAfterTable(uiTable& table) const {
 	const std::string emptyLine = std::string(tablePosition.W, ' ');
 
 	// Clearing after table
+	this->changeColor(defaultTextColor);
 	for (unsigned int line = 0; line < tablePosition.H; line++) {
 		this->cInfo.setCursorPosition(tablePosition.X, tablePosition.Y + line);
 		printf(emptyLine.c_str());
@@ -238,11 +239,6 @@ std::optional<std::string> ui::getUserInputString(std::string customMessage) con
 
 	return "";
 }
-
-
-
-
-
 
 
 functionExitCode ui::parseTableInput(WORD keyCode) {
@@ -415,18 +411,51 @@ void ui::executeUserInput() {
 			this->sorter.resetSorting();
 			break;
 		}
+		this->updateTables();
 	}
 	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) {
 		this->cursorInfo.currentContentCursorPoint;
-		double userAngle = std::fmod(parseNumberInput("Enter angle:"), 360.0);
-		double userRadius = parseNumberInput("Enter radius:");
-		if (userRadius <= 0.0) userRadius = 5;
 
+		double userAngle = 0.0, userRadius = 0.0;
+		std::optional<double> userInput;
+
+		bool correctValueEntered = false;
+		std::string message = " Enter angle:";
+
+		// Getting angle
+		while (!correctValueEntered) {
+			userInput = getUserInputDouble(message);
+
+			if (userInput == std::nullopt)
+				return;
+			else if (userInput > 360.0)
+				message = " Angle cannot be more than 360. Enter correct angle:";
+			else {
+				correctValueEntered = true;
+				userAngle = userInput.value();
+			}
+		}
+
+		// Getting radius
+		correctValueEntered = false;
+		message = " Enter radius:";
+		while (!correctValueEntered) {
+			userInput = getUserInputDouble(message);
+
+			if (userInput == std::nullopt)
+				return;
+			else {
+				correctValueEntered = true;
+				userRadius = userInput.value();
+			}
+		}
+
+		// Setting values
 		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
+		this->updateTables();
 		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
 		this->selectContent(this->cursorInfo.currentContentCursorPoint);
 	}
-	this->updateTables();
 }
 void ui::updateFilePreviewTable() {
 	// Required fields for table
@@ -527,9 +556,6 @@ void ui::draw() {
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);
-
-	// DEBUG - REMOVE LATER
-	//std::optional<double> test = getUserInputDouble();
 }
 
 functionExitCode ui::runFrame() {

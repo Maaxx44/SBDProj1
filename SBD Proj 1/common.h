@@ -56,11 +56,11 @@
 //  UserInput Parameters
 #define ignoredInputEvents (FOCUS_EVENT | MENU_EVENT | MOUSE_EVENT)
 //  User Input Table parameters
-#define inputTableDefaultX 15
-#define inputTableDefaultY 5
-#define inputTableDoubleDefaultWidth 20
-#define inputTableUIntDefaultWidth 20
-#define inputTableStringDefaultWidth 20
+#define inputTableDefaultX 2
+#define inputTableDefaultY 37
+#define inputTableDoubleDefaultWidth 119
+#define inputTableUIntDefaultWidth 119
+#define inputTableStringDefaultWidth 119
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;
