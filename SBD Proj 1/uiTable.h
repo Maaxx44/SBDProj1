@@ -26,8 +26,8 @@ private:
 	
 	// Functions for interaction with program
 	bool isGlobalFunctionActive = false; // if true then any interaction with content will call this function with else - every line will have individual function called
-	std::function<fParUnion(std::vector<fParUnion>)> groupContentFunction;
-	std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunctions;
+	std::function<fParUnion(std::vector<fParUnion>)> globalContentFunction;
+	std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc;
 
 
 	std::string cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const;
@@ -38,7 +38,7 @@ public:
 	uiTable(REC newPosition, std::string title);
 	uiTable(REC newPosition, std::string title, std::vector<std::string> content);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod);
-	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> groupContentFunc);
+	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc);
 
 	// ---- SETTERS ----
@@ -60,6 +60,10 @@ public:
 	/// Setting pointers
 	void setTablePointers(uiTablePointer newTablePointers);
 
+	/// Interaction functions
+	void setGlobalContentFunction(std::function<fParUnion(std::vector<fParUnion>)> newGCF);
+	void setContentFunctions(std::vector<std::function<fParUnion(std::vector<fParUnion>)>> newCFL);
+	void setContentFunc(std::function<fParUnion(std::vector<fParUnion>)> newCF, unsigned int contentLine);
 	// -----------------
 
 
@@ -106,5 +110,10 @@ public:
 
 	/// This function calculates offset needed to make content line visible
 	unsigned int getOffsetForLine(unsigned int lineIndex) const;
+
+	// ---- Calls to content functions ----
+	fParUnion callGlobalContentFunction(std::vector<fParUnion> funcParameters) const;
+	fParUnion callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const;
+	// ------------------------------------
 };
 

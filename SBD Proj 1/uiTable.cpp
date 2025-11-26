@@ -22,8 +22,8 @@ uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> co
 	this->contentMod.resize(contentField.size());
 }
 uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> groupContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), groupContentFunction(groupContentFunc), contentFunctions() {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), groupContentFunction(), contentFunctions(contentFunc) {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc() {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc) {}
 
 
 
@@ -69,6 +69,22 @@ void uiTable::setTableSize(REC newPosition) {
 
 void uiTable::setTablePointers(uiTablePointer newTablePointers) {
 	this->tablePointers = newTablePointers;
+}
+
+void uiTable::setGlobalContentFunction(std::function<fParUnion(std::vector<fParUnion>)> newGCF) {
+	this->globalContentFunction = newGCF;
+}
+void uiTable::setContentFunctions(std::vector<std::function<fParUnion(std::vector<fParUnion>)>> newCFL) {
+	// Checking if size of newCFL matches size of content
+	if (this->contentField.size() != newCFL.size())
+		throw std::runtime_error("setContentFunctions error: newCFL size(" + std::to_string(newCFL.size()) + ") does not match content size(" + std::to_string(this->contentField.size()) + ")");
+	this->contentFunc = newCFL;
+}
+void uiTable::setContentFunc(std::function<fParUnion(std::vector<fParUnion>)> newCF, unsigned int contentLine) {
+	// Checking if index is in range
+	if (contentLine >= this->contentFunc.size())
+		throw std::runtime_error("setContentFunc error: contentLine(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentFunc.size()) + ")");
+	this->contentFunc[contentLine] = newCF;
 }
 // -----------------
 
@@ -225,4 +241,13 @@ unsigned int uiTable::getOffsetForLine(unsigned int lineIndex) const {
 	if (this->contentOffset > 0 && lineIndex < this->contentOffset) return lineIndex;
 	else if (this->contentOffset + this->getContentHeight() <= lineIndex) return lineIndex - this->getContentHeight() + 1;
 	else return 0;
+}
+
+fParUnion uiTable::callGlobalContentFunction(std::vector<fParUnion> funcParameters) const {
+	return this->globalContentFunction(funcParameters);
+}
+fParUnion uiTable::callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const {
+	if (contentLine >= this->contentFunc.size())
+		throw std::runtime_error("callContentFunction error: contentLine(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentFunc.size()) + ")");
+	return this->contentFunc[contentLine](funcParameters);
 }
