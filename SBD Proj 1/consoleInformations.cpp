@@ -257,3 +257,24 @@ std::optional<KEY_EVENT_RECORD> consoleInformations::getFirstKeyInput() const {
 
 	return std::optional<KEY_EVENT_RECORD>(inputBuffer.Event.KeyEvent);
 }
+KEY_EVENT_RECORD consoleInformations::getNextKeyInputBlocking() const {
+	if (this->cInputHandle == NULL) throw std::runtime_error("getNextKeyInputBlocking error: cInputHandle was NULL!");
+
+	INPUT_RECORD inputBuffer;
+	DWORD eventCount = 0x0000;
+	bool keyEventReached = false;
+
+	while (!keyEventReached) {
+		// Getting input event
+		if (!ReadConsoleInput(this->cInputHandle, &inputBuffer, 1, &eventCount))
+			ErrorHandler("Failed to read console input!");
+
+		// Checking if we reched key down event or the end of queue
+		else if (inputBuffer.EventType == KEY_EVENT && inputBuffer.Event.KeyEvent.bKeyDown) {
+			keyEventReached = true;
+			break;
+		}
+	}
+
+	return inputBuffer.Event.KeyEvent;
+}

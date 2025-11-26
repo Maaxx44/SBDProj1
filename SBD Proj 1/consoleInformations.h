@@ -33,7 +33,8 @@ public:
 	INPUT_RECORD getOneKeyUserInput() const; // Returns next event with keydown
 	bool isInputAvalible() const; // checks if there is input in input buffer
 	bool isKeyInputAvalible() const; // checks if there is key input in input buffer
-	std::optional< KEY_EVENT_RECORD> getFirstKeyInput() const; // if there is any key event in the queue  - get first and return - else - empty queue
+	std::optional<KEY_EVENT_RECORD> getFirstKeyInput() const; // if there is any key event in the queue  - get first and return - else - empty queue
+	KEY_EVENT_RECORD getNextKeyInputBlocking() const; // Waits untill there is key input discarding other events
 
 };
 typedef consoleInformations cInfo;

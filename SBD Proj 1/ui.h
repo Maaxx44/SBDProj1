@@ -32,12 +32,14 @@ private:
 	void drawTableContent(uiTable& table) const;
 	void drawTable(uiTable& table) const;
 
+	// Prints empty spaces in place of table to clear inut buffor
+	void clearAfterTable(uiTable& table) const;
+
 	// Helper functions for updating tables content
 	void updateFilePreviewTable();
 	void updateWorkFilePreviewTable();
 	void updateSortingDataPreviewTable();
 	void updateTables();
-
 
 	// Helper functions for cursor manipulation
 	void selectTable(uiTable* table); // enables blinking mode in table
@@ -47,10 +49,14 @@ private:
 	void deselectContent(unsigned int contentLine);
 	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 
+	// helper functions for getting user input
+	uiTable createInputTable(COR position, unsigned int width, std::string title) const; // creates input table with given parameters. Will always be 2 height. Returns position of input box
+	std::optional<double> getUserInputDouble(std::string customMessage = "Enter new value (double)") const;
+	std::optional<unsigned int> getUserInputUInt(std::string customMessage = "Enter new value (unsigned intiger)") const;
+	std::optional<std::string> getUserInputString(std::string customMessage = "Enter new string") const;
 
 
-
-	// Helper functions for input parsing
+	// Helper functions for keys input parsing (not string or number input!!!)
 	functionExitCode parseTableInput(WORD keyCode);
 	functionExitCode parseContentInput(WORD keyCode);
 

@@ -172,6 +172,10 @@ REC uiTable::getContentRectangle() const {
 	return { .X = this->position.X, .Y = this->position.Y + 1, .W = this->position.W, .H = this->position.H - 1 };
 }
 
+REC uiTable::getTableRectangle() const {
+	return this->position;
+}
+
 unsigned int uiTable::getContentHeight() const {
 	return this->position.H - 1;
 }

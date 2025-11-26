@@ -71,6 +71,9 @@ public:
 	REC getTitleRectangle() const;
 	REC getContentRectangle() const;
 
+	/// For getting position of the whole table
+	REC getTableRectangle() const;
+
 	/// This function gets size of the WHOLE content
 	unsigned int getContentHeight() const;
 	unsigned int getContentSize() const;

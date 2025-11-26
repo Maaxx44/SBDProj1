@@ -55,6 +55,12 @@
 #define flashOnTimeMs 750		// flash does not repeat so it wont need off time
 //  UserInput Parameters
 #define ignoredInputEvents (FOCUS_EVENT | MENU_EVENT | MOUSE_EVENT)
+//  User Input Table parameters
+#define inputTableDefaultX 15
+#define inputTableDefaultY 5
+#define inputTableDoubleDefaultWidth 20
+#define inputTableUIntDefaultWidth 20
+#define inputTableStringDefaultWidth 20
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;

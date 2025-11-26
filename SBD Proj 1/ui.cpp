@@ -83,7 +83,6 @@ void ui::drawTableContent(uiTable& table) const {
 		drawTableContentLine(table, drawContent[i], drawMod[i], i);
 	}
 }
-
 void ui::drawTable(uiTable& table) const {
 	table.updateTiming();
 
@@ -96,6 +95,19 @@ void ui::drawTable(uiTable& table) const {
 	// Draw table content
 	drawTableContent(table);
 }
+
+void ui::clearAfterTable(uiTable& table) const {
+	// Gathering data
+	REC tablePosition = table.getTableRectangle();
+	const std::string emptyLine = std::string(tablePosition.W, ' ');
+
+	// Clearing after table
+	for (unsigned int line = 0; line < tablePosition.H; line++) {
+		this->cInfo.setCursorPosition(tablePosition.X, tablePosition.Y + line);
+		printf(emptyLine.c_str());
+	}
+}
+
 
 void ui::selectTable(uiTable* table) {
 	table->getTitleMod().startBlink();
@@ -120,6 +132,118 @@ void ui::changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDes
 	selectContent(newSelectedLine);
 	deselectContent(oldDeselectedLine);
 }
+
+// helper functions for getting user input
+uiTable ui::createInputTable(COR position, unsigned int width, std::string title) const {
+	uiTable inputTable({ .X = position.X, .Y = position.Y, .W = width, .H = 2 }, title, { "" });
+	inputTable.setTableVisible(false);
+
+	return inputTable;
+}
+std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableDoubleDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	inputTable.setTableVisible(true);
+	drawTable(inputTable);
+
+	// Parsing user input
+	bool usedComma = false;
+	std::string unparsedUserInput = "";
+	std::optional<KEY_EVENT_RECORD> keyRecord;
+	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
+		WORD keyCode = keyRecord.value().wVirtualKeyCode;
+
+		// Parse key code
+		if (keyCode == VK_BACK) { // Remove last inputted character
+			if (!unparsedUserInput.empty()) {
+				char removedChar = unparsedUserInput.back(); // Getting last character
+				unparsedUserInput.pop_back(); // Removing last character
+				if (removedChar == '.') usedComma = false; // If last character was comma - enable comma input again
+			}
+		}
+		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
+			this->clearAfterTable(inputTable);
+			return std::nullopt;
+		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
+			if(unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back('0' + keyCode - 0x30);
+		}
+		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA)) { // Verify if no comma has been placed and add comma 
+			if (unparsedUserInput.size() < tableWidth) {
+				unparsedUserInput.push_back('.');
+				usedComma = true;
+			}
+		}
+		else if (keyCode == VK_RETURN) { // Parse user input and return
+			// Clear up user input
+			if (unparsedUserInput == ".") return 0.0;
+			else if (unparsedUserInput.front() == '.' && unparsedUserInput.size() > 1) // If there is dot at the beg. add zero before parsing
+				unparsedUserInput.insert(0, 1, '0');
+			else if (unparsedUserInput.back() == '.' && unparsedUserInput.size() > 1) // If there is dot at the end. add zero before parsing
+				unparsedUserInput.push_back('0');
+
+			// Try parsing
+			double returnValue = 0.0;
+			try {
+				returnValue = stod(unparsedUserInput);
+			}
+			catch (std::exception e) {
+				// If parsing failed - return nullopt
+				this->clearAfterTable(inputTable);
+				return std::nullopt;
+			}
+
+			// Return parsed value
+			this->clearAfterTable(inputTable);
+			return std::optional<double>(returnValue);
+		}
+
+		// Update user input inside table
+		inputTable.setContent({ unparsedUserInput });
+		drawTable(inputTable);
+	}
+
+
+	this->clearAfterTable(inputTable);
+	return std::nullopt;
+}
+std::optional<unsigned int> ui::getUserInputUInt(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableUIntDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	drawTable(inputTable);
+
+	// Parsing user input
+
+
+
+
+
+
+	return 0;
+}
+std::optional<std::string> ui::getUserInputString(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableStringDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	drawTable(inputTable);
+
+	// Parsing user input
+
+
+	return "";
+}
+
+
+
+
+
+
 
 functionExitCode ui::parseTableInput(WORD keyCode) {
 	switch (keyCode) {
@@ -403,6 +527,9 @@ void ui::draw() {
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);
+
+	// DEBUG - REMOVE LATER
+	//std::optional<double> test = getUserInputDouble();
 }
 
 functionExitCode ui::runFrame() {
