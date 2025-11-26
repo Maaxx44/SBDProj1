@@ -4,7 +4,7 @@
 #include "uiTablePointer.h"
 #include "functionParameterUnion.h"
 
-
+// FWD Declaration with needed functions
 
 class uiTable {
 private:
@@ -26,6 +26,7 @@ private:
 	
 	// Functions for interaction with program
 	bool isGlobalFunctionActive = false; // if true then any interaction with content will call this function with else - every line will have individual function called
+	bool isFunctionCallingActive = false; // if there should be any functions calls
 	std::function<fParUnion(std::vector<fParUnion>)> globalContentFunction;
 	std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc;
 
@@ -37,6 +38,8 @@ public:
 	uiTable(REC newPosition);
 	uiTable(REC newPosition, std::string title);
 	uiTable(REC newPosition, std::string title, std::vector<std::string> content);
+	uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc);
+	uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc);
@@ -64,6 +67,7 @@ public:
 	void setGlobalContentFunction(std::function<fParUnion(std::vector<fParUnion>)> newGCF);
 	void setContentFunctions(std::vector<std::function<fParUnion(std::vector<fParUnion>)>> newCFL);
 	void setContentFunc(std::function<fParUnion(std::vector<fParUnion>)> newCF, unsigned int contentLine);
+	void setFunctionFunctionality(bool isFFEnabled); 
 	// -----------------
 
 
@@ -112,6 +116,8 @@ public:
 	unsigned int getOffsetForLine(unsigned int lineIndex) const;
 
 	// ---- Calls to content functions ----
+	bool isGlobalContentFunctionEnabled() const;
+	bool isFunctionCallingEnabled() const;
 	fParUnion callGlobalContentFunction(std::vector<fParUnion> funcParameters) const;
 	fParUnion callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const;
 	// ------------------------------------

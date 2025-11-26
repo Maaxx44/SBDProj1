@@ -1,5 +1,8 @@
 #include "ui.h"
 
+
+
+
 void ui::initConsole() {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	this->cInfo.setConsoleTitle(defaultConsoleTitle);
@@ -8,9 +11,12 @@ void ui::initConsole() {
 	this->cInfo.setCursorVisibility(false);
 }
 void ui::initTables() {
+	std::function<fParUnion(std::vector<fParUnion>)> test = std::bind_front(&core::UICreateEmptyFile, this->appCore);
+
+
 	// Creating tables
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting"});
-	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" }, std::vector<std::function<fParUnion(std::vector<fParUnion>)>>());
+	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {}, std::function<fParUnion(std::vector<fParUnion>)>());
 	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // not editable
 	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
 
@@ -393,18 +399,32 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 
 		break;
 	case VK_RETURN:
-		executeUserInput();
+		if (!this->cursorInfo.currentTableCursorPoint->isFunctionCallingEnabled()) break;
+		else if (this->cursorInfo.currentTableCursorPoint->isGlobalContentFunctionEnabled())
+			executeGlobalFunc({ fParUnion(returnType::tUInt, returnData(this->cursorInfo.currentContentCursorPoint))}); // TODO - parameters
+		else
+			executeContentFunc({ fParUnion(returnType::tUInt, returnData(this->cursorInfo.currentContentCursorPoint))}); // TODO - parameters
 		break;
 	}
 	return continueProgram;
 }
 
+fParUnion ui::executeContentFunc(std::vector<fParUnion> funcParameters) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr)
+		throw std::runtime_error("executeFunc error: cursorInfo.currentTableCursorPoint was nullptr!");
+	return this->cursorInfo.currentTableCursorPoint->callContentFunction(funcParameters, this->cursorInfo.currentContentCursorPoint);
+}
+fParUnion ui::executeGlobalFunc(std::vector<fParUnion> funcParameters) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr)
+		throw std::runtime_error("executeFunc error: cursorInfo.currentTableCursorPoint was nullptr!");
+	return this->cursorInfo.currentTableCursorPoint->callGlobalContentFunction(funcParameters);
+}
+
+
 void ui::executeUserInput() {
 	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
 		// Initializing possible user input - to please the compiler
 		std::optional<unsigned int> userInput(std::nullopt);
-
-
 		switch (this->cursorInfo.currentContentCursorPoint) {
 			//TODO - SET TO FINAL FUNCTIONS !!!!
 		case 0: // "Empty File"

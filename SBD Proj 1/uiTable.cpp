@@ -18,12 +18,12 @@ std::string uiTable::cutoffString(std::string str, unsigned int length, unsigned
 uiTable::uiTable() : position({ 0, 0, 0, 0 }) {}
 uiTable::uiTable(REC newPosition) : position(newPosition) { }
 uiTable::uiTable(REC newPosition, std::string title) : position(newPosition), titleField(title) {}
-uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content) : position(newPosition), titleField(title), contentField(content) {
-	this->contentMod.resize(contentField.size());
-}
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content) : position(newPosition), titleField(title), contentField(content) { this->contentMod.resize(contentField.size()); }
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
 uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc() {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc) {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) {}
 
 
 
@@ -85,6 +85,9 @@ void uiTable::setContentFunc(std::function<fParUnion(std::vector<fParUnion>)> ne
 	if (contentLine >= this->contentFunc.size())
 		throw std::runtime_error("setContentFunc error: contentLine(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentFunc.size()) + ")");
 	this->contentFunc[contentLine] = newCF;
+}
+void uiTable::setFunctionFunctionality(bool isFFEnabled) {
+	this->isFunctionCallingActive = isFFEnabled;
 }
 // -----------------
 
@@ -214,6 +217,7 @@ uiTablePointer& uiTable::getTablePointers() {
 }
 // -----------------
 
+
 void uiTable::updateTiming() {
 	for (textModifiers& contentLineMod : this->contentMod)
 		contentLineMod.updateTiming();
@@ -243,6 +247,12 @@ unsigned int uiTable::getOffsetForLine(unsigned int lineIndex) const {
 	else return 0;
 }
 
+bool uiTable::isGlobalContentFunctionEnabled() const {
+	return this->isGlobalFunctionActive;
+}
+bool uiTable::isFunctionCallingEnabled() const {
+	return this->isFunctionCallingActive;
+}
 fParUnion uiTable::callGlobalContentFunction(std::vector<fParUnion> funcParameters) const {
 	return this->globalContentFunction(funcParameters);
 }
