@@ -14,14 +14,14 @@ private:
 
 public:
 	// ---- Functions called by UI ----
-	fParUnion UICreateEmptyFile(std::vector<fParUnion> funcParameters);
-	fParUnion UICreateRandomFile(std::vector<fParUnion> funcParameters);
-	fParUnion UIOpenFile(std::vector<fParUnion> funcParameters);
-	fParUnion UIClearFile(std::vector<fParUnion> funcParameters);
-	fParUnion UISortFile(std::vector<fParUnion> funcParameters);
-	fParUnion UISortStep(std::vector<fParUnion> funcParameters);
-	fParUnion UIResetSorting(std::vector<fParUnion> funcParameters);
-	fParUnion UIModifyFileLine(std::vector<fParUnion> funcParameters);
+	functionExitCode UICreateEmptyFile(std::vector<fParUnion> funcParameters);
+	functionExitCode UICreateRandomFile(std::vector<fParUnion> funcParameters);
+	functionExitCode UIOpenFile(std::vector<fParUnion> funcParameters);
+	functionExitCode UIClearFile(std::vector<fParUnion> funcParameters);
+	functionExitCode UISortFile(std::vector<fParUnion> funcParameters);
+	functionExitCode UISortStep(std::vector<fParUnion> funcParameters);
+	functionExitCode UIResetSorting(std::vector<fParUnion> funcParameters);
+	functionExitCode UIModifyFileLine(std::vector<fParUnion> funcParameters);
 	// --------------------------------
 
 	core();
