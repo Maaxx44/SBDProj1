@@ -1,5 +1,10 @@
 #pragma once
 
+enum functionExitCode {
+	continueProgram,
+	exitProgram
+};
+
 union returnData {
 	unsigned int rUInt;
 	double rDouble;

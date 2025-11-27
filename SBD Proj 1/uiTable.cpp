@@ -19,11 +19,11 @@ uiTable::uiTable() : position({ 0, 0, 0, 0 }) {}
 uiTable::uiTable(REC newPosition) : position(newPosition) { }
 uiTable::uiTable(REC newPosition, std::string title) : position(newPosition), titleField(title) {}
 uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content) : position(newPosition), titleField(title), contentField(content) { this->contentMod.resize(contentField.size()); }
-uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
-uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::function<functionExitCode(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
+uiTable::uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), contentField(content), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) { this->contentMod.resize(contentField.size()); }
 uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod) {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<fParUnion(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) {}
-uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<fParUnion(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<functionExitCode(std::vector<fParUnion>)> globalContentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(true), globalContentFunction(globalContentFunc), contentFunc(), isFunctionCallingActive(true) {}
+uiTable::uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> contentFunc) : position(newPosition), titleField(title), titleMod(titleMod), contentField(content), contentMod(contentMod), isGlobalFunctionActive(false), globalContentFunction(), contentFunc(contentFunc), isFunctionCallingActive(true) {}
 
 
 
@@ -71,16 +71,16 @@ void uiTable::setTablePointers(uiTablePointer newTablePointers) {
 	this->tablePointers = newTablePointers;
 }
 
-void uiTable::setGlobalContentFunction(std::function<fParUnion(std::vector<fParUnion>)> newGCF) {
+void uiTable::setGlobalContentFunction(std::function<functionExitCode(std::vector<fParUnion>)> newGCF) {
 	this->globalContentFunction = newGCF;
 }
-void uiTable::setContentFunctions(std::vector<std::function<fParUnion(std::vector<fParUnion>)>> newCFL) {
+void uiTable::setContentFunctions(std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> newCFL) {
 	// Checking if size of newCFL matches size of content
 	if (this->contentField.size() != newCFL.size())
 		throw std::runtime_error("setContentFunctions error: newCFL size(" + std::to_string(newCFL.size()) + ") does not match content size(" + std::to_string(this->contentField.size()) + ")");
 	this->contentFunc = newCFL;
 }
-void uiTable::setContentFunc(std::function<fParUnion(std::vector<fParUnion>)> newCF, unsigned int contentLine) {
+void uiTable::setContentFunc(std::function<functionExitCode(std::vector<fParUnion>)> newCF, unsigned int contentLine) {
 	// Checking if index is in range
 	if (contentLine >= this->contentFunc.size())
 		throw std::runtime_error("setContentFunc error: contentLine(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentFunc.size()) + ")");
@@ -253,10 +253,10 @@ bool uiTable::isGlobalContentFunctionEnabled() const {
 bool uiTable::isFunctionCallingEnabled() const {
 	return this->isFunctionCallingActive;
 }
-fParUnion uiTable::callGlobalContentFunction(std::vector<fParUnion> funcParameters) const {
+functionExitCode uiTable::callGlobalContentFunction(std::vector<fParUnion> funcParameters) const {
 	return this->globalContentFunction(funcParameters);
 }
-fParUnion uiTable::callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const {
+functionExitCode uiTable::callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const {
 	if (contentLine >= this->contentFunc.size())
 		throw std::runtime_error("callContentFunction error: contentLine(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentFunc.size()) + ")");
 	return this->contentFunc[contentLine](funcParameters);

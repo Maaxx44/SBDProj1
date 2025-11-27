@@ -3,7 +3,6 @@
 #include "consoleInformations.h"
 #include "cursorInformations.h"
 #include "uiTable.h"
-#include "functionParameterUnion.h"
 
 #include "tapeSorter.h"
 
@@ -14,8 +13,8 @@ class ui {
 private:
 	// UI Data
 	cInfo cInfo;
-	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 	cursorInformations cursorInfo;
+	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 
 	// Reference to core for ability of calling Interface <-> Sorter functionality
 	core& appCore;
@@ -65,8 +64,8 @@ private:
 	functionExitCode parseContentInput(WORD keyCode);
 
 	// Functions execution function (I need to work on my names)
-	fParUnion executeContentFunc(std::vector<fParUnion> funcParameters);
-	fParUnion executeGlobalFunc(std::vector<fParUnion> funcParameters);
+	functionExitCode executeContentFunc(std::vector<fParUnion> funcParameters);
+	functionExitCode executeGlobalFunc(std::vector<fParUnion> funcParameters);
 
 	// DIRTY HACK! - TODO - REMOVE AFTER REFACTOR
 	void executeUserInput(); // Executes functions based on selected table and content
@@ -81,7 +80,12 @@ public:
 	std::optional<unsigned int> getUserInputUInt(std::string customMessage = "Enter new value (unsigned intiger)") const;
 	std::optional<std::string> getUserInputString(std::string customMessage = "Enter new string") const;
 
+	// TODO: 
+	// 1. Replace tOptions, tFilePreview ..... with unified tables vector
+	// 2. Add methods to set and change tables from outside of ui class
+	// 3. Move Tables init to core
 
+	
 	// Main UI function - all functions lead to this one
 	functionExitCode runFrame();
 

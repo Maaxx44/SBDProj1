@@ -18,6 +18,8 @@
 #include <functional>
 #include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
 
+#include "functionParameterUnion.h"
+
 // Data parameters
 #define BLOCK_SIZE 8 // how many records in a block
 #define blocksPerMemory 1 // how many block can we read into memory
@@ -70,8 +72,3 @@ typedef struct RECTANGLE {
 typedef struct COORDINATES {
 	unsigned int X, Y;
 } COORDINATES, COR;
-
-enum functionExitCode {
-	continueProgram,
-	exitProgram
-};
