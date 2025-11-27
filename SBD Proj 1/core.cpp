@@ -94,14 +94,14 @@ void ui::executeUserInput() {
 }*/
 
 // ---- Functions called by UI ----
-functionExitCode core::UICreateEmptyFile(std::vector<fParUnion> funcParameters) {  /*TODO*/  }
-functionExitCode core::UICreateRandomFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UIOpenFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UIClearFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UISortFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UISortStep(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UIResetSorting(std::vector<fParUnion> funcParameters) {  /*TODO*/ }
-functionExitCode core::UIModifyFileLine(std::vector<fParUnion> funcParameters) {  /*TODO*/  }
+functionExitCode core::UICreateEmptyFile(std::vector<fParUnion> funcParameters) {  /*TODO*/  return continueProgram;` }
+functionExitCode core::UICreateRandomFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UIOpenFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UIClearFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UISortFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UISortStep(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UIResetSorting(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram;` }
+functionExitCode core::UIModifyFileLine(std::vector<fParUnion> funcParameters) {  /*TODO*/  return continueProgram;` }
 // --------------------------------
 
 
