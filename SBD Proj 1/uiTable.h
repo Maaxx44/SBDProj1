@@ -27,9 +27,6 @@ private:
 	// Functions for interaction with program
 	bool isGlobalFunctionActive = false; // if true then any interaction with content will call this function with else - every line will have individual function called
 	bool isFunctionCallingActive = false; // if there should be any functions calls
-	std::function<functionExitCode(std::vector<fParUnion>)> globalContentFunction;
-	std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> contentFunc;
-
 
 	std::string cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const;
 
@@ -38,11 +35,7 @@ public:
 	uiTable(REC newPosition);
 	uiTable(REC newPosition, std::string title);
 	uiTable(REC newPosition, std::string title, std::vector<std::string> content);
-	uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::function<functionExitCode(std::vector<fParUnion>)> globalContentFunc);
-	uiTable(REC newPosition, std::string title, std::vector<std::string> content, std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> contentFunc);
 	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod);
-	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::function<functionExitCode(std::vector<fParUnion>)> globalContentFunc);
-	uiTable(REC newPosition, std::string title, textModifiers titleMod, std::vector<std::string> content, std::vector<textModifiers> contentMod, std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> contentFunc);
 
 	// ---- SETTERS ----
 	/// Setting text
@@ -64,10 +57,7 @@ public:
 	void setTablePointers(uiTablePointer newTablePointers);
 
 	/// Interaction functions
-	void setGlobalContentFunction(std::function<functionExitCode(std::vector<fParUnion>)> newGCF);
-	void setContentFunctions(std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> newCFL);
-	void setContentFunc(std::function<functionExitCode(std::vector<fParUnion>)> newCF, unsigned int contentLine);
-	void setFunctionFunctionality(bool isFFEnabled); 
+	void setFunctionCallingParameters(bool isFunctionCallingEnabled, bool isGlobalFunctionEnabled);
 	// -----------------
 
 
@@ -118,8 +108,6 @@ public:
 	// ---- Calls to content functions ----
 	bool isGlobalContentFunctionEnabled() const;
 	bool isFunctionCallingEnabled() const;
-	functionExitCode callGlobalContentFunction(std::vector<fParUnion> funcParameters) const;
-	functionExitCode callContentFunction(std::vector<fParUnion> funcParameters, unsigned int contentLine) const;
 	// ------------------------------------
 };
 

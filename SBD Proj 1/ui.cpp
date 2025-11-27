@@ -107,9 +107,6 @@ void ui::clearAfterTable(uiTable* table) const {
 		printf(emptyLine.c_str());
 	}
 }
-void ui::updateTables() {
-	(this->appCore->*updateProgramTables)();
-}
 
 
 void ui::selectTable(uiTable* table) {
@@ -248,26 +245,11 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 
 		break;
 	case VK_RETURN:
-		if (!this->cursorInfo.currentTableCursorPoint->isFunctionCallingEnabled()) break;
-		else if (this->cursorInfo.currentTableCursorPoint->isGlobalContentFunctionEnabled())
-			if (executeGlobalFunc({ fParUnion(returnType::tUInt, returnData(this->cursorInfo.currentContentCursorPoint)) }) == exitProgram)
+		if (this->cursorInfo.currentTableCursorPoint->isFunctionCallingEnabled())
+			if (this->appCore.callTableFunction(this->cursorInfo.currentTableCursorPoint, this->cursorInfo.currentContentCursorPoint) == exitProgram)
 				return exitProgram;
-			else if (executeContentFunc({ fParUnion(returnType::tUInt, returnData(this->cursorInfo.currentContentCursorPoint)) }) == exitProgram)
-				return exitProgram;
-		break;
 	}
 	return continueProgram;
-}
-
-functionExitCode ui::executeContentFunc(std::vector<fParUnion> funcParameters) {
-	if (this->cursorInfo.currentTableCursorPoint == nullptr)
-		throw std::runtime_error("executeFunc error: cursorInfo.currentTableCursorPoint was nullptr!");
-	return this->cursorInfo.currentTableCursorPoint->callContentFunction(funcParameters, this->cursorInfo.currentContentCursorPoint);
-}
-functionExitCode ui::executeGlobalFunc(std::vector<fParUnion> funcParameters) {
-	if (this->cursorInfo.currentTableCursorPoint == nullptr)
-		throw std::runtime_error("executeFunc error: cursorInfo.currentTableCursorPoint was nullptr!");
-	return this->cursorInfo.currentTableCursorPoint->callGlobalContentFunction(funcParameters);
 }
 
 /*void ui::executeUserInput() {
@@ -395,6 +377,8 @@ functionExitCode ui::parseUserInput() {
 }
 
 void ui::draw() {
+	//this->appCore.updateTables();
+
 	// Draw tables
 	for (uiTable* pTable : this->pProgramTables)
 		this->drawTable(pTable); // TODO - CHECK IF CORRECT
@@ -571,14 +555,6 @@ void ui::setCursor(uiTable* selectedTable) {
 void ui::addTable(uiTable* newPTable) {
 	this->pProgramTables.push_back(newPTable);
 }
-uiTable* ui::getTable(unsigned int tableIndex) {
-	if (tableIndex >= (unsigned int)this->pProgramTables.size())
-		throw std::runtime_error("getTable error: tableIndex(" + std::to_string(tableIndex) + ") out of range pProgramTables.size(" + std::to_string(this->pProgramTables.size()) + ")");
-	return this->pProgramTables[tableIndex];
-}
-std::vector<uiTable*>& ui::getAllTables() {
-	return this->pProgramTables;
-}
 
 functionExitCode ui::runFrame() {
 	if (this->parseUserInput() == exitProgram) return exitProgram;
@@ -586,13 +562,7 @@ functionExitCode ui::runFrame() {
 	return continueProgram;
 }
 
-void ui::setAppCore(core* appCore, void (core::* newUpdateProgramTables)()) {
-	this->appCore = appCore;
-	this->updateProgramTables = newUpdateProgramTables;
-}
-
-
-ui::ui() {
+ui::ui(core& appCore): appCore(appCore) {
 	this->initConsole();
 	this->initCursor();
 }

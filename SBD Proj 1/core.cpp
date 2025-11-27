@@ -1,109 +1,101 @@
 #include "ui-core-merged.h"
 
-// old function to be broken up and translated to new UI*() functions
-/*
-void ui::executeUserInput() {
-	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
-		// Initializing possible user input - to please the compiler
-		std::optional<unsigned int> userInput(std::nullopt);
-		switch (this->cursorInfo.currentContentCursorPoint) {
-			//TODO - SET TO FINAL FUNCTIONS !!!!
-		case 0: // "Empty File"
-			userInput = getUserInputUInt(" Enter number of records:");
-			if (userInput != std::nullopt) {
-				// User did not cancel operation - create new empty file
-				this->openedFile.clear();
-				this->openedFile.setSize(userInput.value());
-				this->sorter.addTapeToSort(&this->openedFile);
-			}
-			break;
-		case 1: // "Random File"
-			userInput = getUserInputUInt(" Enter number of records:");
-			if (userInput != std::nullopt) {
-				// User did not cancel operation - create new random file
-				this->openedFile.clear();
-				this->openedFile = fileTape::getRandomFileTape(userInput.value());
-				this->sorter.addTapeToSort(&this->openedFile);
-			}
-			break;
-		case 2: // "Open File"
-			// TODO
-			break;
-		case 3: // "Clear File"
-			this->openedFile.clear();
-			this->sorter.clear();
-			break;
-		case 4: // "Sort file"
-			this->sorter.addTapeToSort(&this->openedFile);
-			this->sorter.sortTapeFull();
-				break;
-		case 5: // "Sort step"
-			if(!this->sorter.isTapeLoaded())
-				this->sorter.addTapeToSort(&this->openedFile);
-			this->sorter.sortNextPart();
-				break;
-		case 6: // "Reset sorting"
-			this->sorter.resetSorting();
-			break;
-		}
-		this->updateTables();
-	}
-	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) {
-		this->cursorInfo.currentContentCursorPoint;
-
-		double userAngle = 0.0, userRadius = 0.0;
-		std::optional<double> userInput;
-
-		bool correctValueEntered = false;
-		std::string message = " Enter angle:";
-
-		// Getting angle
-		while (!correctValueEntered) {
-			userInput = getUserInputDouble(message);
-
-			if (userInput == std::nullopt)
-				return;
-			else if (userInput > 360.0)
-				message = " Angle cannot be more than 360. Enter correct angle:";
-			else {
-				correctValueEntered = true;
-				userAngle = userInput.value();
-			}
-		}
-
-		// Getting radius
-		correctValueEntered = false;
-		message = " Enter radius:";
-		while (!correctValueEntered) {
-			userInput = getUserInputDouble(message);
-
-			if (userInput == std::nullopt)
-				return;
-			else {
-				correctValueEntered = true;
-				userRadius = userInput.value();
-			}
-		}
-
-		// Setting values
-		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
-		this->updateTables();
-		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
-		this->selectContent(this->cursorInfo.currentContentCursorPoint);
-	}
-}*/
-
 // ---- Functions called by UI ----
-functionExitCode core::UICreateEmptyFile(std::vector<fParUnion> funcParameters) {  /*TODO*/  return continueProgram; }
-functionExitCode core::UICreateRandomFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UIOpenFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UIClearFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UISortFile(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UISortStep(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UIResetSorting(std::vector<fParUnion> funcParameters) {  /*TODO*/ return continueProgram; }
-functionExitCode core::UIModifyFileLine(std::vector<fParUnion> funcParameters) {  /*TODO*/  return continueProgram; }
+functionExitCode core::UICreateEmptyFile() {
+	std::optional<unsigned int> userInput = this->userInterface.getUserInputUInt(" Enter number of records:");
+	if (userInput != std::nullopt) {
+		// User did not cancel operation - create new empty file
+		this->openedTape.clear();
+		this->openedTape.setSize(userInput.value());
+		this->sorter.addTapeToSort(&this->openedTape);
+		this->updateTables();
+	}
+	return continueProgram;
+}
+functionExitCode core::UICreateRandomFile() {
+	std::optional<unsigned int> userInput = this->userInterface.getUserInputUInt(" Enter number of records:");
+	if (userInput != std::nullopt) {
+		// User did not cancel operation - create new random file
+		this->openedTape.clear();
+		this->openedTape = fileTape::getRandomFileTape(userInput.value());
+		this->sorter.addTapeToSort(&this->openedTape);
+		this->updateTables();
+	}
+	return continueProgram;
+}
+functionExitCode core::UIOpenFile() {  /*TODO*/ return continueProgram; }
+functionExitCode core::UIClearFile() {
+	this->openedTape.clear();
+	this->sorter.clear();
+	this->updateTables();
+	return continueProgram;
+}
+functionExitCode core::UISortFile() {
+	this->sorter.addTapeToSort(&this->openedTape);
+	this->sorter.sortTapeFull();
+	this->updateTables();
+	return continueProgram;
+}
+functionExitCode core::UISortStep() {
+	if (!this->sorter.isTapeLoaded())
+		this->sorter.addTapeToSort(&this->openedTape);
+	this->sorter.sortNextPart();
+	this->updateTables();
+	return continueProgram;
+}
+functionExitCode core::UIResetSorting() {
+	this->sorter.resetSorting();
+	this->updateTables();
+	return continueProgram;
+}
+functionExitCode core::UIModifyFileLine(unsigned int selectedContent) {
+	double userAngle = 0.0, userRadius = 0.0;
+	std::optional<double> userInput;
+
+	bool correctValueEntered = false;
+	std::string message = " Enter angle:";
+
+	// Getting angle
+	while (!correctValueEntered) {
+		userInput = this->userInterface.getUserInputDouble(message);
+
+		if (userInput == std::nullopt)
+			return continueProgram;
+		else if (userInput > 360.0)
+			message = " Angle cannot be more than 360. Enter correct angle:";
+		else {
+			correctValueEntered = true;
+			userAngle = userInput.value();
+		}
+	}
+
+	// Getting radius
+	correctValueEntered = false;
+	message = " Enter radius:";
+	while (!correctValueEntered) {
+		userInput = this->userInterface.getUserInputDouble(message);
+
+		if (userInput == std::nullopt)
+			return continueProgram;
+		else {
+			correctValueEntered = true;
+			userRadius = userInput.value();
+		}
+	}
+
+	// Setting values
+	this->openedTape.setRecord(selectedContent, record(userAngle, userRadius));
+	this->updateTables();
+	this->tFilePreview.getContentLineMod(selectedContent).startFlash();
+	this->userInterface.selectContent(selectedContent);
+
+	return continueProgram;
+}
 
 void core::updateFilePreviewTable() {
+	// Preserve blinking and flashing states
+
+
 	// Required fields for table
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
@@ -154,31 +146,10 @@ void core::updateSortingDataPreviewTable() {
 	sortingMetadata.push_back("Runs: " + std::to_string(runsCount));
 	this->tSortingMetadata.setContent(sortingMetadata);
 }
-void core::updateTables() {
-	this->updateFilePreviewTable();
-	this->updateWorkFilePreviewTable();
-	this->updateSortingDataPreviewTable();
-}
-// --------------------------------
-
 void core::initTables() {
-	// Creating functions references
-	std::vector<std::function<functionExitCode(std::vector<fParUnion>)>> fTOptions = {
-		std::bind_front(&core::UICreateEmptyFile, this),
-		std::bind_front(&core::UICreateRandomFile, this),
-		std::bind_front(&core::UIOpenFile, this),
-		std::bind_front(&core::UIClearFile, this),
-		std::bind_front(&core::UISortFile, this),
-		std::bind_front(&core::UISortStep, this),
-		std::bind_front(&core::UIResetSorting, this)
-	};
-	std::function<functionExitCode(std::vector<fParUnion>)> fTFilePreview = std::bind_front(&core::UIModifyFileLine, this);
-
 	// Creating tables
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" }, fTOptions);
-	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {}, fTFilePreview);
-	//this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" }); // TODO - ADD FUNCTIONS
-	//this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {}); // TODO - ADD FUNCTIONS
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" });
+	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
 	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // not editable
 	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
 
@@ -192,6 +163,11 @@ void core::initTables() {
 	this->tWorkFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tOptions));
 	this->tSortingMetadata.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, &this->tWorkFilePreview, &this->tFilePreview));
 
+	// Setting functions 
+	this->tOptions.setFunctionCallingParameters(true, false);
+	this->tFilePreview.setFunctionCallingParameters(true, false);
+	this->tWorkFilePreview.setFunctionCallingParameters(false, false);
+	this->tSortingMetadata.setFunctionCallingParameters(false, false);
 
 	// Init. UI
 	this->userInterface.addTable(&this->tOptions);
@@ -199,13 +175,47 @@ void core::initTables() {
 	this->userInterface.addTable(&this->tWorkFilePreview);
 	this->userInterface.addTable(&this->tSortingMetadata);
 }
+// --------------------------------
 
-core::core() {
-	this->userInterface.setAppCore(this, (&core::updateTables));
+functionExitCode core::callTableFunction(uiTable* selectedTable, unsigned int selectedContent) {
+	// I need to think about better solution. For now it checks individually for each table
+	if (!selectedTable->isFunctionCallingEnabled())
+		return continueProgram;
 
+	// Small shortcut, untill I figure out better solution
+	if (selectedTable == &this->tOptions) {
+		switch (selectedContent) {
+			case 0: // "Create Empty File"
+				return this->UICreateEmptyFile();
+			case 1: // "Create Random File"
+				return this->UICreateRandomFile();
+			case 2: // "Open File"
+				return this->UIOpenFile();
+			case 3: // "Clear File"
+				return this->UIClearFile();
+			case 4: // "Sort file"
+				return this->UISortFile();
+			case 5: // "Sort step"
+				return this->UISortStep();
+			case 6: // "Reset sorting"
+				return this->UIResetSorting();
+		}
+	}
+	else if (selectedTable == &this->tFilePreview) {
+		return UIModifyFileLine(selectedContent);
+	}
+	return continueProgram;
+}
+void core::updateTables() {
+	this->updateFilePreviewTable();
+	this->updateWorkFilePreviewTable();
+	this->updateSortingDataPreviewTable();
+}
+
+
+core::core(): userInterface(*this) {
 	this->initTables();
-
-	//this->updateTables();
+	this->userInterface.setCursor(&this->tOptions);
 
 	while (this->userInterface.runFrame() == continueProgram) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(20)); // waiting just a little bit so we don't spam out PC to death

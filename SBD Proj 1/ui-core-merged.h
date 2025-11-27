@@ -14,15 +14,8 @@ private:
 	cursorInformations cursorInfo;
 	std::vector<uiTable*> pProgramTables;
 
-	// Pointer to core for ability of calling Interface <-> Sorter functionality
-	core* appCore;
-	// Pointer to a function for updating tables elements
-	void (core::* updateProgramTables)();
-
-
-	// DIRTY HACK
-	fileTape openedFile;
-	tapeSorter sorter;
+	// Reference to core for ability of calling Interface <-> Sorter functionality
+	core& appCore;
 
 	// Initialization functions
 	void initConsole();
@@ -38,15 +31,6 @@ private:
 	void drawTableContent(uiTable* table) const;
 	void drawTable(uiTable* table) const;
 	void clearAfterTable(uiTable* table) const; // Prints empty spaces in place of table to clear inut buffor
-	void updateTables();
-
-	// Cursor manipulation functions
-	void selectTable(uiTable* table); // enables blinking mode in table
-	void deselectTable(uiTable* table); // disables blinking mode in table
-	void changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable);
-	void selectContent(unsigned int contentLine); // enables blinking mode in tables content line
-	void deselectContent(unsigned int contentLine); // disables blinking mode in tables content line
-	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 
 	// User alpha-numerical input functions
 	uiTable createInputTable(COR position, unsigned int width, std::string title) const; // creates input table with given parameters. Will always be 2 height. Returns position of input box
@@ -54,13 +38,6 @@ private:
 	// UI navigation functions
 	functionExitCode parseTableInput(WORD keyCode);
 	functionExitCode parseContentInput(WORD keyCode);
-
-	// Functions execution function (I need to work on my names)
-	functionExitCode executeContentFunc(std::vector<fParUnion> funcParameters);
-	functionExitCode executeGlobalFunc(std::vector<fParUnion> funcParameters);
-
-	// DIRTY HACK! - TODO - REMOVE AFTER REFACTOR
-	//void executeUserInput(); // Executes functions based on selected table and content
 
 	// Main functions
 	functionExitCode parseUserInput();
@@ -72,19 +49,21 @@ public:
 	std::optional<unsigned int> getUserInputUInt(std::string customMessage = "Enter new value (unsigned intiger)") const;
 	std::optional<std::string> getUserInputString(std::string customMessage = "Enter new string") const;
 
-
+	// Cursor manipulation functions
+	void selectTable(uiTable* table); // enables blinking mode in table
+	void deselectTable(uiTable* table); // disables blinking mode in table
+	void changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable);
+	void selectContent(unsigned int contentLine); // enables blinking mode in tables content line
+	void deselectContent(unsigned int contentLine); // disables blinking mode in tables content line
+	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
 	void setCursor(uiTable* selectedTable);
 
 	void addTable(uiTable* newPTable);
-	uiTable* getTable(unsigned int tableIndex);
-	std::vector<uiTable*>& getAllTables();
 
 	// Main UI function - all functions lead to this one
 	functionExitCode runFrame();
 
-	void setAppCore(core* appCore, void (core::* newUpdateProgramTables)());
-
-	ui();
+	ui(core& appCore);
 	~ui();
 };
 
@@ -101,6 +80,15 @@ private:
 	const textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
 	const textModifiers tableLinesModInterB[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
 
+	// TODO
+	functionExitCode UICreateEmptyFile();
+	functionExitCode UICreateRandomFile();
+	functionExitCode UIOpenFile();
+	functionExitCode UIClearFile();
+	functionExitCode UISortFile();
+	functionExitCode UISortStep();
+	functionExitCode UIResetSorting();
+	functionExitCode UIModifyFileLine(unsigned int selectedContent);
 
 	// Table content updating functions
 	void updateFilePreviewTable();
@@ -111,14 +99,7 @@ private:
 
 public:
 	// ---- Functions called by UI ----
-	functionExitCode UICreateEmptyFile(std::vector<fParUnion> funcParameters);
-	functionExitCode UICreateRandomFile(std::vector<fParUnion> funcParameters);
-	functionExitCode UIOpenFile(std::vector<fParUnion> funcParameters);
-	functionExitCode UIClearFile(std::vector<fParUnion> funcParameters);
-	functionExitCode UISortFile(std::vector<fParUnion> funcParameters);
-	functionExitCode UISortStep(std::vector<fParUnion> funcParameters);
-	functionExitCode UIResetSorting(std::vector<fParUnion> funcParameters);
-	functionExitCode UIModifyFileLine(std::vector<fParUnion> funcParameters);
+	functionExitCode callTableFunction(uiTable* selectedTable, unsigned int selectedContent);
 	void updateTables();
 	// --------------------------------
 
