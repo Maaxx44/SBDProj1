@@ -1,8 +1,6 @@
-#include "ui.h"
+#include "ui-core-merged.h"
 
-
-
-
+// ---- PRIVATE ----
 void ui::initConsole() {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	this->cInfo.setConsoleTitle(defaultConsoleTitle);
@@ -10,35 +8,13 @@ void ui::initConsole() {
 	this->cInfo.setConsoleMode(consoleNoTextMode);
 	this->cInfo.setCursorVisibility(false);
 }
-void ui::initTables() {
-	//std::function<fParUnion(std::vector<fParUnion>)> test = std::bind_front(&core::UICreateEmptyFile, this->appCore);
-
-
-	// Creating tables
-	//this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" }, std::vector<std::function<functionExitCode(std::vector<fParUnion>)>>());
-	//this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {}, std::function<functionExitCode(std::vector<fParUnion>)>());
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" });
-	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
-	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // not editable
-	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
-
-	// Changing title select color to corresponding one
-	this->tFilePreview.getTitleMod().cSelected = tableLinesModInterA[1].cSelected;
-	this->tWorkFilePreview.getTitleMod().cSelected = tableLinesModInterB[1].cSelected;
-
-	// Creating links
-	this->tOptions.setTablePointers(uiTablePointer(&this->tSortingMetadata, &this->tSortingMetadata, &this->tWorkFilePreview, &this->tFilePreview));
-	this->tFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tOptions, &this->tWorkFilePreview));
-	this->tWorkFilePreview.setTablePointers(uiTablePointer(nullptr, nullptr, &this->tFilePreview, &this->tOptions));
-	this->tSortingMetadata.setTablePointers(uiTablePointer(&this->tOptions, &this->tOptions, &this->tWorkFilePreview, &this->tFilePreview));
-
-	// Initializing cursor with it pointing to options table
-	this->cursorInfo.cType = tablePointer;
+void ui::initCursor() {
+	this->cursorInfo.cType = disabled;
 	this->cursorInfo.currentContentCursorPoint = 0;
-	this->cursorInfo.currentTableCursorPoint = &this->tOptions;
+	this->cursorInfo.currentTableCursorPoint = nullptr;
 	this->cursorInfo.selectedTables.clear();
-	this->selectTable(&this->tOptions);
 }
+
 
 void ui::resetColor() const {
 	this->changeColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
@@ -48,11 +24,14 @@ void ui::changeColor(WORD colorParameters) const{
 		ErrorHandler("Failed to set console font attributes!");
 }
 
-void ui::drawTableTitle(uiTable& table) const {
-	REC titleBox = table.getTitleRectangle();
-	WORD titleModifiers = table.getTitleMod().getTextModifier();
+void ui::drawTableTitle(uiTable* table) const {
+	if (table == nullptr)
+		throw std::runtime_error("drawTable error: table was nullptr!");
+
+	REC titleBox = table->getTitleRectangle();
+	WORD titleModifiers = table->getTitleMod().getTextModifier();
 	std::string titleString = std::string(titleBox.W, ' ');
-	if (table.getTitleMod().isTextVisible) titleString = table.getTitle(); // If title is visible - get title string
+	if (table->getTitleMod().isTextVisible) titleString = table->getTitle(); // If title is visible - get title string
 
 
 	this->cInfo.setCursorPosition(titleBox.X, titleBox.Y);
@@ -63,8 +42,11 @@ void ui::drawTableTitle(uiTable& table) const {
 	this->changeColor(titleModifiers | COMMON_LVB_UNDERSCORE | COMMON_LVB_GRID_HORIZONTAL | COMMON_LVB_GRID_RVERTICAL);
 	printf("%c", titleString.back());
 }
-void ui::drawTableContentLine(uiTable& table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const {
-	REC contentBox = table.getContentRectangle();
+void ui::drawTableContentLine(uiTable* table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const {
+	if (table == nullptr)
+		throw std::runtime_error("drawTable error: table was nullptr!");
+
+	REC contentBox = table->getContentRectangle();
 	WORD contentColor = contentMod.getTextModifier();
 	if (!contentMod.isTextVisible) contentString = std::string(contentBox.W, ' ');
 
@@ -82,20 +64,26 @@ void ui::drawTableContentLine(uiTable& table, std::string contentString, textMod
 	this->changeColor(contentColor | modifiers | COMMON_LVB_GRID_RVERTICAL);
 	printf("%c", contentString.back());
 }
-void ui::drawTableContent(uiTable& table) const {
-	REC contentBox = table.getContentRectangle();
-	std::vector<std::string> drawContent = table.getContent();
-	std::vector<textModifiers> drawMod = table.getContentMod();
+void ui::drawTableContent(uiTable* table) const {
+	if (table == nullptr)
+		throw std::runtime_error("drawTable error: table was nullptr!");
+
+	REC contentBox = table->getContentRectangle();
+	std::vector<std::string> drawContent = table->getContent();
+	std::vector<textModifiers> drawMod = table->getContentMod();
 
 	for (unsigned int i = 0; i < (unsigned int)contentBox.H; i++) {
 		drawTableContentLine(table, drawContent[i], drawMod[i], i);
 	}
 }
-void ui::drawTable(uiTable& table) const {
-	table.updateTiming();
+void ui::drawTable(uiTable* table) const {
+	if (table == nullptr)
+		throw std::runtime_error("drawTable error: table was nullptr!");
+
+	table->updateTiming();
 
 	// If table is invisible - don't draw it lul
-	if (!table.getTableVisible()) return;
+	if (!table->getTableVisible()) return;
 
 	// Draw table title
 	drawTableTitle(table);
@@ -104,9 +92,12 @@ void ui::drawTable(uiTable& table) const {
 	drawTableContent(table);
 }
 
-void ui::clearAfterTable(uiTable& table) const {
+void ui::clearAfterTable(uiTable* table) const {
+	if (table == nullptr)
+		throw std::runtime_error("drawTable error: table was nullptr!");
+
 	// Gathering data
-	REC tablePosition = table.getTableRectangle();
+	REC tablePosition = table->getTableRectangle();
 	const std::string emptyLine = std::string(tablePosition.W, ' ');
 
 	// Clearing after table
@@ -115,6 +106,9 @@ void ui::clearAfterTable(uiTable& table) const {
 		this->cInfo.setCursorPosition(tablePosition.X, tablePosition.Y + line);
 		printf(emptyLine.c_str());
 	}
+}
+void ui::updateTables() {
+	(this->appCore->*updateProgramTables)();
 }
 
 
@@ -149,153 +143,6 @@ uiTable ui::createInputTable(COR position, unsigned int width, std::string title
 
 	return inputTable;
 }
-std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
-	unsigned int tableWidth = max(inputTableDoubleDefaultWidth, (unsigned int)customMessage.size());
-
-	// Creating input table
-	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
-	inputTable.setTableVisible(true);
-	drawTable(inputTable);
-
-	// Parsing user input
-	bool usedComma = false;
-	std::string unparsedUserInput = "";
-	std::optional<KEY_EVENT_RECORD> keyRecord;
-	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
-		WORD keyCode = keyRecord.value().wVirtualKeyCode;
-
-		// Parse key code
-		if (keyCode == VK_BACK) { // Remove last inputted character
-			if (!unparsedUserInput.empty()) {
-				char removedChar = unparsedUserInput.back(); // Getting last character
-				unparsedUserInput.pop_back(); // Removing last character
-				if (removedChar == '.') usedComma = false; // If last character was comma - enable comma input again
-			}
-		}
-		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
-			this->clearAfterTable(inputTable);
-			return std::nullopt;
-		}
-		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
-			if(unparsedUserInput.size() < tableWidth)
-				unparsedUserInput.push_back('0' + keyCode - 0x30);
-		}
-		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA)) { // Verify if no comma has been placed and add comma 
-			if (unparsedUserInput.size() < tableWidth) {
-				unparsedUserInput.push_back('.');
-				usedComma = true;
-			}
-		}
-		else if (keyCode == VK_RETURN) { // Parse user input and return
-			
-			// If input is empty - return nullopt
-			if (unparsedUserInput.empty())
-				return std::nullopt;
-
-			// Clear up user input
-			else if (unparsedUserInput == ".") return 0.0;
-			else if (unparsedUserInput.front() == '.' && unparsedUserInput.size() > 1) // If there is dot at the beg. add zero before parsing
-				unparsedUserInput.insert(0, 1, '0');
-			else if (unparsedUserInput.back() == '.' && unparsedUserInput.size() > 1) // If there is dot at the end. add zero before parsing
-				unparsedUserInput.push_back('0');
-
-			// Try parsing
-			double returnValue = 0.0;
-			try {
-				returnValue = stod(unparsedUserInput);
-			}
-			catch (std::exception e) {
-				// If parsing failed - return nullopt
-				this->clearAfterTable(inputTable);
-				return std::nullopt;
-			}
-
-			// Return parsed value
-			this->clearAfterTable(inputTable);
-			return std::optional<double>(returnValue);
-		}
-
-		// Update user input inside table
-		inputTable.setContent({ unparsedUserInput });
-		drawTable(inputTable);
-	}
-
-
-	this->clearAfterTable(inputTable);
-	return std::nullopt;
-}
-std::optional<unsigned int> ui::getUserInputUInt(std::string customMessage) const {
-	unsigned int tableWidth = max(inputTableUIntDefaultWidth, (unsigned int)customMessage.size());
-
-	// Creating input table
-	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
-	inputTable.setTableVisible(true);
-	drawTable(inputTable);
-
-	// Parsing user input
-	std::string unparsedUserInput = "";
-	std::optional<KEY_EVENT_RECORD> keyRecord;
-	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
-		WORD keyCode = keyRecord.value().wVirtualKeyCode;
-
-		// Parse key code
-		if (keyCode == VK_BACK) { // Remove last inputted character
-			if (!unparsedUserInput.empty())
-				unparsedUserInput.pop_back(); // Removing last character
-		}
-		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
-			this->clearAfterTable(inputTable);
-			return std::nullopt;
-		}
-		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
-			if (unparsedUserInput.size() < tableWidth)
-				unparsedUserInput.push_back('0' + keyCode - 0x30);
-		}
-		else if (keyCode == VK_RETURN) { // Parse user input and return
-			// If input is empty - return nullopt
-			if (unparsedUserInput.empty())
-				return std::nullopt;
-			
-			// Try parsing
-			unsigned int returnValue = 0;
-			try {
-				// atol() converts to long that is then casted to unsigned int. In this way we capture full range of unsigned int and not write custom string-to-unsigned-int interpreter
-				returnValue = (unsigned int)atol(unparsedUserInput.c_str());
-			}
-			catch (std::exception e) {
-				// If parsing failed - return nullopt
-				this->clearAfterTable(inputTable);
-				return std::nullopt;
-			}
-
-			// Return parsed value
-			this->clearAfterTable(inputTable);
-			return std::optional<unsigned int>(returnValue);
-		}
-
-		// Update user input inside table
-		inputTable.setContent({ unparsedUserInput });
-		drawTable(inputTable);
-	}
-
-
-	this->clearAfterTable(inputTable);
-	return std::nullopt;
-}
-std::optional<std::string> ui::getUserInputString(std::string customMessage) const {
-	unsigned int tableWidth = max(inputTableStringDefaultWidth, (unsigned int)customMessage.size());
-
-	// Creating input table
-	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
-	inputTable.setTableVisible(true);
-	drawTable(inputTable);
-
-	// Parsing user input
-
-
-	return "";
-}
-
 
 functionExitCode ui::parseTableInput(WORD keyCode) {
 	switch (keyCode) {
@@ -423,8 +270,7 @@ functionExitCode ui::executeGlobalFunc(std::vector<fParUnion> funcParameters) {
 	return this->cursorInfo.currentTableCursorPoint->callGlobalContentFunction(funcParameters);
 }
 
-
-void ui::executeUserInput() {
+/*void ui::executeUserInput() {
 	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
 		// Initializing possible user input - to please the compiler
 		std::optional<unsigned int> userInput(std::nullopt);
@@ -468,7 +314,7 @@ void ui::executeUserInput() {
 			this->sorter.resetSorting();
 			break;
 		}
-		this->updateTables();
+		this->updateProgramTables();
 	}
 	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) {
 		this->cursorInfo.currentContentCursorPoint;
@@ -509,72 +355,16 @@ void ui::executeUserInput() {
 
 		// Setting values
 		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
-		this->updateTables();
+		this->updateProgramTables();
 		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
 		this->selectContent(this->cursorInfo.currentContentCursorPoint);
 	}
-}
-void ui::updateFilePreviewTable() {
-	// Required fields for table
-	std::vector<std::string> parsedFile;
-	std::vector<textModifiers> parsedFileMod;
-
-	// For every content in opened file - get and parse its values into string
-	for (unsigned int i = 0; i < this->openedFile.getSize(); i++) {
-		record nextRecord = this->openedFile.getRecord(i);
-
-		// Get values and parse them into stringstream (we cau use setw)
-		std::stringstream ss;
-		ss << " A: " << std::setw(10) << std::to_string(nextRecord.getAngle()) << ", R: " << std::setw(10) << std::to_string(nextRecord.getRadius()) << " = " << std::setw(11) << std::to_string(nextRecord.calculateArea());
-
-		// Push back values into vectors
-		parsedFile.push_back(ss.str());
-		parsedFileMod.push_back(tableLinesModInterA[i % 2]);
-	}
-
-	// Setting tables content
-	this->tFilePreview.setContent(parsedFile);
-	this->tFilePreview.setContentMod(parsedFileMod);
-
-	// Adjusting file readn and write counter, because we use those operations to display data
-	this->openedFile.setReadOperations(this->openedFile.getReadOperations() - this->openedFile.getSize());
-
-}
-void ui::updateWorkFilePreviewTable() {
-	std::vector<std::string> parsedFile;
-	std::vector<textModifiers> parsedFileMod;
-	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
-		record nextRecord = this->sorter.getWorkTapeP().getRecord(i);
-		this->sorter.getWorkTapeP().setReadOperations(this->sorter.getWorkTapeP().getReadOperations() - 1); // adjusting for dispalying
-		std::stringstream ss;
-		ss << " A: " << std::setw(10) << std::to_string(nextRecord.getAngle()) << ", R: " << std::setw(10) << std::to_string(nextRecord.getRadius()) << " = " << std::setw(11) << std::to_string(nextRecord.calculateArea());
-		parsedFile.push_back(ss.str());
-		parsedFileMod.push_back(tableLinesModInterB[i % 2]);
-	}
-	this->tWorkFilePreview.setContent(parsedFile);
-	this->tWorkFilePreview.setContentMod(parsedFileMod);
-}
-void ui::updateSortingDataPreviewTable() {
-	std::pair<unsigned int, unsigned int> IOOperations = this->sorter.getIOperationsCount();
-	unsigned int runsCount = this->sorter.getRunsCount();
-	unsigned int runSize = this->sorter.getRunSize();
-	std::vector<std::string> sortingMetadata;
-	sortingMetadata.push_back("Reads: " + std::to_string(IOOperations.first));
-	sortingMetadata.push_back("Writes: " + std::to_string(IOOperations.second));
-	sortingMetadata.push_back("Run size: " + std::to_string(runSize));
-	sortingMetadata.push_back("Runs: " + std::to_string(runsCount));
-	this->tSortingMetadata.setContent(sortingMetadata);
-}
-void ui::updateTables() {
-	this->updateFilePreviewTable();
-	this->updateWorkFilePreviewTable();
-	this->updateSortingDataPreviewTable();
-}
+} */
 
 functionExitCode ui::parseUserInput() {
 	if (cursorInfo.cType == disabled) return continueProgram;
 	if (this->cursorInfo.currentTableCursorPoint == nullptr)
-		this->cursorInfo.currentTableCursorPoint = &this->tOptions;
+		throw std::runtime_error("parseUserInput error: currentTableCursorPoint was nullptr!");
 
 
 	// While there is input to be read - read it 
@@ -606,26 +396,208 @@ functionExitCode ui::parseUserInput() {
 
 void ui::draw() {
 	// Draw tables
-	this->drawTable(this->tOptions);
-	this->drawTable(this->tFilePreview);
-	this->drawTable(this->tWorkFilePreview);
-	this->drawTable(this->tSortingMetadata);
+	for (uiTable* pTable : this->pProgramTables)
+		this->drawTable(pTable); // TODO - CHECK IF CORRECT
 
 	// Return cursor to normal modifiers
 	this->changeColor(defaultTextColor);
 }
+// -----------------
+
+// ---- PUBLIC ----
+/// User input
+std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableDoubleDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	inputTable.setTableVisible(true);
+	drawTable(&inputTable);
+
+	// Parsing user input
+	bool usedComma = false;
+	std::string unparsedUserInput = "";
+	std::optional<KEY_EVENT_RECORD> keyRecord;
+	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
+		WORD keyCode = keyRecord.value().wVirtualKeyCode;
+
+		// Parse key code
+		if (keyCode == VK_BACK) { // Remove last inputted character
+			if (!unparsedUserInput.empty()) {
+				char removedChar = unparsedUserInput.back(); // Getting last character
+				unparsedUserInput.pop_back(); // Removing last character
+				if (removedChar == '.') usedComma = false; // If last character was comma - enable comma input again
+			}
+		}
+		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
+			this->clearAfterTable(&inputTable);
+			return std::nullopt;
+		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
+			if (unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back('0' + keyCode - 0x30);
+		}
+		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA)) { // Verify if no comma has been placed and add comma 
+			if (unparsedUserInput.size() < tableWidth) {
+				unparsedUserInput.push_back('.');
+				usedComma = true;
+			}
+		}
+		else if (keyCode == VK_RETURN) { // Parse user input and return
+
+			// If input is empty - return nullopt
+			if (unparsedUserInput.empty())
+				return std::nullopt;
+
+			// Clear up user input
+			else if (unparsedUserInput == ".") return 0.0;
+			else if (unparsedUserInput.front() == '.' && unparsedUserInput.size() > 1) // If there is dot at the beg. add zero before parsing
+				unparsedUserInput.insert(0, 1, '0');
+			else if (unparsedUserInput.back() == '.' && unparsedUserInput.size() > 1) // If there is dot at the end. add zero before parsing
+				unparsedUserInput.push_back('0');
+
+			// Try parsing
+			double returnValue = 0.0;
+			try {
+				returnValue = stod(unparsedUserInput);
+			}
+			catch (std::exception e) {
+				// If parsing failed - return nullopt
+				this->clearAfterTable(&inputTable);
+				return std::nullopt;
+			}
+
+			// Return parsed value
+			this->clearAfterTable(&inputTable);
+			return std::optional<double>(returnValue);
+		}
+
+		// Update user input inside table
+		inputTable.setContent({ unparsedUserInput });
+		drawTable(&inputTable);
+	}
+
+
+	this->clearAfterTable(&inputTable);
+	return std::nullopt;
+}
+std::optional<unsigned int> ui::getUserInputUInt(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableUIntDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	inputTable.setTableVisible(true);
+	drawTable(&inputTable);
+
+	// Parsing user input
+	std::string unparsedUserInput = "";
+	std::optional<KEY_EVENT_RECORD> keyRecord;
+	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
+		WORD keyCode = keyRecord.value().wVirtualKeyCode;
+
+		// Parse key code
+		if (keyCode == VK_BACK) { // Remove last inputted character
+			if (!unparsedUserInput.empty())
+				unparsedUserInput.pop_back(); // Removing last character
+		}
+		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
+			this->clearAfterTable(&inputTable);
+			return std::nullopt;
+		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
+			if (unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back('0' + keyCode - 0x30);
+		}
+		else if (keyCode == VK_RETURN) { // Parse user input and return
+			// If input is empty - return nullopt
+			if (unparsedUserInput.empty())
+				return std::nullopt;
+
+			// Try parsing
+			unsigned int returnValue = 0;
+			try {
+				// atol() converts to long that is then casted to unsigned int. In this way we capture full range of unsigned int and not write custom string-to-unsigned-int interpreter
+				returnValue = (unsigned int)atol(unparsedUserInput.c_str());
+			}
+			catch (std::exception e) {
+				// If parsing failed - return nullopt
+				this->clearAfterTable(&inputTable);
+				return std::nullopt;
+			}
+
+			// Return parsed value
+			this->clearAfterTable(&inputTable);
+			return std::optional<unsigned int>(returnValue);
+		}
+
+		// Update user input inside table
+		inputTable.setContent({ unparsedUserInput });
+		drawTable(&inputTable);
+	}
+
+
+	this->clearAfterTable(&inputTable);
+	return std::nullopt;
+}
+std::optional<std::string> ui::getUserInputString(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableStringDefaultWidth, (unsigned int)customMessage.size());
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	inputTable.setTableVisible(true);
+	drawTable(&inputTable);
+
+	// Parsing user input
+
+
+	return "";
+}
+/// Cursor
+void ui::setCursor(uiTable* selectedTable) {
+	if (selectedTable == nullptr)
+		throw std::runtime_error("setCursor error: selectedTable was nullptr!");
+
+	// If out cursor was pointing to something - deselect it, just in case
+	if (this->cursorInfo.currentTableCursorPoint != nullptr)
+		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
+
+	this->cursorInfo.cType = tablePointer;
+	this->cursorInfo.currentContentCursorPoint = 0;
+	this->cursorInfo.currentTableCursorPoint = selectedTable;
+	//this->cursorInfo.selectedTables.clear();
+	this->selectTable(selectedTable);
+}
+/// Tables manipulation
+void ui::addTable(uiTable* newPTable) {
+	this->pProgramTables.push_back(newPTable);
+}
+uiTable* ui::getTable(unsigned int tableIndex) {
+	if (tableIndex >= (unsigned int)this->pProgramTables.size())
+		throw std::runtime_error("getTable error: tableIndex(" + std::to_string(tableIndex) + ") out of range pProgramTables.size(" + std::to_string(this->pProgramTables.size()) + ")");
+	return this->pProgramTables[tableIndex];
+}
+std::vector<uiTable*>& ui::getAllTables() {
+	return this->pProgramTables;
+}
+
 functionExitCode ui::runFrame() {
 	if (this->parseUserInput() == exitProgram) return exitProgram;
 	this->draw();
 	return continueProgram;
 }
 
-ui::ui(core&appCore): appCore(appCore) {
+void ui::setAppCore(core* appCore, void (core::* newUpdateProgramTables)()) {
+	this->appCore = appCore;
+	this->updateProgramTables = newUpdateProgramTables;
+}
+
+
+ui::ui() {
 	this->initConsole();
-	this->initTables();
-	this->updateTables();
+	this->initCursor();
 }
 ui::~ui() {
 	//return console to normal functions
 	// handled by deconstructor of consoleInformations
 }
+// ----------------

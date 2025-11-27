@@ -1,5 +1,5 @@
 #include "common.h"
-#include "core.h"
+#include "ui-core-merged.h"
 
 void initProgram() {
 	srand((unsigned int)time(0));

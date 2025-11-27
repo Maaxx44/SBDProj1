@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="consoleInformations.h" />
-    <ClInclude Include="core.h" />
     <ClInclude Include="cursorInformations.h" />
     <ClInclude Include="dataBlock.h" />
     <ClInclude Include="dataManager.h" />
@@ -161,7 +160,7 @@
     <ClInclude Include="record.h" />
     <ClInclude Include="tapeSorter.h" />
     <ClInclude Include="textModifiers.h" />
-    <ClInclude Include="ui.h" />
+    <ClInclude Include="ui-core-merged.h" />
     <ClInclude Include="uiTable.h" />
     <ClInclude Include="uiTablePointer.h" />
     <ClInclude Include="winErrorHandlers.h" />
