@@ -49,13 +49,10 @@ public:
 	std::optional<unsigned int> getUserInputUInt(std::string customMessage = "Enter new value (unsigned intiger)") const;
 	std::optional<std::string> getUserInputString(std::string customMessage = "Enter new string") const;
 
-	// Cursor manipulation functions
-	void selectTable(uiTable* table); // enables blinking mode in table
-	void deselectTable(uiTable* table); // disables blinking mode in table
-	void changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable);
-	void selectContent(unsigned int contentLine); // enables blinking mode in tables content line
-	void deselectContent(unsigned int contentLine); // disables blinking mode in tables content line
-	void changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine);
+	// Cursor selection manipulation functions
+	void changeTableSelection(std::initializer_list<std::pair<uiTable*, bool>> tData);
+	void changeSelectedTableContentSelection(std::initializer_list<std::pair<unsigned int, bool>> cData);
+
 	void setCursor(uiTable* selectedTable);
 
 	void addTable(uiTable* newPTable);
@@ -69,18 +66,16 @@ public:
 
 class core {
 private:
+	// Global data
 	ui userInterface;
-
-	// TODO
 	fileTape openedTape;
 	tapeSorter sorter;
 
-	// TODO - TEMP
+	// UI data
 	uiTable tOptions, tFilePreview, tWorkFilePreview, tSortingMetadata;
 	const textModifiers tableLinesModInterA[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
 	const textModifiers tableLinesModInterB[2] = { textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN), textModifiers(true, false, true, defaultTextColor, defaultHighLightColor, FOREGROUND_GREEN | FOREGROUND_INTENSITY) };
 
-	// TODO
 	functionExitCode UICreateEmptyFile();
 	functionExitCode UICreateRandomFile();
 	functionExitCode UIOpenFile();

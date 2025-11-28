@@ -108,30 +108,26 @@ void ui::clearAfterTable(uiTable* table) const {
 	}
 }
 
+void ui::changeTableSelection(std::initializer_list<std::pair<uiTable*, bool>> tData) {
+	for (std::pair<uiTable*, bool> table : tData) {
+		if (table.first != nullptr)
+			if (table.second)
+				table.first->getTitleMod().startBlink();
+			else
+				table.first->getTitleMod().stopBlink();
+	}
+}
+void ui::changeSelectedTableContentSelection(std::initializer_list<std::pair<unsigned int, bool>> cData) {
+	if (this->cursorInfo.currentTableCursorPoint == nullptr)
+		throw std::runtime_error("changeSelectedTableContentSelection error: currentTableCursorPoint was nullptr!");
+	for (std::pair<unsigned int, bool> content : cData) {
+		if (content.second)
+			this->cursorInfo.currentTableCursorPoint->getContentLineMod(content.first).startBlink();
+		else
+			this->cursorInfo.currentTableCursorPoint->getContentLineMod(content.first).stopBlink();
+	}
+}
 
-void ui::selectTable(uiTable* table) {
-	table->getTitleMod().startBlink();
-}
-void ui::deselectTable(uiTable* table) {
-	table->getTitleMod().stopBlink();
-}
-void ui::changeSelectedTable(uiTable* newSelectedTable, uiTable* oldDeselectedTable) {
-	selectTable(newSelectedTable);
-	deselectTable(oldDeselectedTable);
-}
-void ui::selectContent(unsigned int contentLine) {
-	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
-	this->cursorInfo.currentTableCursorPoint->getContentLineMod(contentLine).startBlink();
-}
-void ui::deselectContent(unsigned int contentLine) {
-	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
-	this->cursorInfo.currentTableCursorPoint->getContentLineMod(contentLine).stopBlink();
-}
-void ui::changeSelectedContent(unsigned int newSelectedLine, unsigned int oldDeselectedLine) {
-	if (this->cursorInfo.currentTableCursorPoint == nullptr) throw std::runtime_error("currentTableCursorPointer is null!");
-	selectContent(newSelectedLine);
-	deselectContent(oldDeselectedLine);
-}
 
 // helper functions for getting user input
 uiTable ui::createInputTable(COR position, unsigned int width, std::string title) const {
@@ -145,25 +141,25 @@ functionExitCode ui::parseTableInput(WORD keyCode) {
 	switch (keyCode) {
 	case VK_UP:
 		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().up != nullptr) {
-			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().up, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint->getTablePointers().up , true}, {this->cursorInfo.currentTableCursorPoint, false} });
 			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().up; // change cursor to new selected table
 		}
 		break;
 	case VK_DOWN:
 		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().down != nullptr) {
-			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().down, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint->getTablePointers().down , true}, {this->cursorInfo.currentTableCursorPoint, false} });
 			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().down; // change cursor to new selected table
 		}
 		break;
 	case VK_LEFT:
 		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().left != nullptr) {
-			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().left, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint->getTablePointers().left , true}, {this->cursorInfo.currentTableCursorPoint, false} });
 			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().left; // change cursor to new selected table
 		}
 		break;
 	case VK_RIGHT:
 		if (this->cursorInfo.currentTableCursorPoint != nullptr && this->cursorInfo.currentTableCursorPoint->getTablePointers().right != nullptr) {
-			this->changeSelectedTable(this->cursorInfo.currentTableCursorPoint->getTablePointers().right, this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+			this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint->getTablePointers().right , true}, {this->cursorInfo.currentTableCursorPoint, false} });
 			this->cursorInfo.currentTableCursorPoint = this->cursorInfo.currentTableCursorPoint->getTablePointers().right; // change cursor to new selected table
 		}
 		break;
@@ -172,7 +168,7 @@ functionExitCode ui::parseTableInput(WORD keyCode) {
 			return exitProgram;
 		else {
 			if (cursorInfo.selectedTables.back() != this->cursorInfo.currentTableCursorPoint) {
-				this->changeSelectedTable(cursorInfo.selectedTables.back(), this->cursorInfo.currentTableCursorPoint); // change blinking to new selected table
+				this->changeTableSelection({ {cursorInfo.selectedTables.back() , true}, {this->cursorInfo.currentTableCursorPoint, false} });
 				this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back(); // change cursor to new selected table
 				cursorInfo.selectedTables.pop_back(); // just remove last element
 			}
@@ -183,7 +179,7 @@ functionExitCode ui::parseTableInput(WORD keyCode) {
 		if (this->cursorInfo.currentTableCursorPoint->getContentSize() == 0) break;
 
 		// First - *select *current table title and disable blinking
-		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
+		this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint , false} });
 		this->cursorInfo.currentTableCursorPoint->getTitleMod().isTextSelected = true;
 
 		// Change cursor settings
@@ -191,7 +187,7 @@ functionExitCode ui::parseTableInput(WORD keyCode) {
 		this->cursorInfo.currentContentCursorPoint = 0;
 
 		// Set content blinking
-		selectContent(this->cursorInfo.currentContentCursorPoint);
+		changeSelectedTableContentSelection({ {this->cursorInfo.currentContentCursorPoint, true} });
 
 		// Add this table to selected tables
 		cursorInfo.selectedTables.push_back(this->cursorInfo.currentTableCursorPoint);
@@ -206,11 +202,11 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 	case VK_UP:
 		if (this->cursorInfo.currentContentCursorPoint == 0) {
 			unsigned int newContentCursorPointer = this->cursorInfo.currentTableCursorPoint->getContentSize() - 1;
-			this->changeSelectedContent(newContentCursorPointer, this->cursorInfo.currentContentCursorPoint);
+			changeSelectedTableContentSelection({ {newContentCursorPointer, true}, {this->cursorInfo.currentContentCursorPoint, false } });
 			this->cursorInfo.currentContentCursorPoint = newContentCursorPointer;
 		}
 		else {
-			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint - 1, this->cursorInfo.currentContentCursorPoint);
+			changeSelectedTableContentSelection({ {this->cursorInfo.currentContentCursorPoint - 1, true}, {this->cursorInfo.currentContentCursorPoint, false } });
 			this->cursorInfo.currentContentCursorPoint--;
 		}
 		// Check if out element is in visible range
@@ -219,11 +215,11 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 		break;
 	case VK_DOWN:
 		if (this->cursorInfo.currentContentCursorPoint == this->cursorInfo.currentTableCursorPoint->getContentSize() - 1) {
-			this->changeSelectedContent(0, this->cursorInfo.currentContentCursorPoint);
+			changeSelectedTableContentSelection({ {0, true}, {this->cursorInfo.currentContentCursorPoint, false } });
 			this->cursorInfo.currentContentCursorPoint = 0;
 		}
 		else {
-			this->changeSelectedContent(this->cursorInfo.currentContentCursorPoint + 1, this->cursorInfo.currentContentCursorPoint);
+			changeSelectedTableContentSelection({ {this->cursorInfo.currentContentCursorPoint + 1, true}, {this->cursorInfo.currentContentCursorPoint, false } });
 			this->cursorInfo.currentContentCursorPoint++;
 		}
 		// Check if out element is in visible range
@@ -235,12 +231,12 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 		this->cursorInfo.cType = tablePointer;
 
 		// Deselect content
-		this->deselectContent(this->cursorInfo.currentContentCursorPoint);
+		changeSelectedTableContentSelection({ {this->cursorInfo.currentContentCursorPoint, false} });
 
 		// Select last table, disable title highlight and enable blinking
 		this->cursorInfo.currentTableCursorPoint = cursorInfo.selectedTables.back();
 		cursorInfo.selectedTables.back()->getTitleMod().isTextSelected = false;
-		this->selectTable(cursorInfo.selectedTables.back());
+		this->changeTableSelection({ {cursorInfo.selectedTables.back() , true} });
 		cursorInfo.selectedTables.pop_back();
 
 		break;
@@ -543,13 +539,12 @@ void ui::setCursor(uiTable* selectedTable) {
 
 	// If out cursor was pointing to something - deselect it, just in case
 	if (this->cursorInfo.currentTableCursorPoint != nullptr)
-		this->deselectTable(this->cursorInfo.currentTableCursorPoint);
+		this->changeTableSelection({ {this->cursorInfo.currentTableCursorPoint , false} });
 
 	this->cursorInfo.cType = tablePointer;
 	this->cursorInfo.currentContentCursorPoint = 0;
 	this->cursorInfo.currentTableCursorPoint = selectedTable;
-	//this->cursorInfo.selectedTables.clear();
-	this->selectTable(selectedTable);
+	this->changeTableSelection({ {selectedTable , true} });
 }
 /// Tables manipulation
 void ui::addTable(uiTable* newPTable) {

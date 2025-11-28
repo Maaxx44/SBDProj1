@@ -87,7 +87,7 @@ functionExitCode core::UIModifyFileLine(unsigned int selectedContent) {
 	this->openedTape.setRecord(selectedContent, record(userAngle, userRadius));
 	this->updateTables();
 	this->tFilePreview.getContentLineMod(selectedContent).startFlash();
-	this->userInterface.selectContent(selectedContent);
+	this->userInterface.changeSelectedTableContentSelection({ {selectedContent, true} });
 
 	return continueProgram;
 }
@@ -154,8 +154,10 @@ void core::initTables() {
 	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
 
 	// Changing title select color to corresponding one
+	this->tOptions.getTitleMod().cSelected = defaultHighLightColor;
 	this->tFilePreview.getTitleMod().cSelected = tableLinesModInterA[1].cSelected;
 	this->tWorkFilePreview.getTitleMod().cSelected = tableLinesModInterB[1].cSelected;
+	this->tSortingMetadata.getTitleMod().cSelected = defaultHighLightColor;
 
 	// Creating links
 	this->tOptions.setTablePointers(uiTablePointer(&this->tSortingMetadata, &this->tSortingMetadata, &this->tWorkFilePreview, &this->tFilePreview));

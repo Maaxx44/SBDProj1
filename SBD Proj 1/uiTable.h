@@ -4,8 +4,6 @@
 #include "uiTablePointer.h"
 #include "functionParameterUnion.h"
 
-// FWD Declaration with needed functions
-
 class uiTable {
 private:
 	// Relative position of other tables
