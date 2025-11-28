@@ -248,97 +248,6 @@ functionExitCode ui::parseContentInput(WORD keyCode) {
 	return continueProgram;
 }
 
-/*void ui::executeUserInput() {
-	if (this->cursorInfo.currentTableCursorPoint == &this->tOptions) { 
-		// Initializing possible user input - to please the compiler
-		std::optional<unsigned int> userInput(std::nullopt);
-		switch (this->cursorInfo.currentContentCursorPoint) {
-			//TODO - SET TO FINAL FUNCTIONS !!!!
-		case 0: // "Empty File"
-			userInput = getUserInputUInt(" Enter number of records:");
-			if (userInput != std::nullopt) {
-				// User did not cancel operation - create new empty file
-				this->openedFile.clear();
-				this->openedFile.setSize(userInput.value());
-				this->sorter.addTapeToSort(&this->openedFile);
-			}
-			break;
-		case 1: // "Random File"
-			userInput = getUserInputUInt(" Enter number of records:");
-			if (userInput != std::nullopt) {
-				// User did not cancel operation - create new random file
-				this->openedFile.clear();
-				this->openedFile = fileTape::getRandomFileTape(userInput.value());
-				this->sorter.addTapeToSort(&this->openedFile);
-			}
-			break;
-		case 2: // "Open File"
-			// TODO
-			break;
-		case 3: // "Clear File"
-			this->openedFile.clear();
-			this->sorter.clear();
-			break;
-		case 4: // "Sort file"
-			this->sorter.addTapeToSort(&this->openedFile);
-			this->sorter.sortTapeFull();
-				break;
-		case 5: // "Sort step"
-			if(!this->sorter.isTapeLoaded())
-				this->sorter.addTapeToSort(&this->openedFile);
-			this->sorter.sortNextPart();
-				break;
-		case 6: // "Reset sorting"
-			this->sorter.resetSorting();
-			break;
-		}
-		this->updateProgramTables();
-	}
-	else if (this->cursorInfo.currentTableCursorPoint == &this->tFilePreview) {
-		this->cursorInfo.currentContentCursorPoint;
-
-		double userAngle = 0.0, userRadius = 0.0;
-		std::optional<double> userInput;
-
-		bool correctValueEntered = false;
-		std::string message = " Enter angle:";
-
-		// Getting angle
-		while (!correctValueEntered) {
-			userInput = getUserInputDouble(message);
-
-			if (userInput == std::nullopt)
-				return;
-			else if (userInput > 360.0)
-				message = " Angle cannot be more than 360. Enter correct angle:";
-			else {
-				correctValueEntered = true;
-				userAngle = userInput.value();
-			}
-		}
-
-		// Getting radius
-		correctValueEntered = false;
-		message = " Enter radius:";
-		while (!correctValueEntered) {
-			userInput = getUserInputDouble(message);
-
-			if (userInput == std::nullopt)
-				return;
-			else {
-				correctValueEntered = true;
-				userRadius = userInput.value();
-			}
-		}
-
-		// Setting values
-		this->openedFile.setRecord(this->cursorInfo.currentContentCursorPoint, record(userAngle, userRadius));
-		this->updateProgramTables();
-		this->tFilePreview.getContentLineMod(this->cursorInfo.currentContentCursorPoint).startFlash();
-		this->selectContent(this->cursorInfo.currentContentCursorPoint);
-	}
-} */
-
 functionExitCode ui::parseUserInput() {
 	if (cursorInfo.cType == disabled) return continueProgram;
 	if (this->cursorInfo.currentTableCursorPoint == nullptr)
@@ -413,11 +322,11 @@ std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
 			this->clearAfterTable(&inputTable);
 			return std::nullopt;
 		}
-		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
+		else if (keyCode >= 0x30 && keyCode <= 0x39 && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Add number if there is space 
 			if (unparsedUserInput.size() < tableWidth)
 				unparsedUserInput.push_back('0' + keyCode - 0x30);
 		}
-		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA)) { // Verify if no comma has been placed and add comma 
+		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA) && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Verify if no comma has been placed and add comma 
 			if (unparsedUserInput.size() < tableWidth) {
 				unparsedUserInput.push_back('.');
 				usedComma = true;
@@ -484,7 +393,7 @@ std::optional<unsigned int> ui::getUserInputUInt(std::string customMessage) cons
 			this->clearAfterTable(&inputTable);
 			return std::nullopt;
 		}
-		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space 
+		else if (keyCode >= 0x30 && keyCode <= 0x39 && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Add number if there is space 
 			if (unparsedUserInput.size() < tableWidth)
 				unparsedUserInput.push_back('0' + keyCode - 0x30);
 		}
@@ -528,10 +437,59 @@ std::optional<std::string> ui::getUserInputString(std::string customMessage) con
 	drawTable(&inputTable);
 
 	// Parsing user input
+	std::string unparsedUserInput = "";
+	std::optional<KEY_EVENT_RECORD> keyRecord;
+	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
+		WORD keyCode = keyRecord.value().wVirtualKeyCode;
+
+		// Parse key code
+		if (keyCode == VK_BACK) { // Remove last inputted character
+			if (!unparsedUserInput.empty())
+				unparsedUserInput.pop_back(); // Removing last character
+		}
+		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
+			this->clearAfterTable(&inputTable);
+			return std::nullopt;
+		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number if there is space
+			if (unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back('0' + keyCode - 0x30);
+		}
+		else if (keyCode >= 0x41 && keyCode <= 0x5A) { // Add character based on LShift key state
+			if (GetKeyState(VK_LSHIFT) & 0x1000) {
+				// If uneven number of CM we add uppercase letter
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('A' + keyCode - 0x41);
+			}
+			else {
+				// Else we add lowercase letter
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('a' + keyCode - 0x41);
+			}
+		}
+		else if (keyCode == VK_RETURN) { // Parse user input and return
+			// If input is empty - return nullopt
+			if (unparsedUserInput.empty())
+				return std::nullopt;
+
+			// Return value
+			this->clearAfterTable(&inputTable);
+			return std::optional<std::string>(unparsedUserInput);
+		}
+
+		// Update user input inside table
+		inputTable.setContent({ unparsedUserInput });
+		drawTable(&inputTable);
+	}
 
 
-	return "";
+	this->clearAfterTable(&inputTable);
+	return std::nullopt;
 }
+std::optional<std::filesystem::path> ui::getUserInputFile(std::string customMessage) const {
+	return std::nullopt;
+}
+
 /// Cursor
 void ui::setCursor(uiTable* selectedTable) {
 	if (selectedTable == nullptr)

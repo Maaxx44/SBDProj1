@@ -3,27 +3,42 @@
 // ---- Functions called by UI ----
 functionExitCode core::UICreateEmptyFile() {
 	std::optional<unsigned int> userInput = this->userInterface.getUserInputUInt(" Enter number of records:");
-	if (userInput != std::nullopt) {
-		// User did not cancel operation - create new empty file
-		this->openedTape.clear();
-		this->openedTape.setSize(userInput.value());
-		this->sorter.addTapeToSort(&this->openedTape);
-		this->updateTables();
-	}
+	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
+
+	this->openedTape.clear();
+	this->openedTape.setSize(userInput.value());
+	this->sorter.addTapeToSort(&this->openedTape);
+	this->updateTables();
+
 	return continueProgram;
 }
 functionExitCode core::UICreateRandomFile() {
 	std::optional<unsigned int> userInput = this->userInterface.getUserInputUInt(" Enter number of records:");
-	if (userInput != std::nullopt) {
-		// User did not cancel operation - create new random file
-		this->openedTape.clear();
-		this->openedTape = fileTape::getRandomFileTape(userInput.value());
-		this->sorter.addTapeToSort(&this->openedTape);
-		this->updateTables();
-	}
+	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
+
+	this->openedTape.clear();
+	this->openedTape = fileTape::getRandomFileTape(userInput.value());
+	this->sorter.addTapeToSort(&this->openedTape);
+	this->updateTables();
+
 	return continueProgram;
 }
-functionExitCode core::UIOpenFile() {  /*TODO*/ return continueProgram; }
+functionExitCode core::UIOpenFile() {
+	// Getting user input
+	std::optional<std::string> userInput = this->userInterface.getUserInputString(" Enter path to file:");
+	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
+
+
+
+
+
+
+
+
+
+	/*TODO*/
+	return continueProgram;
+}
 functionExitCode core::UIClearFile() {
 	this->openedTape.clear();
 	this->sorter.clear();
@@ -220,7 +235,7 @@ core::core(): userInterface(*this) {
 	this->userInterface.setCursor(&this->tOptions);
 
 	while (this->userInterface.runFrame() == continueProgram) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(20)); // waiting just a little bit so we don't spam out PC to death
+		//std::this_thread::sleep_for(std::chrono::milliseconds(5)); // waiting just a little bit so we don't spam out PC to death
 	}
 }
 core::~core() {}

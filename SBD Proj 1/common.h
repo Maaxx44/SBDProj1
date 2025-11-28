@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <queue>
 #include <functional>
+#include <filesystem>
 #include <Windows.h> //i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it i hate it
 
 #include "functionParameterUnion.h"
@@ -64,6 +65,7 @@
 #define inputTableDoubleDefaultWidth 119
 #define inputTableUIntDefaultWidth 119
 #define inputTableStringDefaultWidth 119
+#define inputTableFilepathDefaultWidth 119
 
 typedef struct RECTANGLE {
 	unsigned int X, Y, W, H;
