@@ -25,6 +25,12 @@
 #define BLOCK_SIZE 8 // how many records in a block
 #define blocksPerMemory 1 // how many block can we read into memory
 
+// R/W Optimizations
+// Enables:
+//   - Block caching in fileTape: if you read record frm the same block as previous one it will not count towards IOOperations count
+//   - Block caching in sorting: when getting data for step 2 of sorting (merging) instead of reading one record of every run it caches block and reads record from that block
+#define RWOpt true
+
 // Random data generation
 #define randomRadiusMin 3.0
 #define randomRadiusMax 10.0

@@ -14,32 +14,67 @@ fileTape::fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength): da
 
 record fileTape::getRecord(unsigned int recordIndex) {
 	if(recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
-	if(this->countIOOperations) this->readCount++;
+
+#if RWOpt
+	if (this->countIOOperations && this->cachedBlock != &this->dataFile[getBlockOffset(recordIndex)]) {
+		this->cachedBlock = &this->dataFile[getBlockOffset(recordIndex)];
+		this->readCount++;
+	}
+#else
+	if (this->countIOOperations) this->readCount++;
+#endif
 	return this->dataFile[getBlockOffset(recordIndex)].getRecord(getOffsetIndex(recordIndex));
 }
 dataBlock fileTape::getBlock(unsigned int blockIndex) {
 	if(blockIndex >= this->dataFile.size()) throw std::runtime_error("getBlock error: blockIndex(" + std::to_string(blockIndex) + ") out of range(" + std::to_string(this->dataFile.size()) + ")");
+
+#if RWOpt
+	if (this->countIOOperations && this->cachedBlock != &this->dataFile[blockIndex]) {
+		this->cachedBlock = &this->dataFile[blockIndex];
+		this->readCount++;
+	}
+#else
 	if (this->countIOOperations) this->readCount++;
+#endif
 	return this->dataFile[blockIndex];
 }
 void fileTape::setRecord(unsigned int recordIndex, record newRecord) {
 	if (recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
-	if (this->countIOOperations) this->writeCount++;
 	this->dataFile[getBlockOffset(recordIndex)].setRecord(getOffsetIndex(recordIndex), newRecord);
+
+#if RWOpt
+	if (this->countIOOperations && this->cachedBlock != &this->dataFile[getBlockOffset(recordIndex)]) {
+		this->cachedBlock = &this->dataFile[getBlockOffset(recordIndex)];
+		this->writeCount++;
+	}
+#else
+	if (this->countIOOperations) this->writeCount++;
+#endif
 }
 void fileTape::addRecord(record newRecord) {
 	// if tape is empty OR last data block is full - create new block and add it as the last one
 	if (this->dataLength == 0 || this->dataLength % BLOCK_SIZE == 0) {
-		record blockRecords[BLOCK_SIZE] = { newRecord }; // I hope this works
-		if (this->countIOOperations) this->writeCount++;
+		record blockRecords[BLOCK_SIZE] = { newRecord };
 		this->dataFile.push_back(dataBlock(blockRecords));
-		this->dataLength++;
+		if (this->countIOOperations) this->writeCount++;
+
+#if RWOpt
+		if (this->countIOOperations) this->cachedBlock = &this->dataFile.back();
+#endif
 	}
 	else {
-		if (this->countIOOperations) this->writeCount++;
 		this->dataFile[getBlockOffset(this->dataLength + 1)].setRecord(getOffsetIndex(this->dataLength + 1), newRecord);
-		this->dataLength++;
+
+#if RWOpt
+		if (this->countIOOperations && this->cachedBlock != &this->dataFile[getBlockOffset(this->dataLength + 1)]) {
+			this->cachedBlock = &this->dataFile[getBlockOffset(this->dataLength + 1)];
+			this->writeCount++;
+		} 
+#else
+		if (this->countIOOperations) this->writeCount++;
+#endif
 	}
+	this->dataLength++;
 }
 
 std::pair<unsigned int, unsigned int> fileTape::getIOOperations() const {

@@ -15,6 +15,11 @@ private:
 	unsigned int getOffsetIndex(unsigned int recordIndex) const;
 
 public:
+#if RWOpt
+	dataBlock* cachedBlock = nullptr;
+#endif
+
+
 	fileTape();
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 

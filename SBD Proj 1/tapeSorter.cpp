@@ -9,8 +9,9 @@ tapeSorter::tapeSorter(): mainTape(nullptr), tapeSize(0), numberOfRuns(0), curre
 tapeSorter::~tapeSorter() { }
 
 void tapeSorter::saveSotingMetadata() {
-	std::pair<unsigned int, unsigned int> mainTapeIOO = this->mainTape->getIOOperations();
-	std::pair<unsigned int, unsigned int> workTapeIOO = this->workTape.getIOOperations();
+	std::pair<unsigned int, unsigned int> mainTapeIOO = { 0, 0 }, workTapeIOO = { 0, 0 };
+	if(this->mainTape != nullptr) mainTapeIOO = this->mainTape->getIOOperations();
+	workTapeIOO = this->workTape.getIOOperations();
 	this->readOperations = mainTapeIOO.first + workTapeIOO.first;
 	this->writeOperations = mainTapeIOO.second + workTapeIOO.second;
 }
@@ -61,7 +62,8 @@ unsigned int tapeSorter::getRunsCount() const {
 	return this->numberOfRuns;
 }
 void tapeSorter::setIOOperationsCounting(bool newCIOO) {
-	this->mainTape->setIOOCounting(newCIOO);
+	if(this->mainTape != nullptr)
+		this->mainTape->setIOOCounting(newCIOO);
 	this->workTape.setIOOCounting(newCIOO);
 }
 
@@ -305,6 +307,7 @@ void tapeSorter::resetSorting() {
 	this->writeOperations = 0;
 }
 
-std::pair<unsigned int, unsigned int> tapeSorter::getIOperationsCount() const {
-	return std::pair<unsigned int, unsigned int>(this->writeOperations, this->readOperations);
+std::pair<unsigned int, unsigned int> tapeSorter::getIOperationsCount() {
+	this->saveSotingMetadata();
+	return std::pair<unsigned int, unsigned int>(this->readOperations, this->writeOperations);
 }
