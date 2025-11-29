@@ -51,6 +51,9 @@ functionExitCode core::UIOpenFile() {
 	openedFile.close();
 	return continueProgram;
 }
+functionExitCode core::UISaveToFile() {
+	return continueProgram;
+}
 functionExitCode core::UIClearFile() {
 	this->openedTape.clear();
 	this->sorter.clear();
@@ -120,9 +123,6 @@ functionExitCode core::UIModifyFileLine(unsigned int selectedContent) {
 }
 
 void core::updateFilePreviewTable() {
-	// Preserve blinking and flashing states
-
-
 	// Required fields for table
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
@@ -143,17 +143,12 @@ void core::updateFilePreviewTable() {
 	// Setting tables content
 	this->tFilePreview.setContent(parsedFile);
 	this->tFilePreview.setContentMod(parsedFileMod);
-
-	// Adjusting file readn and write counter, because we use those operations to display data
-	this->openedTape.setReadOperations(this->openedTape.getReadOperations() - this->openedTape.getSize());
-
 }
 void core::updateWorkFilePreviewTable() {
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
 	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
 		record nextRecord = this->sorter.getWorkTapeP().getRecord(i);
-		this->sorter.getWorkTapeP().setReadOperations(this->sorter.getWorkTapeP().getReadOperations() - 1); // adjusting for dispalying
 		std::stringstream ss;
 		ss << " A: " << std::setw(10) << std::to_string(nextRecord.getAngle()) << ", R: " << std::setw(10) << std::to_string(nextRecord.getRadius()) << " = " << std::setw(11) << std::to_string(nextRecord.calculateArea());
 		parsedFile.push_back(ss.str());
@@ -236,9 +231,11 @@ functionExitCode core::callTableFunction(uiTable* selectedTable, unsigned int se
 	return continueProgram;
 }
 void core::updateTables() {
+	this->sorter.setIOOperationsCounting(false);
 	this->updateFilePreviewTable();
 	this->updateWorkFilePreviewTable();
 	this->updateSortingDataPreviewTable();
+	this->sorter.setIOOperationsCounting(true);
 }
 
 

@@ -14,38 +14,45 @@ fileTape::fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength): da
 
 record fileTape::getRecord(unsigned int recordIndex) {
 	if(recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
-	this->readCount++;
+	if(this->countIOOperations) this->readCount++;
 	return this->dataFile[getBlockOffset(recordIndex)].getRecord(getOffsetIndex(recordIndex));
 }
 dataBlock fileTape::getBlock(unsigned int blockIndex) {
 	if(blockIndex >= this->dataFile.size()) throw std::runtime_error("getBlock error: blockIndex(" + std::to_string(blockIndex) + ") out of range(" + std::to_string(this->dataFile.size()) + ")");
+	if (this->countIOOperations) this->readCount++;
 	return this->dataFile[blockIndex];
 }
-
-void fileTape::setReadOperations(unsigned int operationsCount) {
-	this->readCount = operationsCount;
-}
-void fileTape::setWriteOperations(unsigned int operationsCount) {
-	this->writeCount = operationsCount;
-}
-
 void fileTape::setRecord(unsigned int recordIndex, record newRecord) {
 	if (recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
-	this->writeCount++;
+	if (this->countIOOperations) this->writeCount++;
 	this->dataFile[getBlockOffset(recordIndex)].setRecord(getOffsetIndex(recordIndex), newRecord);
 }
 void fileTape::addRecord(record newRecord) {
 	// if tape is empty OR last data block is full - create new block and add it as the last one
 	if (this->dataLength == 0 || this->dataLength % BLOCK_SIZE == 0) {
 		record blockRecords[BLOCK_SIZE] = { newRecord }; // I hope this works
+		if (this->countIOOperations) this->writeCount++;
 		this->dataFile.push_back(dataBlock(blockRecords));
-		dataLength++;
+		this->dataLength++;
 	}
 	else {
+		if (this->countIOOperations) this->writeCount++;
 		this->dataFile[getBlockOffset(this->dataLength + 1)].setRecord(getOffsetIndex(this->dataLength + 1), newRecord);
 		this->dataLength++;
 	}
 }
+
+std::pair<unsigned int, unsigned int> fileTape::getIOOperations() const {
+	return { this->readCount , this->writeCount };
+}
+void fileTape::setIOOCounting(bool newCIOO) {
+	this->countIOOperations = newCIOO;
+}
+void fileTape::resetIOOCounter() {
+	this->readCount = 0;
+	this->writeCount = 0;
+}
+
 unsigned int fileTape::getSize() const {
 	return this->dataLength;
 }
@@ -58,16 +65,9 @@ void fileTape::clear() {
 	this->dataLength = 0;
 }
 
-unsigned int fileTape::getReadOperations() const {
-	return this->readCount;
-}
-unsigned int fileTape::getWriteOperations() const {
-	return this->writeCount;
-}
-
-void fileTape::resetReadOperations() {
-	this->readCount = 0;
-}
-void fileTape::resetWriteOperations() {
-	this->writeCount = 0;
+void fileTape::dumpToFile(std::ofstream* filePath) {
+	for (unsigned int recordIndex = 0; recordIndex < this->dataLength; recordIndex++) {
+		record nextRecord = this->getRecord(recordIndex);
+		*filePath << '[' << nextRecord.getAngle() << ", " << nextRecord.getRadius() << "]\n";
+	}
 }

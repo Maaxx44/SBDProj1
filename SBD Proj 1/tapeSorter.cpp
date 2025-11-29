@@ -8,6 +8,13 @@ tapeSorter::tapeSorter(): mainTape(nullptr), tapeSize(0), numberOfRuns(0), curre
 }
 tapeSorter::~tapeSorter() { }
 
+void tapeSorter::saveSotingMetadata() {
+	std::pair<unsigned int, unsigned int> mainTapeIOO = this->mainTape->getIOOperations();
+	std::pair<unsigned int, unsigned int> workTapeIOO = this->workTape.getIOOperations();
+	this->readOperations = mainTapeIOO.first + workTapeIOO.first;
+	this->writeOperations = mainTapeIOO.second + workTapeIOO.second;
+}
+
 void tapeSorter::addTapeToSort(fileTape* inputTape) {
 	if (inputTape == nullptr) throw std::runtime_error("addTapeToSort error: inputTape was nullptr!");
 
@@ -53,6 +60,10 @@ unsigned int tapeSorter::getRunSize() const {
 unsigned int tapeSorter::getRunsCount() const {
 	return this->numberOfRuns;
 }
+void tapeSorter::setIOOperationsCounting(bool newCIOO) {
+	this->mainTape->setIOOCounting(newCIOO);
+	this->workTape.setIOOCounting(newCIOO);
+}
 
 
 
@@ -61,10 +72,8 @@ void tapeSorter::sortTapeFull() {
 	if (this->mainTape->getSize() <= 1) return;
 
 	// Metadata
-	this->workTape.resetReadOperations();
-	this->workTape.resetWriteOperations();
-	this->mainTape->resetReadOperations();
-	this->mainTape->resetWriteOperations();
+	this->workTape.resetIOOCounter();
+	this->mainTape->resetIOOCounter();
 
 	// Stage 1
 	for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
@@ -129,8 +138,7 @@ void tapeSorter::sortTapeFull() {
 	}
 
 	// Metadata
-  	this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-	this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+	this->saveSotingMetadata();
 }
 void tapeSorter::sortNextStage() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
@@ -141,10 +149,8 @@ void tapeSorter::sortNextStage() {
 	switch (this->currentSortStage) {
 	case stage1:
 		// Metadata
-		this->workTape.resetReadOperations();
-		this->workTape.resetWriteOperations();
-		this->mainTape->resetReadOperations();
-		this->mainTape->resetWriteOperations();
+		this->workTape.resetIOOCounter();
+		this->mainTape->resetIOOCounter();
 
 		// Stage 1
 		for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
@@ -199,8 +205,8 @@ void tapeSorter::sortNextStage() {
 		this->currentSortStage = sorted;
 
 		// Metadata
-		this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-		this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+		this->saveSotingMetadata();
+
 
 		break;
 	}
@@ -226,8 +232,7 @@ void tapeSorter::sortNextPart() {
 			}
 			this->PSRunIndex++;
 
-			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+			this->saveSotingMetadata();
 		}
 		else {
 			// Stage 1.5 (Stage 2 setup)
@@ -246,8 +251,7 @@ void tapeSorter::sortNextPart() {
 			this->currentSortStage = stage2;
 			this->PSRunIndex = 0;
 
-			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+			this->saveSotingMetadata();
 		}
 		break;
 	case stage2:
@@ -269,13 +273,11 @@ void tapeSorter::sortNextPart() {
 			}
 			this->PSOutputIndex++;
 
-			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+			this->saveSotingMetadata();
 		}
 		else {
 			// Metadata
-			this->readOperations = this->mainTape->getReadOperations() + this->workTape.getReadOperations();
-			this->writeOperations = this->mainTape->getWriteOperations() + this->workTape.getWriteOperations();
+			this->saveSotingMetadata();
 
 			this->currentSortStage = sorted;
 			this->PSOutputIndex = 0;
@@ -296,10 +298,8 @@ void tapeSorter::resetSorting() {
 	this->workTape.setSize(this->tapeSize);
 
 	// Metadata
-	this->workTape.resetReadOperations();
-	this->workTape.resetWriteOperations();
-	this->mainTape->resetReadOperations();
-	this->mainTape->resetWriteOperations();
+	this->workTape.resetIOOCounter();
+	this->mainTape->resetIOOCounter();
 
 	this->readOperations = 0;
 	this->writeOperations = 0;

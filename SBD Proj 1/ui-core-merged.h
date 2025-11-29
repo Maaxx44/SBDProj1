@@ -81,6 +81,7 @@ private:
 	functionExitCode UICreateEmptyFile();
 	functionExitCode UICreateRandomFile();
 	functionExitCode UIOpenFile();
+	functionExitCode UISaveToFile();
 	functionExitCode UIClearFile();
 	functionExitCode UISortFile();
 	functionExitCode UISortStep();

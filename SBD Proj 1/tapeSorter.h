@@ -34,6 +34,7 @@ private:
 	// Sorting metadata
 	unsigned int readOperations = 0;
 	unsigned int writeOperations = 0;
+	void saveSotingMetadata();
 	
 	// for partial sorting - unaffected by whole sorting
 	sortingStage currentSortStage;
@@ -58,6 +59,7 @@ public:
 	std::pair<unsigned int, unsigned int> getIOperationsCount() const;
 	unsigned int getRunSize() const;
 	unsigned int getRunsCount() const;
+	void setIOOperationsCounting(bool newCIOO);
 	
 
 	// Misc functions

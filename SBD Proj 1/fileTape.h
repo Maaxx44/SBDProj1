@@ -5,10 +5,11 @@
 class fileTape {
 private:
 	std::vector<dataBlock> dataFile;
-	unsigned int dataLength;
+	unsigned int dataLength = 0;
 
-	unsigned int readCount;
-	unsigned int writeCount;
+	unsigned int readCount = 0;
+	unsigned int writeCount = 0;
+	bool countIOOperations = true;
 
 	unsigned int getBlockOffset(unsigned int recordIndex) const;
 	unsigned int getOffsetIndex(unsigned int recordIndex) const;
@@ -17,21 +18,24 @@ public:
 	fileTape();
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
+	// Data access functions
 	dataBlock getBlock(unsigned int blockIndex);
 	record getRecord(unsigned int recordIndex);
-	unsigned int getReadOperations() const;
-	unsigned int getWriteOperations() const;
-	unsigned int getSize() const;
-
-	void resetReadOperations();
-	void resetWriteOperations();
-	void setReadOperations(unsigned int operationsCount);
-	void setWriteOperations(unsigned int operationsCount);
 	void setRecord(unsigned int recordIndex, record newRecord);
 	void addRecord(record newRecord);
+
+	// Metadata functions
+	/// Returns read as first, write as second
+	std::pair<unsigned int, unsigned int> getIOOperations() const;
+	void resetIOOCounter();
+	void setIOOCounting(bool newCIOO);
+
+	// Tape data access functions
+	unsigned int getSize() const;
 	void setSize(unsigned int newSize);
 	void clear();
 
+	void dumpToFile(std::ofstream* filePath);
 	fileTape static getFileTapeFromDisk(std::ifstream* filePath) {
 		if (filePath == nullptr || !filePath->is_open()) throw std::runtime_error("getFileTapeFromDisk error: filePath was NULL");
 		
