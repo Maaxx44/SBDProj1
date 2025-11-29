@@ -131,7 +131,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="consoleInformations.cpp" />
     <ClCompile Include="core.cpp" />
     <ClCompile Include="cursorInformations.cpp" />
     <ClCompile Include="dataBlock.cpp" />
@@ -146,11 +145,11 @@
     <ClCompile Include="ui.cpp" />
     <ClCompile Include="uiTable.cpp" />
     <ClCompile Include="uiTablePointer.cpp" />
-    <ClCompile Include="winErrorHandlers.cpp" />
+    <ClCompile Include="win\consoleInformations.cpp" />
+    <ClCompile Include="win\winErrorHandlers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
-    <ClInclude Include="consoleInformations.h" />
     <ClInclude Include="cursorInformations.h" />
     <ClInclude Include="dataBlock.h" />
     <ClInclude Include="dataManager.h" />
@@ -163,7 +162,8 @@
     <ClInclude Include="ui-core-merged.h" />
     <ClInclude Include="uiTable.h" />
     <ClInclude Include="uiTablePointer.h" />
-    <ClInclude Include="winErrorHandlers.h" />
+    <ClInclude Include="win\consoleInformations.h" />
+    <ClInclude Include="win\winErrorHandlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

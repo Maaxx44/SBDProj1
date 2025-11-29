@@ -39,12 +39,6 @@
     <ClCompile Include="tapeSorter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="consoleInformations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="winErrorHandlers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="uiTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,6 +55,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="functionParameterUnion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win\consoleInformations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win\winErrorHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,12 +83,6 @@
     <ClInclude Include="tapeSorter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="consoleInformations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="winErrorHandlers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="uiTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -108,6 +102,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ui-core-merged.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win\consoleInformations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win\winErrorHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
