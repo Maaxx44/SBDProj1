@@ -57,10 +57,10 @@
     <ClCompile Include="functionParameterUnion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="win\consoleInformations.cpp">
+    <ClCompile Include="winErrorHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="win\winErrorHandlers.cpp">
+    <ClCompile Include="consoleInformations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,10 +104,10 @@
     <ClInclude Include="ui-core-merged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="win\consoleInformations.h">
+    <ClInclude Include="consoleInformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="win\winErrorHandlers.h">
+    <ClInclude Include="winErrorHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
