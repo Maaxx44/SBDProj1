@@ -15,7 +15,7 @@ void ErrorHandler() {
     }
     else {
         // ani cout ani wcout nie działa poprawnie z lpMsgBuffer
-        printf("Error message: %ls", (std::wstring*)lpMsgBuffer);
+        printf("Error message: %ls", (wchar_t*)lpMsgBuffer);
         LocalFree(lpMsgBuffer);
         ExitProcess(errorCode);
     }
@@ -36,7 +36,7 @@ void ErrorHandler(void(*callBeforeExit)(void)) {
     }
     else {
         // ani cout ani wcout nie działa poprawnie z lpMsgBuffer
-        printf("Error message: %ls", (std::wstring*)lpMsgBuffer);
+        printf("Error message: %ls", (wchar_t*)lpMsgBuffer);
         LocalFree(lpMsgBuffer);
         callBeforeExit();
         ExitProcess(errorCode);
@@ -66,7 +66,7 @@ void WSAErrorHandler() {
     }
     else {
         // ani cout ani wcout nie działa poprawnie z lpMsgBuffer
-        printf("Error message: %ls", (std::wstring*)lpMsgBuffer);
+        printf("Error message: %ls", (wchar_t*)lpMsgBuffer);
         LocalFree(lpMsgBuffer);
         WSACleanup();
         ExitProcess(errorCode);
@@ -132,7 +132,7 @@ std::wstring LPWCHtWSTR(LPWCH envVar) {
 
     // Kopiowanie zmiennych do wstringa
     retVal.resize(envVarLength, '\0');
-    for (int i = 0; i < envVarLength; i++) {
+    for (unsigned long i = 0; i < envVarLength; i++) {
         retVal[i] = envVar[i];
     }
     return retVal;
@@ -143,7 +143,7 @@ WCHAR* WSTRtWCHAR(std::wstring envVar) {
     for (envVarLength = 1; envVar[(unsigned long long)envVarLength - 1] != '\0' && envVar[envVarLength] != '\0'; envVarLength++);
 
     WCHAR* retVal = new WCHAR[envVarLength];
-    for (int i = 0; i < envVarLength; i++) {
+    for (unsigned long i = 0; i < envVarLength; i++) {
         retVal[i] = envVar[i];
     }
 
