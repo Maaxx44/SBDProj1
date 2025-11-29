@@ -27,6 +27,10 @@ public:
 	COR getCurrentDwSize() const;
 	COR getCurrentSrWindow() const;
 
+	// Keyboard
+	// Returns pointer to 256 byte array
+	void getKeyboardState(BYTE* KBStateOut) const;
+
 	std::vector<INPUT_RECORD> getUserInput() const;
 	std::vector<INPUT_RECORD> getUserInput(std::vector<char> cBreak) const; // Stops reading input buffer at selected character/s keyboard input
 	INPUT_RECORD getOneUserInput() const; // Returns next event

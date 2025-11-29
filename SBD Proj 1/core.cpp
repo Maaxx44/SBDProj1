@@ -25,18 +25,30 @@ functionExitCode core::UICreateRandomFile() {
 }
 functionExitCode core::UIOpenFile() {
 	// Getting user input
-	std::optional<std::string> userInput = this->userInterface.getUserInputString(" Enter path to file:");
-	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
+	std::string message = " Enter path to file:";
+	std::ifstream openedFile;
+	std::optional<std::string> userInput = std::nullopt;
 
+	bool correctFile = false;
+	while (!correctFile) {
+		userInput = this->userInterface.getUserInputFileString(message);
+		if (userInput == std::nullopt) return continueProgram; // User canceled operation
 
+		// Try opening file
+		openedFile.open(userInput.value(), std::ios_base::in);
+		if (openedFile.is_open())
+			correctFile = true;
+		else
+			message = " Path was incorrect. Enter correct path:";
+	}
 
+	// We have path to file - now pass it to reader
+	this->openedTape.clear();
+	this->openedTape = fileTape::getFileTapeFromDisk(&openedFile);
+	this->sorter.addTapeToSort(&this->openedTape);
+	this->updateTables();
 
-
-
-
-
-
-	/*TODO*/
+	openedFile.close();
 	return continueProgram;
 }
 functionExitCode core::UIClearFile() {

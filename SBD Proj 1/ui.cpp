@@ -322,16 +322,6 @@ std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
 			this->clearAfterTable(&inputTable);
 			return std::nullopt;
 		}
-		else if (keyCode >= 0x30 && keyCode <= 0x39 && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Add number if there is space 
-			if (unparsedUserInput.size() < tableWidth)
-				unparsedUserInput.push_back('0' + keyCode - 0x30);
-		}
-		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA) && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Verify if no comma has been placed and add comma 
-			if (unparsedUserInput.size() < tableWidth) {
-				unparsedUserInput.push_back('.');
-				usedComma = true;
-			}
-		}
 		else if (keyCode == VK_RETURN) { // Parse user input and return
 
 			// If input is empty - return nullopt
@@ -360,6 +350,17 @@ std::optional<double> ui::getUserInputDouble(std::string customMessage) const {
 			this->clearAfterTable(&inputTable);
 			return std::optional<double>(returnValue);
 		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39 && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Add number if there is space 
+			if (unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back('0' + keyCode - 0x30);
+		}
+		else if (!usedComma && (keyCode == VK_OEM_PERIOD || keyCode == VK_OEM_COMMA) && (GetKeyState(VK_LSHIFT) & 0x1000) == 0) { // Verify if no comma has been placed and add comma 
+			if (unparsedUserInput.size() < tableWidth) {
+				unparsedUserInput.push_back('.');
+				usedComma = true;
+			}
+		}
+
 
 		// Update user input inside table
 		inputTable.setContent({ unparsedUserInput });
@@ -486,7 +487,106 @@ std::optional<std::string> ui::getUserInputString(std::string customMessage) con
 	this->clearAfterTable(&inputTable);
 	return std::nullopt;
 }
-std::optional<std::filesystem::path> ui::getUserInputFile(std::string customMessage) const {
+std::optional<std::string> ui::getUserInputFileString(std::string customMessage) const {
+	unsigned int tableWidth = max(inputTableStringDefaultWidth, (unsigned int)customMessage.size());
+	const char numbersTranslationArray[2][10] = { {'0', '1','2','3','4','5','6','7','8','9'}, {')', '!', '@', '#', '$', '%', '^', '&', '*', '('} }; // for usage when translation number code with shift
+	const char OEMTranslationArray1[2][7] = { {';', '=', ',', '-', '.', '/', '`'}, {':','+','<','_','>','?','~'} };
+	const char OEMTranslationArray2[2][4] = { {'[', '\\', ']', '\'' }, {'{', '|', '}', '"'}};
+
+	// Creating input table
+	uiTable inputTable = this->createInputTable({ inputTableDefaultX, inputTableDefaultY }, tableWidth, customMessage);
+	inputTable.setTableVisible(true);
+	drawTable(&inputTable);
+
+	// Parsing user input
+	std::string unparsedUserInput = "";
+	std::optional<KEY_EVENT_RECORD> keyRecord;
+	while (keyRecord = this->cInfo.getNextKeyInputBlocking()) {
+		WORD keyCode = keyRecord.value().wVirtualKeyCode;
+
+		// Parse key code
+		if (keyCode == VK_BACK) { // Remove last inputted character
+			if (!unparsedUserInput.empty())
+				unparsedUserInput.pop_back(); // Removing last character
+		}
+		else if (keyCode == VK_ESCAPE) { // Exit user input without parsing
+			this->clearAfterTable(&inputTable);
+			return std::nullopt;
+		}
+		else if (keyCode >= 0x30 && keyCode <= 0x39) { // Add number or special char if there is space
+			// We user default keyboard layout because I wont show this in other country. Windows API is ****** ** piece of **** this should be ********* and ******.
+			if (GetKeyState(VK_LSHIFT) & 0x1000) { // Input is special char
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(numbersTranslationArray[1][keyCode - 0x30]);
+			}
+			else { // Input is a number
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(numbersTranslationArray[0][keyCode - 0x30]);
+			}
+		}
+		else if (keyCode == VK_SPACE) { // Space
+			if (unparsedUserInput.size() < tableWidth)
+				unparsedUserInput.push_back(' ');
+		}
+		else if (keyCode >= 0x41 && keyCode <= 0x5A) { // Add character based on LShift key state
+			if (GetKeyState(VK_LSHIFT) & 0x1000) {
+				// If uneven number of CM we add uppercase letter
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('A' + keyCode - 0x41);
+			}
+			else {
+				// Else we add lowercase letter
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('a' + keyCode - 0x41);
+			}
+		}
+		else if (keyCode >= VK_OEM_1 && keyCode <= VK_OEM_3) { // The rest of special characters
+			if (GetKeyState(VK_LSHIFT) & 0x1000) {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(OEMTranslationArray1[1][keyCode - VK_OEM_1]);
+			}
+			else {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(OEMTranslationArray1[0][keyCode - VK_OEM_1]);
+			}
+		}
+		else if (keyCode == VK_OEM_102) {
+			if (GetKeyState(VK_LSHIFT) & 0x1000) {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('|');
+			}
+			else {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back('\\');
+			}
+		}
+		else if (keyCode >= VK_OEM_4 && keyCode <= VK_OEM_8) { // The rest of special characters
+			if (GetKeyState(VK_LSHIFT) & 0x1000) {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(OEMTranslationArray2[1][keyCode - VK_OEM_4]);
+			}
+			else {
+				if (unparsedUserInput.size() < tableWidth)
+					unparsedUserInput.push_back(OEMTranslationArray2[0][keyCode - VK_OEM_4]);
+			}
+		}
+		else if (keyCode == VK_RETURN) { // Parse user input and return
+			// If input is empty - return nullopt
+			if (unparsedUserInput.empty())
+				return std::nullopt;
+
+			// Return value
+			this->clearAfterTable(&inputTable);
+			return std::optional<std::string>(unparsedUserInput);
+		}
+
+		// Update user input inside table
+		inputTable.setContent({ unparsedUserInput });
+		drawTable(&inputTable);
+	}
+
+
+	this->clearAfterTable(&inputTable);
 	return std::nullopt;
 }
 

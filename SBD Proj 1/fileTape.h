@@ -51,11 +51,11 @@ public:
 			while (!ss.eof()) {
 				while (c != '[' && !ss.eof()) { ss >> c; }	// seeking [ bracket
 				if (ss.eof()) continue;							// Skip this line
-				ss >> tempRadius;							// parse first number
+				ss >> tempAngle;							// parse first number
 				if (ss.eof()) continue;							// Skip this line
-				while (c != ';' && !ss.eof()) { ss >> c; }	// seeking ;
+				while (c != ',' && !ss.eof()) { ss >> c; }	// seeking ,
 				if (ss.eof()) continue;							// Skip this line
-				ss >> tempAngle;							// parse second number
+				ss >> tempRadius;							// parse second number
 				if (ss.eof()) continue;							// Skip this line
 				while (c != ']' && !ss.eof()) { ss >> c; }	// seeking ] bracket
 				if (ss.eof()) continue;							// Skip this line

@@ -49,7 +49,7 @@ public:
 	std::optional<double> getUserInputDouble(std::string customMessage = " Enter new value (double):") const;
 	std::optional<unsigned int> getUserInputUInt(std::string customMessage = " Enter new value (unsigned intiger):") const;
 	std::optional<std::string> getUserInputString(std::string customMessage = " Enter new string:") const;
-	std::optional<std::filesystem::path> getUserInputFile(std::string customMessage = " Enter path to file:") const;
+	std::optional<std::string> getUserInputFileString(std::string customMessage = " Enter path to file:") const;
 
 	// Cursor selection manipulation functions
 	void changeTableSelection(std::initializer_list<std::pair<uiTable*, bool>> tData);

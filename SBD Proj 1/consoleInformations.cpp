@@ -103,6 +103,11 @@ COR consoleInformations::getCurrentSrWindow() const {
 	return { .X = (unsigned int)this->cScreenBufferInfoEx.srWindow.Right, .Y = (unsigned int)this->cScreenBufferInfoEx.srWindow.Bottom };
 }
 
+void consoleInformations::getKeyboardState(BYTE* KBStateOut) const {
+	if(!GetKeyboardState(KBStateOut))
+		ErrorHandler("Failed to get keyboard state!");
+}
+
 std::vector<INPUT_RECORD> consoleInformations::getUserInput() const {
 	if(this->cInputHandle == NULL) throw std::runtime_error("getUserInput error: cInputHandle was NULL!");
 
