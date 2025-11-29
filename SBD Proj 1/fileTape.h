@@ -24,8 +24,8 @@ public:
 	fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength);
 
 	// Data access functions
-	dataBlock getBlock(unsigned int blockIndex);
-	record getRecord(unsigned int recordIndex);
+	dataBlock getBlock(unsigned int blockIndex, bool ignoreCIOO = false);
+	record getRecord(unsigned int recordIndex, bool ignoreCIOO = false);
 	void setRecord(unsigned int recordIndex, record newRecord);
 	void addRecord(record newRecord);
 

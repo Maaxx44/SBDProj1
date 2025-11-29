@@ -132,9 +132,15 @@ void tapeSorter::sortTapeFull() {
 		/// pushing new element from the same run to queue (if there are any left from this run)
 		if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
 			mergingQueue.push(queueElement{
-				.rIndex = edgeElement.rIndex, // Same index of the run
-				.rElement = edgeElement.rElement + 1, // Get next element of the run
-				.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
+#if RWOpt
+					.rIndex = edgeElement.rIndex, // Same index of the run
+					.rElement = edgeElement.rElement + 1, // Get next element of the run
+					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 != BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
+#else
+					.rIndex = edgeElement.rIndex, // Same index of the run
+					.rElement = edgeElement.rElement + 1, // Get next element of the run
+					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
+#endif
 			});
 		}
 	}
@@ -198,9 +204,15 @@ void tapeSorter::sortNextStage() {
 			/// pushing new element from the same run to queue (if there are any left from this run)
 			if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
 				mergingQueue.push(queueElement{
+#if RWOpt
+					.rIndex = edgeElement.rIndex, // Same index of the run
+					.rElement = edgeElement.rElement + 1, // Get next element of the run
+					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 != BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
+#else
 					.rIndex = edgeElement.rIndex, // Same index of the run
 					.rElement = edgeElement.rElement + 1, // Get next element of the run
 					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
+#endif
 					});
 			}
 		}
@@ -268,9 +280,15 @@ void tapeSorter::sortNextPart() {
 			/// pushing new element from the same run to queue (if there are any left from this run)
 			if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
 				PSMergingQueue.push(queueElement{
+#if RWOpt
+					.rIndex = edgeElement.rIndex, // Same index of the run
+					.rElement = edgeElement.rElement + 1, // Get next element of the run
+					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 != BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
+#else
 					.rIndex = edgeElement.rIndex, // Same index of the run
 					.rElement = edgeElement.rElement + 1, // Get next element of the run
 					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
+#endif
 					});
 			}
 			this->PSOutputIndex++;

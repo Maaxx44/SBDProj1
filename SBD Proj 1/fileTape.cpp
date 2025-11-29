@@ -12,29 +12,29 @@ fileTape::fileTape(std::vector<dataBlock> dataFile, unsigned int dataLength): da
 	this->dataFile = dataFile;
 }
 
-record fileTape::getRecord(unsigned int recordIndex) {
+record fileTape::getRecord(unsigned int recordIndex, bool ignoreCIOO) {
 	if(recordIndex >= this->dataLength) throw std::runtime_error("getRecord error: recordIndex(" + std::to_string(recordIndex) + ") out of range(" + std::to_string(this->dataLength) + ")");
 
 #if RWOpt
-	if (this->countIOOperations && this->cachedBlock != &this->dataFile[getBlockOffset(recordIndex)]) {
+	if (!ignoreCIOO && this->countIOOperations && this->cachedBlock != &this->dataFile[getBlockOffset(recordIndex)]) {
 		this->cachedBlock = &this->dataFile[getBlockOffset(recordIndex)];
 		this->readCount++;
 	}
 #else
-	if (this->countIOOperations) this->readCount++;
+	if (!ignoreCIOO && this->countIOOperations) this->readCount++;
 #endif
 	return this->dataFile[getBlockOffset(recordIndex)].getRecord(getOffsetIndex(recordIndex));
 }
-dataBlock fileTape::getBlock(unsigned int blockIndex) {
+dataBlock fileTape::getBlock(unsigned int blockIndex, bool ignoreCIOO) {
 	if(blockIndex >= this->dataFile.size()) throw std::runtime_error("getBlock error: blockIndex(" + std::to_string(blockIndex) + ") out of range(" + std::to_string(this->dataFile.size()) + ")");
 
 #if RWOpt
-	if (this->countIOOperations && this->cachedBlock != &this->dataFile[blockIndex]) {
+	if (!ignoreCIOO && this->countIOOperations && this->cachedBlock != &this->dataFile[blockIndex]) {
 		this->cachedBlock = &this->dataFile[blockIndex];
 		this->readCount++;
 	}
 #else
-	if (this->countIOOperations) this->readCount++;
+	if (!ignoreCIOO && this->countIOOperations) this->readCount++;
 #endif
 	return this->dataFile[blockIndex];
 }
