@@ -26,6 +26,12 @@ private:
 	bool isGlobalFunctionActive = false; // if true then any interaction with content will call this function with else - every line will have individual function called
 	bool isFunctionCallingActive = false; // if there should be any functions calls
 
+	// Cached parsed table
+	std::vector<std::string> cachedContentField;
+	std::vector<textModifiers> cachedContentMod;
+	bool cacheContentValid = false;
+	bool cacheModValid = false;
+
 	std::string cutoffString(std::string str, unsigned int length, unsigned int cutoffLength) const;
 
 public:
@@ -63,7 +69,7 @@ public:
 	/// For rendering text
 	std::string getTitle() const;
 	std::vector<std::string> getFullContent() const; // returns full content, with all lines, but cuts them off
-	std::vector<std::string> getContent() const; // returns content with lines fitting content height
+	std::vector<std::string> getContent(); // returns content with lines fitting content height
 	std::string getContentLine(unsigned int n) const;
 	
 	/// For rendering text style

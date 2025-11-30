@@ -32,12 +32,14 @@ void uiTable::setContent(std::vector<std::string> newContent) {
 	this->contentField = newContent;
 	this->contentMod.clear();
 	this->contentMod.resize(contentField.size());
+	this->cacheContentValid = false;
 }
 void uiTable::setContentPart(std::string newContentPart, unsigned int contentLine) {
 	if (contentLine >= this->contentField.size())
 		throw std::runtime_error("setContentPart error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	this->contentField[contentLine] = newContentPart;
 	this->contentMod[contentLine] = textModifiers();
+	this->cacheContentValid = false;
 }
 
 void uiTable::setTitleMod(textModifiers newTitleMod) {
@@ -46,21 +48,27 @@ void uiTable::setTitleMod(textModifiers newTitleMod) {
 void uiTable::setContentMod(std::vector<textModifiers> newContentMod) {
 	if (newContentMod.size() != this->contentMod.size()) throw std::runtime_error("setContentMod error: newContentMod.size() was not equal to contentMod.size()!");
 	this->contentMod = newContentMod;
+	this->cacheModValid = false;
 }
 void uiTable::setContentPartMod(textModifiers newContentMod, unsigned int contentLine) {
 	if (contentLine >= this->contentField.size())
 		throw std::runtime_error("setContentPartMod error: n(" + std::to_string(contentLine) + ") out of range(" + std::to_string(this->contentField.size()) + ")");
 	this->contentMod[contentLine] = newContentMod;
+	this->cacheModValid = false;
 }
 
 void uiTable::setContentOffset(unsigned int newContentOffset) {
 	this->contentOffset = newContentOffset % contentField.size();
+	this->cacheContentValid = false;
+	this->cacheModValid = false;
 }
 void uiTable::setTableVisible(bool isTableVisible) {
 	this->isTableVisible = isTableVisible;
 }
 void uiTable::setTableSize(REC newPosition) {
 	this->position = newPosition;
+	this->cacheContentValid = false;
+	this->cacheModValid = false;
 }
 
 void uiTable::setTablePointers(uiTablePointer newTablePointers) {
@@ -84,39 +92,66 @@ std::vector<std::string> uiTable::getFullContent() const {
 	}
 	return retCont;
 }
-std::vector<std::string> uiTable::getContent() const {
-	std::vector<std::string> fullContent = this->getFullContent(); // getting cut-off lines
+std::vector<std::string> uiTable::getContent() {
+	if (this->cacheContentValid) {
+		// If data in cache is valid - just return cache
+		return this->cachedContentField;
+	} else if (this->contentField.size() < changeTableRenderModeAfterSize) {
+		// If there are *small* number of context elements - use optimized algorithm
+		std::vector<std::string> returnContext = this->getFullContent(); // getting cut-off lines
 
-	// 1. Scrolling lines
-	unsigned int realScroll = (fullContent.size() > 0) ? this->contentOffset % fullContent.size() : 0;
+		// 1. Scrolling lines
+		unsigned int realScroll = (this->contentField.size() > 0) ? this->contentOffset % this->contentField.size() : 0;
 
-	if(realScroll != 0) {
-		// Copying block out of beg.
-		std::vector<std::string>::const_iterator blockFirst = fullContent.begin();
-		std::vector<std::string>::const_iterator blockLast = fullContent.begin() + realScroll;
-		std::vector<std::string> block(blockFirst, blockLast);
+		if (realScroll != 0) {
+			// Copying block out of beg.
+			std::vector<std::string>::const_iterator blockFirst = returnContext.begin();
+			std::vector<std::string>::const_iterator blockLast = returnContext.begin() + realScroll;
+			std::vector<std::string> block(blockFirst, blockLast);
 
-		// Removing block from oryginal vector
-		fullContent.erase(fullContent.begin(), fullContent.begin() + realScroll);
+			// Removing block from oryginal vector
+			returnContext.erase(returnContext.begin(), returnContext.begin() + realScroll);
 
-		// Appending block at the end
-		fullContent.reserve(fullContent.size() + block.size());
-		fullContent.insert(std::end(fullContent), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
+			// Appending block at the end
+			returnContext.reserve(returnContext.size() + block.size());
+			returnContext.insert(std::end(returnContext), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
+		}
+
+		// 2. Add empty lines ro remove extra lines (to fit into context's height)
+		if (returnContext.size() < this->getContentHeight()) {
+			// Adding empty lines
+			unsigned int sizeBeforeUpdating = (unsigned int)returnContext.size();
+			for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
+				returnContext.push_back(std::string(this->position.W, ' '));
+		}
+		else if (returnContext.size() > this->getContentHeight()) {
+			// Removing extra lines
+			returnContext.erase(returnContext.begin() + this->getContentHeight(), returnContext.end());
+		}
+
+		//Caching data
+		this->cachedContentField = returnContext;
+		this->cacheContentValid = true;
+
+		return returnContext;
 	}
+	else {
+		// If high number of context lines - iterate over them and push back
+		std::vector<std::string> returnContext;
+		unsigned int realScroll = (this->contentField.size() > 0) ? this->contentOffset % this->contentField.size() : 0;
 
-	// 2. Add empty lines ro remove extra lines (to fit into context's height)
-	if (fullContent.size() < this->getContentHeight()) {
-		// Adding empty lines
-		unsigned int sizeBeforeUpdating = (unsigned int)fullContent.size();
-		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
-			fullContent.push_back(std::string(this->position.W, ' '));
-	}
-	else if (fullContent.size() > this->getContentHeight()) {
-		// Removing extra lines
-		fullContent.erase(fullContent.begin() + this->getContentHeight(), fullContent.end());
-	}
+		for (unsigned int lineIndex = 0, currentLineOffset = realScroll; lineIndex < this->getContentHeight(); lineIndex++, currentLineOffset++) {
+			if (lineIndex >= this->contentField.size())
+				currentLineOffset = 0;
+			returnContext.push_back(this->cutoffString(this->contentField[currentLineOffset], this->position.W, stringCutOffMin));
+		}
 
-	return fullContent;
+		//Caching data
+		this->cachedContentField = returnContext;
+		this->cacheContentValid = true;
+
+		return returnContext;
+	}
 }
 std::string uiTable::getContentLine(unsigned int n) const {
 	if (n >= this->contentField.size())
@@ -131,38 +166,64 @@ std::vector<textModifiers>& uiTable::getFullContentMod() {
 	return this->contentMod;
 }
 std::vector<textModifiers> uiTable::getContentMod() {
-	std::vector<textModifiers> fullContentMod = this->getFullContentMod();
+	if (this->cacheModValid) {
+		// If data in cache is valid
+		return this->cachedContentMod;
+	} else if (this->contentField.size() < changeTableRenderModeAfterSize) {
+		std::vector<textModifiers> fullContentMod = this->getFullContentMod();
 
-	unsigned int realScroll = (fullContentMod.size() > 0) ? this->contentOffset % fullContentMod.size() : 0;
+		unsigned int realScroll = (this->contentMod.size() > 0) ? this->contentOffset % this->contentMod.size() : 0;
 
-	if (realScroll != 0) {
-		// Copying block out of beg.
-		std::vector<textModifiers>::const_iterator blockFirst = fullContentMod.begin();
-		std::vector<textModifiers>::const_iterator blockLast = fullContentMod.begin() + realScroll;
-		std::vector<textModifiers> block(blockFirst, blockLast);
+		if (realScroll != 0) {
+			// Copying block out of beg.
+			std::vector<textModifiers>::const_iterator blockFirst = fullContentMod.begin();
+			std::vector<textModifiers>::const_iterator blockLast = fullContentMod.begin() + realScroll;
+			std::vector<textModifiers> block(blockFirst, blockLast);
 
-		// Removing block from oryginal vector
-		fullContentMod.erase(fullContentMod.begin(), fullContentMod.begin() + realScroll);
+			// Removing block from oryginal vector
+			fullContentMod.erase(fullContentMod.begin(), fullContentMod.begin() + realScroll);
 
-		// Appending block at the end
-		fullContentMod.reserve(fullContentMod.size() + block.size());
-		fullContentMod.insert(std::end(fullContentMod), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
+			// Appending block at the end
+			fullContentMod.reserve(fullContentMod.size() + block.size());
+			fullContentMod.insert(std::end(fullContentMod), std::begin(block), std::end(block)); // if performance suffers I could use std::move()
+		}
+
+		// 2. Add empty lines ro remove extra lines (to fit into context's height)
+		if (fullContentMod.size() < this->getContentHeight()) {
+			textModifiers emptyMod;
+			// Adding empty lines
+			unsigned int sizeBeforeUpdating = (unsigned int)fullContentMod.size();
+			for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
+				fullContentMod.push_back(emptyMod);
+		}
+		else if (fullContentMod.size() > this->getContentHeight()) {
+			// Removing extra lines
+			fullContentMod.erase(fullContentMod.begin() + this->getContentHeight(), fullContentMod.end());
+		}
+
+		//Caching data
+		this->cachedContentMod = fullContentMod;
+		this->cacheModValid = true;
+
+		return fullContentMod;
+
+	} else {
+ 		// If high number of context lines - iterate over them and push back
+		std::vector<textModifiers> returnMod;
+		unsigned int realScroll = (this->contentMod.size() > 0) ? this->contentOffset % this->contentMod.size() : 0;
+
+		for (unsigned int lineIndex = 0, currentLineOffset = realScroll; lineIndex < this->getContentHeight(); lineIndex++, currentLineOffset++) {
+			if (currentLineOffset >= this->contentMod.size())
+				currentLineOffset = 0;
+			returnMod.push_back(this->contentMod[currentLineOffset]);
+		}
+
+		//Caching data
+		this->cachedContentMod = returnMod;
+		this->cacheModValid = true;
+
+		return returnMod;
 	}
-
-	// 2. Add empty lines ro remove extra lines (to fit into context's height)
-	if (fullContentMod.size() < this->getContentHeight()) {
-		textModifiers emptyMod;
-		// Adding empty lines
-		unsigned int sizeBeforeUpdating = (unsigned int)fullContentMod.size();
-		for (unsigned int i = 0; i < this->getContentHeight() - sizeBeforeUpdating; i++)
-			fullContentMod.push_back(emptyMod);
-	}
-	else if (fullContentMod.size() > this->getContentHeight()) {
-		// Removing extra lines
-		fullContentMod.erase(fullContentMod.begin() + this->getContentHeight(), fullContentMod.end());
-	}
-
-	return fullContentMod;
 }
 textModifiers& uiTable::getContentLineMod(unsigned int n) {
 	if (n >= this->contentField.size())
@@ -201,8 +262,18 @@ uiTablePointer& uiTable::getTablePointers() {
 
 
 void uiTable::updateTiming() {
+#if optimizeTextModUpdated
+	unsigned int realScroll = ((this->contentMod.size() > 0) ? this->contentOffset % this->contentMod.size() : 0);
+	for (unsigned int lineIndex = 0, currentLineOffset = realScroll; lineIndex < this->contentMod.size(); lineIndex++, currentLineOffset++) {
+		if (currentLineOffset >= this->contentMod.size())
+			currentLineOffset = 0;
+		this->contentMod[currentLineOffset].updateTiming();
+	}
+#else
 	for (textModifiers& contentLineMod : this->contentMod)
 		contentLineMod.updateTiming();
+#endif
+	this->cacheModValid = false;
 }
 void uiTable::setPositionToText() {
 	this->position.H = (int)this->contentField.size() + 1;
@@ -213,6 +284,9 @@ void uiTable::setPositionToText() {
 		maxLength = (maxLength < (unsigned int)s.size()) ? (unsigned int)s.size() : maxLength;
 
 	this->position.W = maxLength;
+
+	this->cacheContentValid = false;
+	this->cacheModValid = false;
 }
 
 /// This function checks if given line is visible ( is not cut off )

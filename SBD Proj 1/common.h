@@ -50,6 +50,10 @@
 #define defaultFlashColor FOREGROUND_RED | FOREGROUND_INTENSITY
 //  Small toggle to define behavoiur
 #define returnNoColorOnInvisible false
+//  After 100 lines the table wont manipulate whole context but iterate over selected lines
+#define changeTableRenderModeAfterSize 100
+//  Only uptares visible content mod instead of everything
+#define optimizeTextModUpdated true
 //  Console drawing
 #define defaultConsoleSizeX 150
 #define defaultConsoleSizeY 50
