@@ -121,7 +121,7 @@ void tapeSorter::sortTapeFull() {
 	#if RWOpt
 						.rIndex = edgeElement.rIndex, // Same index of the run
 						.rElement = edgeElement.rElement + 1, // Get next element of the run
-						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 != BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
+						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, (edgeElement.rElement + 1) % BLOCK_SIZE != 0) // get next record of the run, dont count towards IOO unless 
 	#else
 						.rIndex = edgeElement.rIndex, // Same index of the run
 						.rElement = edgeElement.rElement + 1, // Get next element of the run
@@ -149,7 +149,6 @@ void tapeSorter::sortTapeFull() {
 
 		unsigned int nextRunInQueue = blocksPerMemory;
 
-
 		// Stage 2 
 		for (unsigned int outputIndex = 0; mergingQueue.size() > 0 && outputIndex < this->tapeSize; outputIndex++) {
 			/// getting smallest/largest value and removing from queue
@@ -165,7 +164,7 @@ void tapeSorter::sortTapeFull() {
 #if RWOpt
 						.rIndex = edgeElement.rIndex, // Same index of the run
 						.rElement = edgeElement.rElement + 1, // Get next element of the run
-						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 == BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
+						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, (edgeElement.rElement + 1) % BLOCK_SIZE != 0) // get next record of the run, dont count towards IOO unless 
 #else
 						.rIndex = edgeElement.rIndex, // Same index of the run
 						.rElement = edgeElement.rElement + 1, // Get next element of the run
@@ -173,20 +172,20 @@ void tapeSorter::sortTapeFull() {
 #endif
 					});
 			} // If we reached the end of this tape and there are more runs in queue - add next run to queue
-			else if ((edgeElement.rIndex * runSize + edgeElement.rElement + 1) >= this->workTape.getSize() && nextRunInQueue < this->numberOfRuns) {
+			else if (edgeElement.rElement >= runSize - 1 && nextRunInQueue < this->numberOfRuns) {
 				mergingQueue.push(queueElement{
 #if RWOpt
 						.rIndex = nextRunInQueue, // index of the next run
 						.rElement = 0, // First element of run
-						.rData = this->workTape.getRecord(nextRunInQueue * runSize) // get next record of the run, dont count towards IOO unless
+						.rData = this->workTape.getRecord(nextRunInQueue * runSize) // get next record of the run
 #else
 						.rIndex = nextRunInQueue, // index of the next run
 						.rElement = 0, // First element of run
 						.rData = this->workTape.getRecord(nextRunInQueue * runSize) // get next record of the run
 #endif
 					});
+				nextRunInQueue++;
 			}
-			
 		}
 	}
 
