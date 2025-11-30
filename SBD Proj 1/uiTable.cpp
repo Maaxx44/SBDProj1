@@ -263,11 +263,17 @@ uiTablePointer& uiTable::getTablePointers() {
 
 void uiTable::updateTiming() {
 #if optimizeTextModUpdated
-	unsigned int realScroll = ((this->contentMod.size() > 0) ? this->contentOffset % this->contentMod.size() : 0);
-	for (unsigned int lineIndex = 0, currentLineOffset = realScroll; lineIndex < this->contentMod.size(); lineIndex++, currentLineOffset++) {
-		if (currentLineOffset >= this->contentMod.size())
-			currentLineOffset = 0;
-		this->contentMod[currentLineOffset].updateTiming();
+	if (this->contentMod.size() >=changeTableRenderModeAfterSize) {
+		unsigned int realScroll = ((this->contentMod.size() > 0) ? this->contentOffset % this->contentMod.size() : 0);
+		for (unsigned int lineIndex = 0, currentLineOffset = realScroll; lineIndex < this->getContentHeight(); lineIndex++, currentLineOffset++) {
+			if (currentLineOffset >= this->contentMod.size())
+				currentLineOffset = 0;
+			this->contentMod[currentLineOffset].updateTiming();
+		}
+	}
+	else {
+		for (textModifiers& contentLineMod : this->contentMod)
+			contentLineMod.updateTiming();
 	}
 #else
 	for (textModifiers& contentLineMod : this->contentMod)
