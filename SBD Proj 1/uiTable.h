@@ -71,7 +71,7 @@ public:
 	std::vector<std::string> getFullContent() const; // returns full content, with all lines, but cuts them off
 	std::vector<std::string> getContent(); // returns content with lines fitting content height
 	std::string getContentLine(unsigned int n) const;
-	
+
 	/// For rendering text style
 	textModifiers& getTitleMod();
 	std::vector<textModifiers>& getFullContentMod(); // just returns all contentmods

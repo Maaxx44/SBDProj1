@@ -22,14 +22,21 @@
 #include "functionParameterUnion.h"
 
 // Data parameters
-#define BLOCK_SIZE 8 // how many records in a block
-#define blocksPerMemory 1 // how many block can we read into memory
+#define BLOCK_SIZE 32 // how many records in a block
+#define blocksPerMemory 16 // how many block can we read into memory
 
-// R/W Optimizations
-// Enables:
-//   - Block caching in fileTape: if you read record frm the same block as previous one it will not count towards IOOperations count
-//   - Block caching in sorting: when getting data for step 2 of sorting (merging) instead of reading one record of every run it caches block and reads record from that block
+
+// Optimizations
+//   R/W Optimizations
+//   Enables:
+//     - Block caching in fileTape: if you read record frm the same block as previous one it will not count towards IOOperations count
+//     - Block caching in sorting: when getting data for step 2 of sorting (merging) instead of reading one record of every run it caches block and reads record from that block
 #define RWOpt true
+//  After 100 lines the table wont manipulate whole context but iterate over selected lines
+#define changeTableRenderModeAfterSize 100
+//  Only uptares visible content mod instead of everything
+#define optimizeTextModUpdated true
+//  Updates only visible part of table - REQUIRES FUNCTION IN CORE
 
 // Random data generation
 #define randomRadiusMin 3.0
@@ -50,10 +57,7 @@
 #define defaultFlashColor FOREGROUND_RED | FOREGROUND_INTENSITY
 //  Small toggle to define behavoiur
 #define returnNoColorOnInvisible false
-//  After 100 lines the table wont manipulate whole context but iterate over selected lines
-#define changeTableRenderModeAfterSize 100
-//  Only uptares visible content mod instead of everything
-#define optimizeTextModUpdated true
+
 //  Console drawing
 #define defaultConsoleSizeX 150
 #define defaultConsoleSizeY 50

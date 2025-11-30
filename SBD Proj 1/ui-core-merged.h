@@ -31,7 +31,6 @@ private:
 	void drawTableContentLine(uiTable* table, std::string contentString, textModifiers& contentMod, unsigned int laneIndex) const;
 	void drawTableContent(uiTable* table) const;
 	void drawTable(uiTable* table) const;
-	void clearAfterTable(uiTable* table) const; // Prints empty spaces in place of table to clear inut buffor
 
 	// User alpha-numerical input functions
 	uiTable createInputTable(COR position, unsigned int width, std::string title) const; // creates input table with given parameters. Will always be 2 height. Returns position of input box
@@ -50,6 +49,8 @@ public:
 	std::optional<unsigned int> getUserInputUInt(std::string customMessage = " Enter new value (unsigned intiger):") const;
 	std::optional<std::string> getUserInputString(std::string customMessage = " Enter new string:") const;
 	std::optional<std::string> getUserInputFileString(std::string customMessage = " Enter path to file:") const;
+
+	void clearAfterTable(uiTable* table) const; // Prints empty spaces in place of table to clear inut buffor
 
 	// Cursor selection manipulation functions
 	void changeTableSelection(std::initializer_list<std::pair<uiTable*, bool>> tData);
@@ -87,6 +88,7 @@ private:
 	functionExitCode UISortStep();
 	functionExitCode UIResetSorting();
 	functionExitCode UIModifyFileLine(unsigned int selectedContent);
+	functionExitCode UIToggleFilePreview();
 
 	// Table content updating functions
 	void updateFilePreviewTable();
@@ -100,6 +102,7 @@ public:
 	functionExitCode callTableFunction(uiTable* selectedTable, unsigned int selectedContent);
 	void updateTables();
 	// --------------------------------
+
 
 	core();
 	~core();

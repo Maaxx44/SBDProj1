@@ -41,6 +41,7 @@ private:
 	std::priority_queue<queueElement, std::vector<queueElement>, Compare> PSMergingQueue;
 	unsigned int PSRunIndex = 0;
 	unsigned int PSOutputIndex = 0;
+	unsigned int PSNextRunInQueue = 0;
 
 public:
 	tapeSorter();
@@ -49,7 +50,6 @@ public:
 
 	// Sorting functions
 	void sortTapeFull(); // Sorts full tape in one go, without stopping
-	void sortNextStage(); // Iterates over every step of sorting
 	void sortNextPart(); // Sorts just barely
 	void resetSorting();
 

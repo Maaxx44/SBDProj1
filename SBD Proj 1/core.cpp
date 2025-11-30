@@ -6,6 +6,7 @@ functionExitCode core::UICreateEmptyFile() {
 	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
 
 	this->openedTape.clear();
+	this->sorter.resetSorting();
 	this->openedTape.setSize(userInput.value());
 	this->sorter.addTapeToSort(&this->openedTape);
 	this->updateTables();
@@ -17,6 +18,7 @@ functionExitCode core::UICreateRandomFile() {
 	if (userInput == std::nullopt) return continueProgram; // If user canceled operation - dont proceed
 
 	this->openedTape.clear();
+	this->sorter.resetSorting();
 	this->openedTape = fileTape::getRandomFileTape(userInput.value());
 	this->sorter.addTapeToSort(&this->openedTape);
 	this->updateTables();
@@ -44,6 +46,7 @@ functionExitCode core::UIOpenFile() {
 
 	// We have path to file - now pass it to reader
 	this->openedTape.clear();
+	this->sorter.resetSorting();
 	this->openedTape = fileTape::getFileTapeFromDisk(&openedFile);
 	this->sorter.addTapeToSort(&this->openedTape);
 	this->updateTables();
@@ -57,6 +60,7 @@ functionExitCode core::UISaveToFile() {
 functionExitCode core::UIClearFile() {
 	this->openedTape.clear();
 	this->sorter.clear();
+	this->sorter.resetSorting();
 	this->updateTables();
 	return continueProgram;
 }
@@ -121,8 +125,21 @@ functionExitCode core::UIModifyFileLine(unsigned int selectedContent) {
 
 	return continueProgram;
 }
+functionExitCode core::UIToggleFilePreview() {
+	if (this->tFilePreview.getTableVisible()) {
+		this->userInterface.clearAfterTable(&this->tFilePreview);
+		this->userInterface.clearAfterTable(&this->tWorkFilePreview);
+
+	}
+ 
+	this->tFilePreview.setTableVisible(!this->tFilePreview.getTableVisible());
+	this->tWorkFilePreview.setTableVisible(!this->tWorkFilePreview.getTableVisible());
+	return continueProgram;
+}
 
 void core::updateFilePreviewTable() {
+	if (!this->tFilePreview.getTableVisible()) return;
+
 	// Required fields for table
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
@@ -145,6 +162,8 @@ void core::updateFilePreviewTable() {
 	this->tFilePreview.setContentMod(parsedFileMod);
 }
 void core::updateWorkFilePreviewTable() {
+	if (!this->tWorkFilePreview.getTableVisible()) return;
+
 	std::vector<std::string> parsedFile;
 	std::vector<textModifiers> parsedFileMod;
 	for (unsigned int i = 0; i < this->sorter.getWorkTapeP().getSize(); i++) {
@@ -170,7 +189,7 @@ void core::updateSortingDataPreviewTable() {
 }
 void core::initTables() {
 	// Creating tables
-	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting" });
+	this->tOptions = uiTable({ .X = 2, .Y = 1, .W = 25, .H = 13 }, "Options", { "Create empty file", "Create random file", "Open file", "Clear file", "Sort file", "Make sorting step", "Reset sorting", "Toggle Previews"});
 	this->tFilePreview = uiTable({ .X = 29, .Y = 1, .W = 45, .H = 35 }, "File Preview", {});
 	this->tWorkFilePreview = uiTable({ .X = 76, .Y = 1, .W = 45, .H = 35 }, "Work File Preview", {}); // not editable
 	this->tSortingMetadata = uiTable({ .X = 2, .Y = 15, .W = 25, .H = 21 }, "Sorting Data", {}); // not editable
@@ -223,6 +242,8 @@ functionExitCode core::callTableFunction(uiTable* selectedTable, unsigned int se
 				return this->UISortStep();
 			case 6: // "Reset sorting"
 				return this->UIResetSorting();
+			case 7: // "Toggle Previews"
+				return this->UIToggleFilePreview();
 		}
 	}
 	else if (selectedTable == &this->tFilePreview) {
