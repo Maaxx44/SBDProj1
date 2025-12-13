@@ -66,8 +66,9 @@ void tapeSorter::setIOOperationsCounting(bool newCIOO) {
 		this->mainTape->setIOOCounting(newCIOO);
 	this->workTape.setIOOCounting(newCIOO);
 }
-
-
+unsigned int tapeSorter::getPhazesCount() {
+	return this->phazesCount;
+}
 
 void tapeSorter::sortTapeFull() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
@@ -76,6 +77,7 @@ void tapeSorter::sortTapeFull() {
 	// Metadata
 	this->workTape.resetIOOCounter();
 	this->mainTape->resetIOOCounter();
+	this->phazesCount = 0;
 
 	// Stage 1
 	for (unsigned int runIndex = 0; runIndex < this->numberOfRuns; runIndex++) {
@@ -341,6 +343,7 @@ void tapeSorter::resetSorting() {
 	// Metadata
 	this->workTape.resetIOOCounter();
 	if(this->mainTape != nullptr) this->mainTape->resetIOOCounter();
+	this->phazesCount = 0;
 
 	this->readOperations = 0;
 	this->writeOperations = 0;

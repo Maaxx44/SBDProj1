@@ -180,11 +180,13 @@ void core::updateSortingDataPreviewTable() {
 	std::pair<unsigned int, unsigned int> IOOperations = this->sorter.getIOperationsCount();
 	unsigned int runsCount = this->sorter.getRunsCount();
 	unsigned int runSize = this->sorter.getRunSize();
+	unsigned int phazesCount = this->sorter.getPhazesCount();
 	std::vector<std::string> sortingMetadata;
 	sortingMetadata.push_back("Reads: " + std::to_string(IOOperations.first));
 	sortingMetadata.push_back("Writes: " + std::to_string(IOOperations.second));
 	sortingMetadata.push_back("Run size: " + std::to_string(runSize));
 	sortingMetadata.push_back("Runs: " + std::to_string(runsCount));
+	sortingMetadata.push_back("Phazes: " + std::to_string(phazesCount));
 	this->tSortingMetadata.setContent(sortingMetadata);
 }
 void core::initTables() {

@@ -34,6 +34,7 @@ private:
 	// Sorting metadata
 	unsigned int readOperations = 0;
 	unsigned int writeOperations = 0;
+	unsigned int phazesCount = 0;
 	void saveSotingMetadata();
 	
 	// for partial sorting - unaffected by whole sorting
@@ -57,6 +58,7 @@ public:
 	void addTapeToSort(fileTape* inputTape);
 	fileTape& getWorkTapeP();
 	std::pair<unsigned int, unsigned int> getIOperationsCount();
+	unsigned int getPhazesCount();
 	unsigned int getRunSize() const;
 	unsigned int getRunsCount() const;
 	void setIOOperationsCounting(bool newCIOO);
