@@ -94,6 +94,82 @@ void tapeSorter::sortTapeFull() {
 		}
 	}
 
+	// Stage 2
+	// Main sorting pointers
+	fileTape* outputTape = this->mainTape;
+	fileTape* inputTape = &this->workTape;
+	std::priority_queue<queueElement, std::vector<queueElement>, Compare> mergingQueue;
+
+	unsigned int currentRunsCount = 0;
+	unsigned int currentPhazesCount = 0;
+	unsigned int currentRunSize = this->runSize;
+	unsigned int currentRunsInputIndex = 0;
+	unsigned int outputTapeInsertIndex = 0;
+
+	do {
+		outputTapeInsertIndex = 0;
+		currentRunsInputIndex = 0;
+		currentRunsCount = 0;
+		currentPhazesCount++;
+
+		// Possibly remove later
+		do {
+			// 1: Adding runs to merging queue
+			for (unsigned int runIndex = 0; runIndex < blocksPerMemory - 1 && (currentRunsInputIndex * currentRunSize) < this->tapeSize; runIndex++, currentRunsInputIndex++) {
+				currentRunsCount++;
+				mergingQueue.push(queueElement{
+						.rIndex = currentRunsInputIndex,
+						.rElement = 0,
+						.rData = inputTape->getRecord(currentRunsInputIndex * currentRunSize)
+					});
+			}
+
+			// 2: merge with merging queue
+			while (mergingQueue.size() > 0) {
+				// Adding edge element to output file
+				queueElement edgeElement = mergingQueue.top();
+				mergingQueue.pop();
+
+				outputTape->setRecord(outputTapeInsertIndex, edgeElement.rData);
+				outputTapeInsertIndex++;
+
+				// Adding element to merging queue
+				if (edgeElement.rElement < currentRunSize - 1 && edgeElement.rElement + 1 + edgeElement.rIndex * currentRunSize < this->tapeSize) {
+					mergingQueue.push(queueElement{
+						.rIndex = edgeElement.rIndex,
+						.rElement = edgeElement.rElement + 1,
+						.rData = inputTape->getRecord(edgeElement.rIndex * currentRunSize + edgeElement.rElement + 1, (edgeElement.rElement + 1) % BLOCK_SIZE != 0)
+						});
+				}
+			}
+		} while (outputTapeInsertIndex < this->tapeSize);
+
+		fileTape* tempTape = inputTape;
+		inputTape = outputTape;
+		outputTape = tempTape;
+
+		currentRunSize *= (blocksPerMemory - 1);
+	} while (currentRunsCount > 1);
+	// We are left with one run what *should* be sorted
+
+	// If the last run is in the work tape we copy it to outr main tape
+	// We check for outputTape, because we swap pointers on line 147!!!
+	if (outputTape == this->mainTape) {
+		for (unsigned int index = 0; index < this->tapeSize; index++) {
+			outputTape->setRecord(index, inputTape->getRecord(index, true));
+		}
+	}
+
+	// Metadata
+	this->phazesCount = currentPhazesCount - 1; // adjusting for overcounting
+	this->saveSotingMetadata();
+
+	// Sanity check
+	if (!this->mainTape->checkIfSorted()) throw std::runtime_error("YOU FUCKED UP SORTING AGAIN!!!");
+
+
+	// Legacy code
+	/*
 	if (this->numberOfRuns <= blocksPerMemory) {
 		this->mainTape->clear();
 		this->mainTape->setSize(this->tapeSize);
@@ -189,7 +265,6 @@ void tapeSorter::sortTapeFull() {
 		this->phazesCount = currentPhazesCount;
 
 		// Legacy Code
-		/*
 		// Stage 1.5 (Stage 2 setup)
 		//  Clearing up main tape to make room for sorted elements (I think it might not be necesarry if we override all elements with sorted ones, but I guess it is nicer)
 		this->mainTape->clear();
@@ -249,11 +324,9 @@ void tapeSorter::sortTapeFull() {
 				nextRunInQueue++;
 			}
 		}
-		*/
+		
 	}
-
-	// Metadata
-	this->saveSotingMetadata();
+	*/
 }
 void tapeSorter::sortNextPart() {
 	if (this->mainTape == nullptr) throw std::runtime_error("sortTapeFull error: mainTape was nullptr!");
@@ -279,6 +352,19 @@ void tapeSorter::sortNextPart() {
 			this->saveSotingMetadata();
 		}
 		else {
+			this->mainTape->clear();
+			this->mainTape->setSize(this->tapeSize);
+
+			this->currentSortStage = stage2;
+			this->PSOutputTape = this->mainTape;
+			this->PSInputTape = &this->workTape;
+			this->stage2NestedLevel = 0;
+			this->PSRunIndex = 0;
+			this->PSCurrentRunSize = this->runSize;
+			this->PSCurrentPhazesCount = 0;
+		}
+		/*
+		else {
 			if (this->numberOfRuns <= blocksPerMemory) {
 				// Stage 1.5 (Stage 2 setup)
 				//  Clearing up main tape to make room for sorted elements (I think it might not be necesarry if we override all elements with sorted ones, but I guess it is nicer)
@@ -294,6 +380,9 @@ void tapeSorter::sortNextPart() {
 				}
 
 				this->currentSortStage = stage2;
+				this->PSOutputTape = this->mainTape;
+				this->PSInputTape = &this->workTape;
+				this->stage2NestedLevel = 0;
 				this->PSRunIndex = 0;
 			} else {
 				//  Clearing up main tape to make room for sorted elements (I think it might not be necesarry if we override all elements with sorted ones, but I guess it is nicer)
@@ -312,81 +401,129 @@ void tapeSorter::sortNextPart() {
 
 
 			this->saveSotingMetadata();
-		}
+		} */
 		break;
 	case stage2:
-		if (this->numberOfRuns <= blocksPerMemory) {
-			/// getting smallest/largest value and removing from queue
+		// 1: Adding runs to merging queue
+		for (unsigned int runIndex = 0; runIndex < blocksPerMemory - 1 && (PSCurrentRunsInputIndex * PSCurrentRunSize) < this->tapeSize; runIndex++, PSCurrentRunsInputIndex++) {
+			PSCurrentRunsCount++;
+			PSMergingQueue.push(queueElement{
+					.rIndex = PSCurrentRunsInputIndex,
+					.rElement = 0,
+					.rData = PSInputTape->getRecord(PSCurrentRunsInputIndex * PSCurrentRunSize)
+				});
+		}
+
+		// 2: merge with merging queue
+		while (PSMergingQueue.size() > 0) {
+			// Adding edge element to output file
 			queueElement edgeElement = PSMergingQueue.top();
 			PSMergingQueue.pop();
 
-			/// saving element to disk
-			this->mainTape->setRecord(PSOutputIndex, edgeElement.rData);
+			PSOutputTape->setRecord(PSOutputTapeInsertIndex, edgeElement.rData);
+			PSOutputTapeInsertIndex++;
 
-			/// pushing new element from the same run to queue (if there are any left from this run)
-			if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
+			// Adding element to merging queue
+			if (edgeElement.rElement < PSCurrentRunSize - 1 && edgeElement.rElement + 1 + edgeElement.rIndex * PSCurrentRunSize < this->tapeSize) {
 				PSMergingQueue.push(queueElement{
-#if RWOpt
-					.rIndex = edgeElement.rIndex, // Same index of the run
-					.rElement = edgeElement.rElement + 1, // Get next element of the run
-					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 != BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
-#else
-					.rIndex = edgeElement.rIndex, // Same index of the run
-					.rElement = edgeElement.rElement + 1, // Get next element of the run
-					.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
-#endif
-					});
-			}
-			this->PSOutputIndex++;
-
-			this->saveSotingMetadata();
-		} else {
-			/// getting smallest/largest value and removing from queue
-			queueElement edgeElement = PSMergingQueue.top();
-			PSMergingQueue.pop();
-
-			/// saving element to disk
-			this->mainTape->setRecord(PSOutputIndex, edgeElement.rData);
-
-			/// pushing new element from the same run to queue (if there are any left from this run)
-			if (edgeElement.rElement < runSize - 1 && (edgeElement.rIndex * runSize + edgeElement.rElement + 1) < this->workTape.getSize()) {
-				PSMergingQueue.push(queueElement{
-#if RWOpt
-						.rIndex = edgeElement.rIndex, // Same index of the run
-						.rElement = edgeElement.rElement + 1, // Get next element of the run
-						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1, edgeElement.rElement + 1 == BLOCK_SIZE) // get next record of the run, dont count towards IOO unless 
-#else
-						.rIndex = edgeElement.rIndex, // Same index of the run
-						.rElement = edgeElement.rElement + 1, // Get next element of the run
-						.rData = this->workTape.getRecord(edgeElement.rIndex * runSize + edgeElement.rElement + 1) // get next record of the run
-#endif
-					});
-			} // If we reached the end of this tape and there are more runs in queue - add next run to queue
-			else if ((edgeElement.rIndex * runSize + edgeElement.rElement + 1) >= this->workTape.getSize() && this->PSNextRunInQueue < this->numberOfRuns) {
-				PSMergingQueue.push(queueElement{
-#if RWOpt
-						.rIndex = PSNextRunInQueue, // index of the next run
-						.rElement = 0, // First element of run
-						.rData = this->workTape.getRecord(PSNextRunInQueue * runSize) // get next record of the run, dont count towards IOO unless
-#else
-						.rIndex = PSNextRunInQueue, // index of the next run
-						.rElement = 0, // First element of run
-						.rData = this->workTape.getRecord(PSNextRunInQueue * runSize) // get next record of the run
-#endif
+					.rIndex = edgeElement.rIndex,
+					.rElement = edgeElement.rElement + 1,
+					.rData = PSInputTape->getRecord(edgeElement.rIndex * PSCurrentRunSize + edgeElement.rElement + 1, (edgeElement.rElement + 1) % BLOCK_SIZE != 0)
 					});
 			}
 		}
-		if (PSMergingQueue.size() > 0 && PSOutputIndex < this->tapeSize) {
 
-		}
-		else {
-			// Metadata
-			this->saveSotingMetadata();
+		// Metadata
+		this->phazesCount = PSCurrentPhazesCount;
+		this->saveSotingMetadata();
 
-			this->currentSortStage = sorted;
-			this->PSOutputIndex = 0;
+		if (!(PSOutputTapeInsertIndex < this->tapeSize)) {
+			fileTape* tempTape = PSInputTape;
+			PSInputTape = PSOutputTape;
+			PSOutputTape = tempTape;
+			PSCurrentRunSize *= (blocksPerMemory - 1);
+
+			if (!(PSCurrentRunsCount > 1)) {
+				if (PSOutputTape == this->mainTape) {
+					for (unsigned int index = 0; index < this->tapeSize; index++) {
+						PSOutputTape->setRecord(index, PSInputTape->getRecord(index, true));
+					}
+				}
+
+				// Metadata
+				this->phazesCount = PSCurrentPhazesCount;
+				this->saveSotingMetadata();
+
+				// Sanity check
+				if (!this->mainTape->checkIfSorted()) throw std::runtime_error("YOU FUCKED UP SORTING AGAIN!!!");
+
+				this->currentSortStage = sorted;
+			}
+
+			PSOutputTapeInsertIndex = 0;
+			PSCurrentRunsInputIndex = 0;
+			PSCurrentRunsCount = 0;
+			PSCurrentPhazesCount++;
 		}
-		break;
+		/*
+		do {
+			PSOutputTapeInsertIndex = 0;
+			PSCurrentRunsInputIndex = 0;
+			PSCurrentRunsCount = 0;
+			PSCurrentPhazesCount++;
+
+			// Possibly remove later
+			do {
+				// 1: Adding runs to merging queue
+				for (unsigned int runIndex = 0; runIndex < blocksPerMemory - 1 && (PSCurrentRunsInputIndex * PSCurrentRunSize) < this->tapeSize; runIndex++, PSCurrentRunsInputIndex++) {
+					PSCurrentRunsCount++;
+					PSMergingQueue.push(queueElement{
+							.rIndex = PSCurrentRunsInputIndex,
+							.rElement = 0,
+							.rData = PSInputTape->getRecord(PSCurrentRunsInputIndex * PSCurrentRunSize)
+						});
+				}
+
+				// 2: merge with merging queue
+				while (PSMergingQueue.size() > 0) {
+					// Adding edge element to output file
+					queueElement edgeElement = PSMergingQueue.top();
+					PSMergingQueue.pop();
+
+					PSOutputTape->setRecord(PSOutputTapeInsertIndex, edgeElement.rData);
+					PSOutputTapeInsertIndex++;
+
+					// Adding element to merging queue
+					if (edgeElement.rElement < PSCurrentRunSize - 1 && edgeElement.rElement + 1 + edgeElement.rIndex * PSCurrentRunSize < this->tapeSize) {
+						PSMergingQueue.push(queueElement{
+							.rIndex = edgeElement.rIndex,
+							.rElement = edgeElement.rElement + 1,
+							.rData = PSInputTape->getRecord(edgeElement.rIndex * PSCurrentRunSize + edgeElement.rElement + 1, (edgeElement.rElement + 1) % BLOCK_SIZE != 0)
+							});
+					}
+				}
+			} while (PSOutputTapeInsertIndex < this->tapeSize);
+
+			fileTape* tempTape = PSInputTape;
+			PSInputTape = PSOutputTape;
+			PSOutputTape = tempTape;
+
+			PSCurrentRunSize *= (blocksPerMemory - 1);
+		} while (PSCurrentRunsCount > 1);
+
+		if (PSOutputTape == this->mainTape) {
+			for (unsigned int index = 0; index < this->tapeSize; index++) {
+				PSOutputTape->setRecord(index, PSInputTape->getRecord(index, true));
+			}
+		}
+
+		// Metadata
+		this->phazesCount = PSCurrentPhazesCount - 1; // adjusting for overcounting
+		this->saveSotingMetadata();
+
+		// Sanity check
+		if (!this->mainTape->checkIfSorted()) throw std::runtime_error("YOU FUCKED UP SORTING AGAIN!!!");
+		*/
 	}
 }
 

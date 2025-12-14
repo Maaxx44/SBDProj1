@@ -22,8 +22,8 @@
 #include "functionParameterUnion.h"
 
 // Data parameters
-#define BLOCK_SIZE 32 // how many records in a block
-#define blocksPerMemory 16 // how many block can we read into memory
+#define BLOCK_SIZE 3 // 32 // how many records in a block
+#define blocksPerMemory 3 // 16 // how many block can we read into memory
 
 
 // Optimizations

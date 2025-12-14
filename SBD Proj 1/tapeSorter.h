@@ -39,10 +39,17 @@ private:
 	
 	// for partial sorting - unaffected by whole sorting
 	sortingStage currentSortStage;
+	unsigned int stage2NestedLevel = 0;
+	fileTape* PSOutputTape = this->mainTape;
+	fileTape* PSInputTape = &this->workTape;
 	std::priority_queue<queueElement, std::vector<queueElement>, Compare> PSMergingQueue;
-	unsigned int PSRunIndex = 0;
-	unsigned int PSOutputIndex = 0;
+	unsigned int PSCurrentRunsCount = 0;
+	unsigned int PSCurrentPhazesCount = 0;
+	unsigned int PSCurrentRunSize = this->runSize;
+	unsigned int PSCurrentRunsInputIndex = 0;
+	unsigned int PSOutputTapeInsertIndex = 0;
 	unsigned int PSNextRunInQueue = 0;
+	unsigned int PSRunIndex = 0;
 
 public:
 	tapeSorter();

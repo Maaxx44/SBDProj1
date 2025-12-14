@@ -40,6 +40,7 @@ public:
 	void setSize(unsigned int newSize);
 	void clear();
 
+	bool checkIfSorted();
 	void dumpToFile(std::ofstream* filePath);
 	fileTape static getFileTapeFromDisk(std::ifstream* filePath) {
 		if (filePath == nullptr || !filePath->is_open()) throw std::runtime_error("getFileTapeFromDisk error: filePath was NULL");

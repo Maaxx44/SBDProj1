@@ -92,7 +92,7 @@ unsigned int fileTape::getSize() const {
 	return this->dataLength;
 }
 void fileTape::setSize(unsigned int newSize) {
-	this->dataFile.resize(newSize, dataBlock());
+	this->dataFile.resize(ceil((double)newSize / BLOCK_SIZE), dataBlock());
 	this->dataLength = newSize;
 }
 void fileTape::clear() {
@@ -100,6 +100,14 @@ void fileTape::clear() {
 	this->dataLength = 0;
 }
 
+bool fileTape::checkIfSorted() {
+	for (unsigned int index = 0; index < this->dataLength - 1; index++) {
+		if (this->getRecord(index).calculateArea() < this->getRecord(index + 1).calculateArea()) {
+			return false;
+		}
+	}
+	return true;
+}
 void fileTape::dumpToFile(std::ofstream* filePath) {
 	for (unsigned int recordIndex = 0; recordIndex < this->dataLength; recordIndex++) {
 		record nextRecord = this->getRecord(recordIndex);
