@@ -132,14 +132,69 @@ void tapeSorter::sortTapeFull() {
 					});
 			}
 		}
+		this->phazesCount = 1;
 	}
 	else {
+		// Main sorting pointers
+		fileTape* outputTape = &this->workTape;
+		fileTape* inputTape = this->mainTape;
+		std::priority_queue<queueElement, std::vector<queueElement>, Compare> mergingQueue;
+
+		unsigned int currentRunsCount = 0;
+		unsigned int currentPhazesCount = 0;
+		unsigned int currentRunSize = this->runSize;
+		unsigned int currentRunsInputIndex = 0;
+		unsigned int outputTapeInsertIndex = 0;
+
+		do {
+			outputTapeInsertIndex = 0;
+			currentRunsInputIndex = 0;
+			currentRunsCount = 0;
+			currentPhazesCount++;
+
+			do {
+				// Adding runs to merging queue
+				for (; currentRunsInputIndex < blocksPerMemory - 1 && (currentRunsInputIndex * currentRunSize) < this->tapeSize; currentRunsInputIndex++) {
+					currentRunsCount++;
+					mergingQueue.push(queueElement{
+							.rIndex = currentRunsInputIndex,
+							.rElement = 0,
+							.rData = inputTape->getRecord(currentRunsInputIndex * currentRunSize)
+						});
+				}
+
+				// 2: merge with merging queue
+				while (mergingQueue.size() > 0) {
+					// Adding edge element to output file
+					queueElement edgeElement = mergingQueue.top();
+					mergingQueue.pop();
+
+					outputTape->setRecord(outputTapeInsertIndex, edgeElement.rData);
+					outputTapeInsertIndex++;
+
+					// Adding element to merging queue
+					if (edgeElement.rElement < currentRunSize - 1 && edgeElement.rElement + 1 + edgeElement.rIndex * currentRunSize < this->tapeSize) {
+						mergingQueue.push(queueElement{
+							.rIndex = edgeElement.rIndex,
+							.rElement = edgeElement.rElement + 1,
+							.rData = inputTape->getRecord(edgeElement.rIndex * currentRunSize + edgeElement.rElement + 1)
+						});
+					}
+				}
+			} while (outputTapeInsertIndex != this->tapeSize);
+			currentRunSize *= (blocksPerMemory - 1);
+		} while (currentRunsCount > 1);
+		// We are left with one runt what *should* be sorted
+		
+		this->phazesCount = currentPhazesCount;
+
+		// Legacy Code
+		/*
 		// Stage 1.5 (Stage 2 setup)
 		//  Clearing up main tape to make room for sorted elements (I think it might not be necesarry if we override all elements with sorted ones, but I guess it is nicer)
 		this->mainTape->clear();
 		this->mainTape->setSize(this->tapeSize);
 		//  Creating prio. queue for mering runs
-		std::priority_queue<queueElement, std::vector<queueElement>, Compare> mergingQueue;
 		// Iterating over blocksPerMemory runs and pushing first value to PQ
 		for (unsigned int runIndex = 0; runIndex < blocksPerMemory; runIndex++) {
 			mergingQueue.push(queueElement{
@@ -150,8 +205,13 @@ void tapeSorter::sortTapeFull() {
 		}
 
 		unsigned int nextRunInQueue = blocksPerMemory;
+		unsigned int currentRunsCount = blocksPerMemory;
 
 		// Stage 2 
+
+
+
+
 		for (unsigned int outputIndex = 0; mergingQueue.size() > 0 && outputIndex < this->tapeSize; outputIndex++) {
 			/// getting smallest/largest value and removing from queue
 			queueElement edgeElement = mergingQueue.top();
@@ -189,6 +249,7 @@ void tapeSorter::sortTapeFull() {
 				nextRunInQueue++;
 			}
 		}
+		*/
 	}
 
 	// Metadata
